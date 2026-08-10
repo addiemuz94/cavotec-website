@@ -1,0 +1,268 @@
+---
+import Layout from '../layouts/Layout.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const products = [
+	{ name: 'Minisonic MS20', slug: 'minisonic-ms20', category: 'Test and Measurement' },
+	{ name: 'The DigiSonic DS10', slug: 'digisonic-ds10', category: 'Test and Measurement' },
+	{ name: 'The Lindos Analyser LA100', slug: 'lindos-analyser-la100', category: 'Test and Measurement' },
+	{ name: 'The MiniSonic MS10', slug: 'minisonic-ms10', category: 'Test and Measurement' },
+];
+
+// Look for a matching image in public/images/products/<slug>.<ext>.
+// If nothing is found, the card falls back to a clean placeholder so it's
+// obvious real product photography still needs to be dropped in.
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
+const PRODUCTS_IMAGE_DIR = path.join(process.cwd(), 'public', 'images', 'products');
+
+const catalog = products.map((product) => {
+	let imageSrc = null;
+	for (const ext of IMAGE_EXTENSIONS) {
+		const filePath = path.join(PRODUCTS_IMAGE_DIR, `${product.slug}.${ext}`);
+		if (fs.existsSync(filePath)) {
+			imageSrc = `/images/products/${product.slug}.${ext}`;
+			break;
+		}
+	}
+	return { ...product, imageSrc };
+});
+---
+
+<Layout
+	title="Products — Cavotec Malaysia Sdn Bhd"
+	description="Browse Cavotec Malaysia's test and measurement product catalog, including the Minisonic MS20, DigiSonic DS10, Lindos Analyser LA100, and MiniSonic MS10."
+>
+	<section class="page-header">
+		<div class="page-header-grid" aria-hidden="true"></div>
+		<div class="page-header-inner" data-reveal>
+			<span class="eyebrow">Our Catalog</span>
+			<h1>Products</h1>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="products">
+		<div class="products-inner">
+			<div class="products-grid">
+				{catalog.map((product, index) => (
+					<article class="product-card tech-card" data-reveal style={`--reveal-i: ${index};`}>
+						<div class="product-image">
+							{product.imageSrc ? (
+								<img src={product.imageSrc} alt={product.name} loading="lazy" />
+							) : (
+								<div class="image-placeholder">
+									<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+										<rect x="3" y="4" width="18" height="16" rx="2" />
+										<circle cx="8.5" cy="9.5" r="1.5" />
+										<path d="M21 16l-5.5-5.5a1.5 1.5 0 0 0-2.1 0L4 19" />
+									</svg>
+									<strong>{product.name}</strong>
+									<span>Image placeholder — add photo</span>
+								</div>
+							)}
+						</div>
+						<div class="product-body">
+							<span class="category-badge spec-mono">{product.category}</span>
+							<h2>{product.name}</h2>
+							<a href="#" class="btn-details">View Details</a>
+						</div>
+					</article>
+				))}
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	section {
+		width: 100%;
+	}
+
+	/* Page header */
+	.page-header {
+		position: relative;
+		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
+		color: #ffffff;
+		padding: 4.5rem 1.5rem 3.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.page-header-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image:
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px),
+			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: radial-gradient(ellipse at center, black 15%, transparent 75%);
+	}
+
+	.page-header-inner {
+		max-width: 760px;
+		margin: 0 auto;
+		position: relative;
+	}
+
+	.eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-amber);
+		margin-bottom: 0.75rem;
+	}
+
+	.page-header h1 {
+		font-size: clamp(2rem, 4.5vw, 2.75rem);
+		font-weight: 700;
+		margin: 0;
+	}
+
+	/* Products */
+	.products {
+		background: var(--color-bg-alt);
+		padding: 5rem 1.5rem;
+	}
+
+	.products-inner {
+		max-width: 1000px;
+		margin: 0 auto;
+	}
+
+	.products-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 2rem;
+	}
+
+	.product-card {
+		background: var(--color-bg);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		transition: transform 0.25s ease, box-shadow 0.25s ease;
+	}
+
+	.product-image {
+		aspect-ratio: 4 / 3;
+		width: 100%;
+		background: var(--color-bg-alt);
+	}
+
+	.product-image img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.image-placeholder {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		text-align: center;
+		padding: 1.5rem;
+		color: #94a1b2;
+		background: repeating-linear-gradient(
+			135deg,
+			#eef1f5,
+			#eef1f5 10px,
+			#e6eaf0 10px,
+			#e6eaf0 20px
+		);
+		border-bottom: 1px dashed var(--color-border);
+	}
+
+	.image-placeholder strong {
+		font-size: 0.95rem;
+		color: var(--color-indigo);
+	}
+
+	.image-placeholder span {
+		font-size: 0.78rem;
+		color: #94a1b2;
+	}
+
+	.product-body {
+		padding: 1.75rem;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.75rem;
+		flex: 1;
+	}
+
+	.category-badge {
+		display: inline-block;
+		font-size: 0.72rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: var(--color-indigo);
+		background: rgba(11, 30, 58, 0.08);
+		padding: 0.35rem 0.85rem;
+		border-radius: 999px;
+	}
+
+	.product-body h2 {
+		font-size: 1.15rem;
+		font-weight: 700;
+		color: var(--color-text);
+		margin: 0;
+	}
+
+	.btn-details {
+		margin-top: auto;
+		display: inline-block;
+		padding: 0.65rem 1.5rem;
+		border-radius: 4px;
+		font-family: var(--font-display);
+		font-size: 0.88rem;
+		font-weight: 600;
+		color: var(--color-indigo);
+		background: var(--color-bg-alt);
+		border: 1.5px solid var(--color-indigo);
+		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+	}
+
+	.btn-details:hover,
+	.btn-details:focus-visible {
+		background: var(--color-teal);
+		border-color: var(--color-teal);
+		color: var(--color-indigo);
+		transform: translateY(-2px);
+		box-shadow: 0 8px 20px rgba(var(--color-teal-rgb), 0.35);
+	}
+
+	@media (max-width: 700px) {
+		.products-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.page-header {
+			padding: 3.5rem 1.25rem 2.75rem;
+		}
+
+		.products {
+			padding: 3.5rem 1.25rem;
+		}
+
+		.product-body {
+			padding: 1.5rem;
+		}
+	}
+</style>

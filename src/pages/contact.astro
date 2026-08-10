@@ -1,0 +1,448 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const contactDetails = [
+	{
+		label: 'Phone',
+		value: '+603-9082 5329, +6019-255 6908',
+		icon: 'phone',
+	},
+	{
+		label: 'Email',
+		value: 'admin@cavotec.com.my',
+		icon: 'email',
+	},
+	{
+		label: 'Office',
+		value: 'No. 28 Jalan CJ3/13-4 Batu 11, Taman Cheras Jaya, 43200 Cheras, Selangor, Malaysia',
+		icon: 'pin',
+	},
+];
+
+const mapEmbedUrl =
+	'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3984.2704138984013!2d101.75725931387028!3d3.021871354766775!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31cdcb25eac42e95%3A0xa9b2070c01e14c66!2sCavotec+Malaysia+Sdn+Bhd!5e0!3m2!1sen!2s!4v1499757443687';
+---
+
+<Layout
+	title="Contact Us — Cavotec Malaysia Sdn Bhd"
+	description="Get in touch with Cavotec Malaysia Sdn Bhd — phone, email, office location, and an online enquiry form."
+>
+	<section class="page-header">
+		<div class="page-header-grid" aria-hidden="true"></div>
+		<div class="page-header-inner" data-reveal>
+			<span class="eyebrow">Get In Touch</span>
+			<h1>Contact Us</h1>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="contact">
+		<div class="contact-inner">
+			<div class="contact-grid">
+				<div class="contact-info" data-reveal>
+					<ul class="contact-details">
+						{contactDetails.map((detail) => (
+							<li>
+								<span class="contact-icon" aria-hidden="true">
+									{detail.icon === 'phone' && (
+										<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M5 4h4l1.5 5-2.5 1.5a12 12 0 0 0 5.5 5.5L15 13.5l5 1.5v4a2 2 0 0 1-2 2C10.5 21 3 13.5 3 6a2 2 0 0 1 2-2z" />
+										</svg>
+									)}
+									{detail.icon === 'email' && (
+										<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+											<rect x="3" y="5" width="18" height="14" rx="2" />
+											<path d="M3.5 6.5L12 13l8.5-6.5" />
+										</svg>
+									)}
+									{detail.icon === 'pin' && (
+										<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z" />
+											<circle cx="12" cy="9" r="2.5" />
+										</svg>
+									)}
+								</span>
+								<div class="contact-text">
+									<span class="contact-label spec-mono">{detail.label}</span>
+									<span class="contact-value spec-mono">{detail.value}</span>
+								</div>
+							</li>
+						))}
+					</ul>
+
+					<div class="map-wrapper">
+						<iframe
+							src={mapEmbedUrl}
+							width="600"
+							height="450"
+							style="border:0;"
+							allowfullscreen
+							loading="lazy"
+							referrerpolicy="no-referrer-when-downgrade"
+							title="Cavotec Malaysia Sdn Bhd location"
+						></iframe>
+					</div>
+				</div>
+
+				<div class="contact-form-column" data-reveal style="--reveal-i: 1;">
+					<div class="form-wrapper">
+						<form id="contact-form" class="contact-form">
+							<div class="form-field">
+								<label for="name">Name</label>
+								<input type="text" id="name" name="name" required autocomplete="name" />
+							</div>
+
+							<div class="form-field">
+								<label for="email">Email</label>
+								<input type="email" id="email" name="email" required autocomplete="email" />
+							</div>
+
+							<div class="form-field">
+								<label for="message">Message</label>
+								<textarea id="message" name="message" rows="6" required></textarea>
+							</div>
+
+							<input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE" />
+
+							<div id="form-error" class="form-feedback form-error" hidden>
+								<p>Something went wrong sending your message. Please try again, or reach us directly using the details on the left.</p>
+							</div>
+
+							<button type="submit" class="btn-submit">Send Message</button>
+						</form>
+
+						<div id="form-success" class="form-feedback form-success" hidden>
+							<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<circle cx="12" cy="12" r="9" />
+								<path d="M8 12.5l2.5 2.5L16 9" />
+							</svg>
+							<h3>Thank you!</h3>
+							<p>Your message has been sent successfully. We'll get back to you shortly.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<script>
+	const form = document.getElementById('contact-form');
+	const successEl = document.getElementById('form-success');
+	const errorEl = document.getElementById('form-error');
+
+	if (form instanceof HTMLFormElement) {
+		form.addEventListener('submit', async (event) => {
+			event.preventDefault();
+
+			const submitBtn = form.querySelector('button[type="submit"]');
+			if (errorEl) errorEl.hidden = true;
+			if (submitBtn instanceof HTMLButtonElement) {
+				submitBtn.disabled = true;
+				submitBtn.textContent = 'Sending...';
+			}
+
+			try {
+				const formData = new FormData(form);
+				const response = await fetch('https://api.web3forms.com/submit', {
+					method: 'POST',
+					headers: { Accept: 'application/json' },
+					body: formData,
+				});
+				const result = await response.json().catch(() => null);
+
+				if (response.ok && result && result.success) {
+					form.hidden = true;
+					if (successEl) successEl.hidden = false;
+				} else if (errorEl) {
+					errorEl.hidden = false;
+				}
+			} catch (err) {
+				if (errorEl) errorEl.hidden = false;
+			} finally {
+				if (submitBtn instanceof HTMLButtonElement) {
+					submitBtn.disabled = false;
+					submitBtn.textContent = 'Send Message';
+				}
+			}
+		});
+	}
+</script>
+
+<style>
+	section {
+		width: 100%;
+	}
+
+	/* Page header */
+	.page-header {
+		position: relative;
+		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
+		color: #ffffff;
+		padding: 4.5rem 1.5rem 3.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.page-header-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image:
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px),
+			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: radial-gradient(ellipse at center, black 15%, transparent 75%);
+	}
+
+	.page-header-inner {
+		max-width: 760px;
+		margin: 0 auto;
+		position: relative;
+	}
+
+	.eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-amber);
+		margin-bottom: 0.75rem;
+	}
+
+	.page-header h1 {
+		font-size: clamp(2rem, 4.5vw, 2.75rem);
+		font-weight: 700;
+		margin: 0;
+	}
+
+	/* Contact section */
+	.contact {
+		background: var(--color-bg-alt);
+		padding: 5rem 1.5rem;
+	}
+
+	.contact-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+	}
+
+	.contact-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 3rem;
+		align-items: start;
+	}
+
+	/* Left column: contact details + map */
+	.contact-details {
+		list-style: none;
+		margin: 0 0 2rem;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.contact-details li {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		background: var(--color-bg);
+		border: 1px solid var(--color-border);
+		border-radius: 10px;
+		padding: 1.25rem 1.5rem;
+	}
+
+	.contact-icon {
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: rgba(11, 30, 58, 0.06);
+		color: var(--color-indigo);
+	}
+
+	.contact-text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+	}
+
+	.contact-label {
+		font-size: 0.72rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-teal-dark, #018b96);
+	}
+
+	.contact-value {
+		font-size: 0.9rem;
+		line-height: 1.6;
+		color: var(--color-text);
+	}
+
+	.map-wrapper {
+		position: relative;
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		border-radius: 10px;
+		overflow: hidden;
+		border: 1px solid var(--color-border);
+	}
+
+	.map-wrapper iframe {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	/* Right column: form */
+	.form-wrapper {
+		background: var(--color-bg);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		padding: 2.25rem;
+	}
+
+	.contact-form {
+		display: flex;
+		flex-direction: column;
+		gap: 1.35rem;
+	}
+
+	.form-field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.form-field label {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--color-indigo);
+	}
+
+	.form-field input,
+	.form-field textarea {
+		font: inherit;
+		font-size: 0.96rem;
+		color: var(--color-text);
+		background: var(--color-bg-alt);
+		border: 1px solid var(--color-border);
+		border-radius: 6px;
+		padding: 0.75rem 0.9rem;
+		resize: vertical;
+		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	.form-field input:focus,
+	.form-field textarea:focus {
+		outline: none;
+		border-color: var(--color-teal);
+		box-shadow: 0 0 0 3px rgba(var(--color-teal-rgb), 0.18);
+	}
+
+	.btn-submit {
+		align-self: flex-start;
+		display: inline-block;
+		padding: 0.85rem 2.25rem;
+		border: none;
+		border-radius: 4px;
+		font-family: var(--font-display);
+		font-size: 0.95rem;
+		font-weight: 600;
+		letter-spacing: 0.01em;
+		color: var(--color-indigo);
+		background: var(--color-amber);
+		box-shadow: 0 6px 18px rgba(var(--color-amber-rgb), 0.35);
+		cursor: pointer;
+		transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, opacity 0.15s ease;
+	}
+
+	.btn-submit:hover:not(:disabled),
+	.btn-submit:focus-visible:not(:disabled) {
+		background: #ffb85e;
+		transform: translateY(-2px);
+		box-shadow: 0 10px 24px rgba(var(--color-amber-rgb), 0.45);
+	}
+
+	.btn-submit:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
+		transform: none;
+	}
+
+	.form-feedback.form-error {
+		background: rgba(217, 66, 47, 0.08);
+		border: 1px solid rgba(217, 66, 47, 0.25);
+		color: #a3341f;
+		border-radius: 6px;
+		padding: 0.9rem 1.1rem;
+		font-size: 0.88rem;
+		line-height: 1.5;
+	}
+
+	.form-feedback.form-error p {
+		margin: 0;
+	}
+
+	.form-feedback.form-success {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 0.75rem;
+		padding: 2.5rem 1.5rem;
+		color: var(--color-indigo);
+	}
+
+	.form-feedback.form-success svg {
+		color: #1f9d55;
+	}
+
+	.form-feedback.form-success h3 {
+		margin: 0;
+		font-size: 1.25rem;
+	}
+
+	.form-feedback.form-success p {
+		margin: 0;
+		font-size: 0.95rem;
+		color: var(--color-text-muted);
+		max-width: 32ch;
+	}
+
+	@media (max-width: 900px) {
+		.contact-grid {
+			grid-template-columns: 1fr;
+			gap: 2.5rem;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.page-header {
+			padding: 3.5rem 1.25rem 2.75rem;
+		}
+
+		.contact {
+			padding: 3.5rem 1.25rem;
+		}
+
+		.form-wrapper {
+			padding: 1.75rem;
+		}
+
+		.contact-details li {
+			padding: 1rem 1.25rem;
+		}
+	}
+</style>

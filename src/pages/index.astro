@@ -1,11 +1,373 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const services = [
+	{
+		title: 'Test and Measurement Solutions',
+		icon: 'gauge',
+	},
+	{
+		title: 'Telecommunication Equipment',
+		icon: 'tower',
+	},
+	{
+		title: 'RF, Microwave & Radio Accessories',
+		icon: 'signal',
+	},
+	{
+		title: 'Test Equipment Repair, Calibration and Training',
+		icon: 'wrench',
+	},
+	{
+		title: 'Test Equipment Rental',
+		icon: 'clock',
+	},
+];
+
+// Build a seamless repeating sine-wave path for the hero's animated
+// "signal" line. The pattern is drawn twice back to back (0–800 and
+// 800–1600) so translating the rendered SVG by exactly half its width
+// loops without a visible seam.
+const SEGMENT_WIDTH = 40;
+const SEGMENTS_PER_CYCLE = 20; // 20 * 40 = 800 units per repeat
+const AMPLITUDE = 10;
+
+function buildWaveSegment(offsetX) {
+	let d = `M${offsetX},20`;
+	for (let i = 0; i < SEGMENTS_PER_CYCLE; i++) {
+		const x0 = offsetX + i * SEGMENT_WIDTH;
+		const x1 = x0 + SEGMENT_WIDTH / 4;
+		const x2 = x0 + (SEGMENT_WIDTH * 3) / 4;
+		const x3 = x0 + SEGMENT_WIDTH;
+		const cy = i % 2 === 0 ? 20 - AMPLITUDE : 20 + AMPLITUDE;
+		d += ` C${x1},${cy} ${x2},${cy} ${x3},20`;
+	}
+	return d;
+}
+
+const signalWavePath = `${buildWaveSegment(0)} ${buildWaveSegment(800).replace(/^M[\d.]+,20/, 'L800,20')}`;
 ---
 
-<Layout>
-	<Welcome />
+<Layout
+	title="Cavotec Malaysia Sdn Bhd — Test & Measurement Solutions"
+	description="Cavotec Malaysia Sdn Bhd provides test and measurement solutions, telecommunication equipment, RF & microwave accessories, repair, calibration, training and rental services."
+>
+	<section class="hero">
+		<div class="hero-grid" aria-hidden="true"></div>
+		<div class="hero-inner">
+			<h1 data-reveal>Welcome to Cavotec Malaysia Sdn Bhd</h1>
+			<p class="hero-subheading" data-reveal style="--reveal-i: 1;">
+				Home for repair and services of your favorite test and measurement equipment
+			</p>
+
+			<div class="signal-wave" aria-hidden="true">
+				<svg class="signal-wave-svg" viewBox="0 0 1600 40" preserveAspectRatio="none">
+					<path d={signalWavePath} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+				</svg>
+			</div>
+
+			<a href="/services" class="btn btn-accent" data-reveal style="--reveal-i: 2;">Learn More</a>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="services">
+		<div class="services-inner">
+			<h2 data-reveal>List of Services Offered</h2>
+			<div class="services-grid">
+				{services.map((service, index) => (
+					<div class="service-card tech-card" data-reveal style={`--reveal-i: ${index};`}>
+						<span class="service-icon" aria-hidden="true">
+							{service.icon === 'gauge' && (
+								<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M12 21a9 9 0 1 0-9-9" />
+									<path d="M12 21a9 9 0 0 0 9-9" />
+									<path d="M12 12L16 8" />
+									<circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
+								</svg>
+							)}
+							{service.icon === 'tower' && (
+								<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M12 2l7 20M12 2L5 22" />
+									<path d="M8.5 12h7M6.5 17h11" />
+									<path d="M12 2v4" />
+								</svg>
+							)}
+							{service.icon === 'signal' && (
+								<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M4 12a8 8 0 0 1 16 0" />
+									<path d="M7.5 12a4.5 4.5 0 0 1 9 0" />
+									<circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none" />
+									<path d="M12 13.3V19" />
+								</svg>
+							)}
+							{service.icon === 'wrench' && (
+								<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M14.7 6.3a4 4 0 0 0-5.4 4.6L4 16.2V20h3.8l5.3-5.3a4 4 0 0 0 4.6-5.4l-2.6 2.6-2-2 2.6-2.6z" />
+								</svg>
+							)}
+							{service.icon === 'clock' && (
+								<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+									<circle cx="12" cy="12" r="9" />
+									<path d="M12 7v5l3.5 2" />
+								</svg>
+							)}
+						</span>
+						<h3>{service.title}</h3>
+					</div>
+				))}
+			</div>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="closing-cta">
+		<div class="closing-cta-grid" aria-hidden="true"></div>
+		<div class="closing-cta-inner" data-reveal>
+			<h2>Need High Quality Services? Call Us!</h2>
+			<a href="/contact" class="btn btn-warm">Get in Touch</a>
+		</div>
+	</section>
 </Layout>
+
+<style>
+	section {
+		width: 100%;
+	}
+
+	.btn {
+		display: inline-block;
+		padding: 0.85rem 2rem;
+		border-radius: 4px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: 0.01em;
+		transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+	}
+
+	.btn-accent {
+		background: var(--color-teal);
+		color: var(--color-indigo);
+		box-shadow: 0 6px 20px rgba(var(--color-teal-rgb), 0.35);
+	}
+
+	.btn-accent:hover,
+	.btn-accent:focus-visible {
+		background: #00d9eb;
+		transform: translateY(-2px);
+		box-shadow: 0 10px 26px rgba(var(--color-teal-rgb), 0.45);
+	}
+
+	/* Warm, customer-facing CTA — the one place amber takes the lead */
+	.btn-warm {
+		background: var(--color-amber);
+		color: var(--color-indigo);
+		box-shadow: 0 6px 20px rgba(var(--color-amber-rgb), 0.35);
+	}
+
+	.btn-warm:hover,
+	.btn-warm:focus-visible {
+		background: #ffb85e;
+		transform: translateY(-2px);
+		box-shadow: 0 10px 26px rgba(var(--color-amber-rgb), 0.45);
+	}
+
+	/* Hero */
+	.hero {
+		position: relative;
+		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
+		color: #ffffff;
+		padding: 6.5rem 1.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	/* Faint oscilloscope-style grid texture */
+	.hero-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image:
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.09) 0 1px, transparent 1px 48px),
+			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.09) 0 1px, transparent 1px 48px);
+		mask-image: radial-gradient(ellipse at center, black 15%, transparent 75%);
+	}
+
+	.hero-inner {
+		max-width: 760px;
+		margin: 0 auto;
+		position: relative;
+	}
+
+	.hero h1 {
+		font-size: clamp(2rem, 4.5vw, 3rem);
+		font-weight: 700;
+		line-height: 1.2;
+		margin: 0 0 1.25rem;
+	}
+
+	.hero-subheading {
+		font-size: clamp(1rem, 2vw, 1.25rem);
+		color: #cfdbe8;
+		line-height: 1.6;
+		margin: 0 0 2.25rem;
+	}
+
+	/* Animated signal-wave line */
+	.signal-wave {
+		width: 100%;
+		max-width: 280px;
+		height: 32px;
+		margin: 0 auto 2.25rem;
+		overflow: hidden;
+		color: var(--color-teal);
+		opacity: 0.85;
+	}
+
+	.signal-wave-svg {
+		display: block;
+		width: 200%;
+		height: 100%;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.signal-wave-svg {
+			animation: signal-scroll 7s linear infinite;
+		}
+	}
+
+	@keyframes signal-scroll {
+		from {
+			transform: translateX(0);
+		}
+		to {
+			transform: translateX(-50%);
+		}
+	}
+
+	/* Services */
+	.services {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.services-inner {
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+
+	.services h2 {
+		text-align: center;
+		font-size: clamp(1.6rem, 3vw, 2.2rem);
+		color: var(--color-indigo);
+		margin: 0 0 3rem;
+		position: relative;
+	}
+
+	.services h2::after {
+		content: '';
+		display: block;
+		width: 64px;
+		height: 3px;
+		background: var(--color-teal);
+		margin: 0.9rem auto 0;
+		border-radius: 2px;
+	}
+
+	.services-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: 1.75rem;
+	}
+
+	.service-card {
+		background: var(--color-bg);
+		border: 1px solid var(--color-border, #e1e6ee);
+		border-radius: 10px;
+		padding: 2.25rem 1.5rem;
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+		transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+	}
+
+	.service-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 60px;
+		height: 60px;
+		border-radius: 50%;
+		background: rgba(11, 30, 58, 0.06);
+		color: var(--color-indigo);
+		transition: background 0.25s ease, color 0.25s ease;
+	}
+
+	.service-card:hover .service-icon {
+		background: var(--color-teal);
+		color: var(--color-indigo);
+	}
+
+	.service-card h3 {
+		font-family: var(--font-display);
+		font-size: 1.05rem;
+		font-weight: 600;
+		color: var(--color-text);
+		margin: 0;
+		line-height: 1.4;
+	}
+
+	/* Closing CTA */
+	.closing-cta {
+		position: relative;
+		background: var(--color-indigo);
+		color: #ffffff;
+		padding: 4.5rem 1.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.closing-cta-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image: repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: linear-gradient(to bottom, black, transparent);
+	}
+
+	.closing-cta-inner {
+		max-width: 640px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.75rem;
+	}
+
+	.closing-cta h2 {
+		font-size: clamp(1.5rem, 3vw, 2rem);
+		margin: 0;
+	}
+
+	@media (max-width: 600px) {
+		.hero {
+			padding: 4.5rem 1.25rem;
+		}
+
+		.services,
+		.closing-cta {
+			padding: 3.5rem 1.25rem;
+		}
+
+		.service-card {
+			padding: 1.75rem 1.25rem;
+		}
+	}
+</style>
