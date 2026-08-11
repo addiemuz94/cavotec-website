@@ -27,24 +27,83 @@ const catalog = products.map((product) => {
 	}
 	return { ...product, imageSrc };
 });
+
+// Mirrors the "Our Business" mega-menu structure in Layout.astro — keep the
+// anchors and hierarchy here in sync with `ourBusinessMenu` there.
+const tocLinks = [
+	{ href: '#calibration-test-equipment-automation', label: 'Calibration & Test Equipment Automation' },
+	{ href: '#internet-of-things-iot', label: 'Internet of Things (IoT)' },
+];
+
+const iotItems = [
+	{
+		id: 'smart-key-management-system-ekms',
+		title: 'Smart Key Management System (eKMS)',
+		description: 'Secure, connected key control and tracking. Visit kms-cvt.com for full details.',
+		href: 'https://kms-cvt.com',
+		external: true,
+		icon: 'key',
+		flow: [
+			{ label: 'Device / Key', icon: 'key' },
+			{ label: 'Secure Access Data', icon: 'lock' },
+			{ label: 'Central Dashboard', icon: 'dashboard' },
+			{ label: 'Access Granted / Logged', icon: 'check' },
+		],
+	},
+	{
+		id: 'integrated-alarm-system',
+		title: 'Integrated Alarm System',
+		description:
+			'Centralized, connected alarm monitoring and control for your facility — full product details are coming soon.',
+		icon: 'alarm',
+		flow: [
+			{ label: 'Sensor Trigger', icon: 'sensorTrigger' },
+			{ label: 'Signal Processing', icon: 'chip' },
+			{ label: 'Alert Dashboard', icon: 'dashboard' },
+			{ label: 'Notification Sent', icon: 'bellNotify' },
+		],
+	},
+	{
+		id: 'smart-building-management-monitoring-system',
+		title: 'Smart Building Management and Monitoring System (BMS)',
+		description:
+			'Real-time building systems monitoring and management from a single connected platform — full product details are coming soon.',
+		icon: 'building',
+		flow: [
+			{ label: 'Building Sensors', icon: 'buildingSensor' },
+			{ label: 'Data Collection', icon: 'database' },
+			{ label: 'Monitoring Dashboard', icon: 'dashboard' },
+			{ label: 'Automated Response', icon: 'gearAuto' },
+		],
+	},
+];
 ---
 
 <Layout
 	title="Products — Cavotec Malaysia Sdn Bhd"
-	description="Browse Cavotec Malaysia's test and measurement product catalog, including the Minisonic MS20, DigiSonic DS10, Lindos Analyser LA100, and MiniSonic MS10."
+	description="Browse Cavotec Malaysia's calibration and test equipment automation catalog alongside our growing Internet of Things (IoT) product line."
 >
 	<section class="page-header">
-		<div class="page-header-grid" aria-hidden="true"></div>
+		<div class="page-header-grid" aria-hidden="true" data-parallax-bg></div>
 		<div class="page-header-inner" data-reveal>
 			<span class="eyebrow">Our Catalog</span>
 			<h1>Products</h1>
 		</div>
 	</section>
 
+	<nav class="page-subnav" aria-label="Products on this page">
+		<div class="page-subnav-inner">
+			{tocLinks.map((link) => (
+				<a href={link.href}>{link.label}</a>
+			))}
+		</div>
+	</nav>
+
 	<div class="tick-divider" aria-hidden="true"></div>
 
-	<section class="products">
+	<section class="products anchor" id="calibration-test-equipment-automation">
 		<div class="products-inner">
+			<h2 class="section-heading" data-reveal>Calibration and Test Equipment Automation</h2>
 			<div class="products-grid">
 				{catalog.map((product, index) => (
 					<article class="product-card tech-card" data-reveal style={`--reveal-i: ${index};`}>
@@ -65,11 +124,163 @@ const catalog = products.map((product) => {
 						</div>
 						<div class="product-body">
 							<span class="category-badge spec-mono">{product.category}</span>
-							<h2>{product.name}</h2>
+							<h3>{product.name}</h3>
 							<a href="#" class="btn-details">View Details</a>
 						</div>
 					</article>
 				))}
+			</div>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="iot-section anchor" id="internet-of-things-iot">
+		<div class="iot-inner">
+			<h2 class="section-heading" data-reveal>Internet of Things (IoT)</h2>
+			<p class="iot-intro" data-reveal style="--reveal-i: 1;">
+				Our growing IoT portfolio brings connected, remotely managed hardware to the same test
+				and measurement expertise Cavotec Malaysia is known for.
+			</p>
+			<div class="iot-grid">
+				{iotItems.map((item, index) => {
+					const Tag = item.external ? 'a' : 'div';
+					return (
+						<div class="iot-item tech-card" data-reveal style={`--reveal-i: ${index + 2};`}>
+							<Tag
+								class="iot-card anchor"
+								id={item.id}
+								{...(item.external
+									? { href: item.href, target: '_blank', rel: 'noopener noreferrer', 'aria-label': `${item.title} (opens in a new tab)` }
+									: {})}
+							>
+								<span class="iot-card-icon" aria-hidden="true">
+									{item.icon === 'key' && (
+										<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+											<circle cx="8" cy="8" r="4" />
+											<path d="M11 11l9 9" />
+											<path d="M17 17l2-2" />
+											<path d="M15 19l2-2" />
+										</svg>
+									)}
+									{item.icon === 'alarm' && (
+										<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+											<path d="M13.73 21a2 2 0 0 1-3.46 0" />
+										</svg>
+									)}
+									{item.icon === 'building' && (
+										<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+											<rect x="4" y="3" width="10" height="18" rx="1" />
+											<rect x="14" y="9" width="6" height="12" rx="1" />
+											<path d="M7 7h1M10 7h1M7 11h1M10 11h1M7 15h1M10 15h1M16.5 12.5h1M16.5 15.5h1" />
+										</svg>
+									)}
+								</span>
+								<div class="iot-card-body">
+									{!item.external && <span class="placeholder-tag">Coming soon</span>}
+									<h3>
+										{item.title}
+										{item.external && (
+											<svg class="external-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+												<path d="M7 17L17 7" />
+												<path d="M8 7h9v9" />
+											</svg>
+										)}
+									</h3>
+									<p>{item.description}</p>
+								</div>
+							</Tag>
+
+							<div class="iot-flow">
+								<span class="iot-flow-title spec-mono">How It Works</span>
+								<ol class="iot-flow-steps">
+									{item.flow.map((step, stepIndex) => (
+										<>
+											<li class="iot-flow-step">
+												<span class="iot-flow-icon" aria-hidden="true">
+													{step.icon === 'key' && (
+														<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+															<circle cx="8" cy="8" r="4" />
+															<path d="M11 11l9 9" />
+															<path d="M17 17l2-2" />
+															<path d="M15 19l2-2" />
+														</svg>
+													)}
+													{step.icon === 'lock' && (
+														<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+															<rect x="5" y="11" width="14" height="9" rx="2" />
+															<path d="M8 11V7a4 4 0 0 1 8 0v4" />
+														</svg>
+													)}
+													{step.icon === 'dashboard' && (
+														<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+															<rect x="3" y="4" width="18" height="12" rx="2" />
+															<path d="M8 20h8M12 16v4" />
+														</svg>
+													)}
+													{step.icon === 'check' && (
+														<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+															<circle cx="12" cy="12" r="9" />
+															<path d="M8 12.5l2.5 2.5L16 9" />
+														</svg>
+													)}
+													{step.icon === 'sensorTrigger' && (
+														<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+															<circle cx="12" cy="12" r="2.5" />
+															<path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3" />
+														</svg>
+													)}
+													{step.icon === 'chip' && (
+														<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+															<rect x="9" y="9" width="6" height="6" rx="1" />
+															<path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3" />
+														</svg>
+													)}
+													{step.icon === 'bellNotify' && (
+														<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+															<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+															<path d="M13.73 21a2 2 0 0 1-3.46 0" />
+															<path d="M4 3.5L5.5 5M20 3.5L18.5 5" />
+														</svg>
+													)}
+													{step.icon === 'buildingSensor' && (
+														<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+															<rect x="5" y="4" width="8" height="16" rx="1" />
+															<rect x="13" y="10" width="6" height="10" rx="1" />
+															<path d="M8 8h1M11 8h1M8 12h1M11 12h1" />
+														</svg>
+													)}
+													{step.icon === 'database' && (
+														<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+															<ellipse cx="12" cy="6" rx="7" ry="3" />
+															<path d="M5 6v12c0 1.66 3.13 3 7 3s7-1.34 7-3V6" />
+															<path d="M5 12c0 1.66 3.13 3 7 3s7-1.34 7-3" />
+														</svg>
+													)}
+													{step.icon === 'gearAuto' && (
+														<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+															<circle cx="12" cy="12" r="3" />
+															<path d="M12 3v3M12 18v3M4.2 7.8l2.1 1.2M17.7 15l2.1 1.2M4.2 16.2l2.1-1.2M17.7 9l2.1-1.2M3 12h3M18 12h3" />
+														</svg>
+													)}
+												</span>
+												<span class="iot-flow-label spec-mono">{step.label}</span>
+											</li>
+											{stepIndex < item.flow.length - 1 && (
+												<li class="iot-flow-arrow" aria-hidden="true">
+													<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+														<path d="M5 12h14M13 6l6 6-6 6" />
+													</svg>
+												</li>
+											)}
+										</>
+									))}
+								</ol>
+							</div>
+						</div>
+					);
+				})}
 			</div>
 		</div>
 	</section>
@@ -124,7 +335,85 @@ const catalog = products.map((product) => {
 		margin: 0;
 	}
 
-	/* Products */
+	/* In-page table of contents, mirrors the mega-menu's section list so
+	   visitors arriving from the header dropdown (or scrolling manually)
+	   can jump straight to any section. */
+	.page-subnav {
+		background: var(--color-bg);
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.page-subnav-inner {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 1rem 1.5rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+		justify-content: center;
+	}
+
+	.page-subnav a {
+		font-family: var(--font-mono);
+		font-size: 0.76rem;
+		font-weight: 500;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+		background: var(--color-bg-alt);
+		border: 1px solid var(--color-border);
+		border-radius: 999px;
+		padding: 0.45rem 0.95rem;
+		transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+	}
+
+	.page-subnav a:hover,
+	.page-subnav a:focus-visible {
+		color: var(--color-teal-dark, #018b96);
+		border-color: var(--color-teal);
+		background: rgba(var(--color-teal-rgb), 0.08);
+	}
+
+	/* Anchor targets sit under a sticky header, so give scroll position
+	   some breathing room instead of tucking straight under it. */
+	.anchor {
+		scroll-margin-top: calc(var(--header-height) + 1.25rem);
+	}
+
+	/* Shared section heading */
+	.section-heading {
+		font-size: clamp(1.6rem, 3vw, 2.2rem);
+		color: var(--color-indigo);
+		margin: 0 0 3rem;
+		text-align: center;
+		position: relative;
+	}
+
+	.section-heading::after {
+		content: '';
+		display: block;
+		width: 64px;
+		height: 3px;
+		background: var(--color-teal);
+		margin: 0.9rem auto 0;
+		border-radius: 2px;
+	}
+
+	.placeholder-tag {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-amber-dark);
+		background: rgba(var(--color-amber-rgb), 0.14);
+		padding: 0.3rem 0.7rem;
+		border-radius: 999px;
+		margin-bottom: 0.5rem;
+	}
+
+	/* Calibration and Test Equipment Automation (product catalog) */
 	.products {
 		background: var(--color-bg-alt);
 		padding: 5rem 1.5rem;
@@ -216,7 +505,7 @@ const catalog = products.map((product) => {
 		border-radius: 999px;
 	}
 
-	.product-body h2 {
+	.product-body h3 {
 		font-size: 1.15rem;
 		font-weight: 700;
 		color: var(--color-text);
@@ -246,23 +535,219 @@ const catalog = products.map((product) => {
 		box-shadow: 0 8px 20px rgba(var(--color-teal-rgb), 0.35);
 	}
 
+	/* Internet of Things (IoT) */
+	.iot-section {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.iot-inner {
+		max-width: 780px;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.iot-intro {
+		font-size: 1.05rem;
+		line-height: 1.7;
+		color: var(--color-text-muted);
+		margin: 0 0 2.5rem;
+	}
+
+	.iot-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 1.75rem;
+	}
+
+	/* Wraps a card + its "How It Works" diagram as one hoverable unit, so
+	   the tech-card corner-bracket/lift treatment frames the whole group
+	   instead of just the card half. */
+	.iot-item {
+		border-radius: 12px;
+		overflow: hidden;
+		transition: transform 0.25s ease, box-shadow 0.25s ease;
+	}
+
+	.iot-card {
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+		text-align: left;
+		background: var(--color-bg-alt);
+		border: 1px solid var(--color-border);
+		border-bottom: none;
+		border-radius: 12px 12px 0 0;
+		padding: 1.75rem;
+	}
+
+	.iot-card-icon {
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 56px;
+		height: 56px;
+		border-radius: 50%;
+		background: rgba(var(--color-teal-rgb), 0.12);
+		color: var(--color-teal-dark, #018b96);
+	}
+
+	.iot-card-body h3 {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: var(--color-indigo);
+		margin: 0 0 0.35rem;
+	}
+
+	.iot-card-body p {
+		font-size: 0.92rem;
+		line-height: 1.6;
+		color: var(--color-text-muted);
+		margin: 0;
+	}
+
+	/* "How It Works" flow diagram — an illustrative, conceptual strip
+	   attached under each IoT card, not a literal product screenshot. The
+	   dashed top border echoes the same motif already used to separate
+	   .image-placeholder above from its caption. */
+	.iot-flow {
+		background: var(--color-bg);
+		border: 1px solid var(--color-border);
+		border-top: 1px dashed var(--color-border);
+		border-radius: 0 0 12px 12px;
+		padding: 1.25rem 1.75rem 1.5rem;
+		text-align: left;
+	}
+
+	.iot-flow-title {
+		display: block;
+		font-size: 0.68rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+		margin-bottom: 1rem;
+	}
+
+	.iot-flow-steps {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		align-items: flex-start;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 0.25rem 0.4rem;
+	}
+
+	.iot-flow-step {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 0.5rem;
+		width: 84px;
+		flex-shrink: 0;
+	}
+
+	.iot-flow-icon {
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		background: rgba(var(--color-teal-rgb), 0.12);
+		color: var(--color-teal-dark, #018b96);
+	}
+
+	.iot-flow-label {
+		font-size: 0.64rem;
+		font-weight: 500;
+		line-height: 1.35;
+		letter-spacing: 0.01em;
+		text-transform: uppercase;
+		color: var(--color-indigo);
+	}
+
+	.iot-flow-arrow {
+		display: flex;
+		align-items: center;
+		flex-shrink: 0;
+		color: var(--color-teal);
+		margin-top: 18px;
+	}
+
 	@media (max-width: 700px) {
 		.products-grid {
 			grid-template-columns: 1fr;
 		}
 	}
 
-	@media (max-width: 600px) {
+	@media (max-width: 640px) {
 		.page-header {
 			padding: 3.5rem 1.25rem 2.75rem;
 		}
 
-		.products {
+		.page-subnav-inner {
+			padding: 0.85rem 1.25rem;
+			justify-content: flex-start;
+			overflow-x: auto;
+			flex-wrap: nowrap;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		.page-subnav a {
+			white-space: nowrap;
+		}
+
+		.products,
+		.iot-section {
 			padding: 3.5rem 1.25rem;
 		}
 
 		.product-body {
 			padding: 1.5rem;
+		}
+
+		.iot-card {
+			flex-direction: column;
+			text-align: center;
+			padding: 1.5rem;
+		}
+
+		.iot-card-body h3 {
+			justify-content: center;
+		}
+
+		.iot-flow {
+			padding: 1.25rem;
+			text-align: center;
+		}
+
+		.iot-flow-title {
+			text-align: center;
+		}
+
+		.iot-flow-steps {
+			flex-direction: column;
+			align-items: center;
+			gap: 0.75rem;
+		}
+
+		.iot-flow-step {
+			width: auto;
+			max-width: 240px;
+		}
+
+		.iot-flow-arrow {
+			margin-top: 0;
+			transform: rotate(90deg);
 		}
 	}
 </style>

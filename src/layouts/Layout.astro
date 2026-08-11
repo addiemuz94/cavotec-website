@@ -11,12 +11,67 @@ const {
 	description = 'Cavotec Malaysia Sdn Bhd — connection and electrification solutions.',
 } = Astro.props;
 
-const navLinks = [
+// Footer "Quick Links": top-level pages stay flat, but Services/Products
+// mirror the full "Our Business" structure below (same ourBusinessMenu data)
+// so the footer and the nav mega-menu never drift out of sync.
+const footerCompanyLinks = [
 	{ href: '/', label: 'Home' },
 	{ href: '/our-company', label: 'Our Company' },
-	{ href: '/services', label: 'Services' },
-	{ href: '/products', label: 'Products' },
-	{ href: 'https://kms-cvt.com', label: 'Smart Key Management System', external: true },
+	{ href: '/case-studies', label: 'Case Studies' },
+	{ href: '/contact', label: 'Contact' },
+];
+
+// Header nav: Services and Products are merged into a single "Our Business"
+// two-column mega menu instead of two standalone top-level links.
+const ourBusinessMenu = [
+	{
+		title: 'Services',
+		href: '/services',
+		items: [
+			{ href: '/services#calibration', label: 'Calibration' },
+			{ href: '/services#repair-work', label: 'Repair Work' },
+			{ href: '/services#equipment-rental', label: 'Equipment Rental' },
+			{ href: '/services#training', label: 'Training' },
+			{
+				href: '/services#customize-solution-provider',
+				label: 'Customize Solution Provider',
+				children: [
+					{ href: '/services#electronic-design-service', label: 'Electronic Design Service' },
+					{ href: '/services#3d-design-service', label: '3D Design Service' },
+					{ href: '/services#new-product-rd-innovation', label: 'New Product R&D and Innovation' },
+				],
+			},
+		],
+	},
+	{
+		title: 'Products',
+		href: '/products',
+		items: [
+			{
+				href: '/products#calibration-test-equipment-automation',
+				label: 'Calibration and Test Equipment Automation',
+			},
+			{
+				href: '/products#internet-of-things-iot',
+				label: 'Internet of Things (IoT)',
+				children: [
+					{ href: 'https://kms-cvt.com', label: 'Smart Key Management System (eKMS)', external: true },
+					{ href: '/products#integrated-alarm-system', label: 'Integrated Alarm System' },
+					{
+						href: '/products#smart-building-management-monitoring-system',
+						label: 'Smart Building Management and Monitoring System (BMS)',
+					},
+				],
+			},
+		],
+	},
+];
+
+const headerNavLinks = [
+	{ href: '/', label: 'Home' },
+	{ href: '/our-company', label: 'Our Company' },
+	{ label: 'Our Business', megaMenu: ourBusinessMenu },
+	{ href: '/case-studies', label: 'Case Studies' },
 	{ href: '/contact', label: 'Contact' },
 ];
 
@@ -62,24 +117,66 @@ const socialLinks = [
 
 				<nav class="site-nav" aria-label="Main navigation">
 					<ul>
-						{navLinks.map((link) => (
-							<li>
-								<a
-									href={link.href}
-									target={link.external ? '_blank' : undefined}
-									rel={link.external ? 'noopener noreferrer' : undefined}
-									aria-label={link.external ? `${link.label} (opens in a new tab)` : undefined}
-								>
-									{link.label}
-									{link.external && (
-										<svg class="external-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-											<path d="M7 17L17 7" />
-											<path d="M8 7h9v9" />
+						{headerNavLinks.map((link) =>
+							link.megaMenu ? (
+								<li class="has-dropdown">
+									<button
+										type="button"
+										class="dropdown-toggle"
+										aria-expanded="false"
+										aria-haspopup="true"
+										aria-controls="our-business-menu"
+									>
+										{link.label}
+										<svg class="chevron-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+											<path d="M6 9l6 6 6-6" />
 										</svg>
-									)}
-								</a>
-							</li>
-						))}
+									</button>
+									<div class="dropdown-panel mega-menu-panel" id="our-business-menu">
+										<div class="mega-menu-columns">
+											{link.megaMenu.map((column) => (
+												<div class="mega-menu-column">
+													<a href={column.href} class="mega-menu-column-title">{column.title}</a>
+													<ul>
+														{column.items.map((item) => (
+															<li class={item.children ? 'has-subitems' : undefined}>
+																<a href={item.href}>{item.label}</a>
+																{item.children && (
+																	<ul class="dropdown-subitems">
+																		{item.children.map((child) => (
+																			<li>
+																				<a
+																					href={child.href}
+																					target={child.external ? '_blank' : undefined}
+																					rel={child.external ? 'noopener noreferrer' : undefined}
+																					aria-label={child.external ? `${child.label} (opens in a new tab)` : undefined}
+																				>
+																					{child.label}
+																					{child.external && (
+																						<svg class="external-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+																							<path d="M7 17L17 7" />
+																							<path d="M8 7h9v9" />
+																						</svg>
+																					)}
+																				</a>
+																			</li>
+																		))}
+																	</ul>
+																)}
+															</li>
+														))}
+													</ul>
+												</div>
+											))}
+										</div>
+									</div>
+								</li>
+							) : (
+								<li>
+									<a href={link.href}>{link.label}</a>
+								</li>
+							)
+						)}
 					</ul>
 				</nav>
 			</div>
@@ -96,28 +193,52 @@ const socialLinks = [
 					<p>Connection and electrification solutions for ports, airports and industry.</p>
 				</div>
 
-				<nav class="footer-nav" aria-label="Footer navigation">
-					<ul>
-						{navLinks.map((link) => (
-							<li>
-								<a
-									href={link.href}
-									target={link.external ? '_blank' : undefined}
-									rel={link.external ? 'noopener noreferrer' : undefined}
-									aria-label={link.external ? `${link.label} (opens in a new tab)` : undefined}
-								>
-									{link.label}
-									{link.external && (
-										<svg class="external-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-											<path d="M7 17L17 7" />
-											<path d="M8 7h9v9" />
-										</svg>
-									)}
-								</a>
-							</li>
-						))}
-					</ul>
-				</nav>
+				<div class="footer-link-groups">
+					<nav class="footer-nav" aria-label="Footer navigation">
+						<ul>
+							{footerCompanyLinks.map((link) => (
+								<li>
+									<a href={link.href}>{link.label}</a>
+								</li>
+							))}
+						</ul>
+					</nav>
+
+					{ourBusinessMenu.map((column) => (
+						<nav class="footer-nav footer-business-group" aria-label={`${column.title} links`}>
+							<a href={column.href} class="footer-group-title">{column.title}</a>
+							<ul>
+								{column.items.map((item) => (
+									<li class={item.children ? 'has-subitems' : undefined}>
+										<a href={item.href}>{item.label}</a>
+										{item.children && (
+											<ul class="footer-subitems">
+												{item.children.map((child) => (
+													<li>
+														<a
+															href={child.href}
+															target={child.external ? '_blank' : undefined}
+															rel={child.external ? 'noopener noreferrer' : undefined}
+															aria-label={child.external ? `${child.label} (opens in a new tab)` : undefined}
+														>
+															{child.label}
+															{child.external && (
+																<svg class="external-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+																	<path d="M7 17L17 7" />
+																	<path d="M8 7h9v9" />
+																</svg>
+															)}
+														</a>
+													</li>
+												))}
+											</ul>
+										)}
+									</li>
+								))}
+							</ul>
+						</nav>
+					))}
+				</div>
 
 				<div class="footer-social">
 					<span class="footer-social-title">Follow us</span>
@@ -183,6 +304,74 @@ const socialLinks = [
 
 		document.querySelectorAll('[data-reveal]').forEach((el) => observer.observe(el));
 	}
+
+	// Subtle scroll-based depth for hero/page-header/closing-CTA background
+	// grid textures (marked with [data-parallax-bg]) — the background drifts
+	// at a fraction of scroll speed, so it lags slightly behind the
+	// foreground content instead of scrolling in lockstep. Disabled for
+	// reduced motion and on touch/narrow-viewport devices, where scroll-
+	// linked transforms tend to read as janky rather than smooth.
+	const parallaxEls = document.querySelectorAll('[data-parallax-bg]');
+	const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+	const isNarrowViewport = window.innerWidth <= 768;
+
+	if (!prefersReducedMotion && !isCoarsePointer && !isNarrowViewport && parallaxEls.length) {
+		let parallaxTicking = false;
+
+		const updateParallax = () => {
+			parallaxEls.forEach((el) => {
+				const parent = el.parentElement;
+				if (!parent) return;
+				const offset = parent.getBoundingClientRect().top * 0.12;
+				el.style.transform = `translate3d(0, ${offset}px, 0)`;
+			});
+			parallaxTicking = false;
+		};
+
+		const onParallaxScroll = () => {
+			if (!parallaxTicking) {
+				requestAnimationFrame(updateParallax);
+				parallaxTicking = true;
+			}
+		};
+
+		window.addEventListener('scroll', onParallaxScroll, { passive: true });
+		window.addEventListener('resize', onParallaxScroll, { passive: true });
+		updateParallax();
+	}
+
+	// "Our Business" nav mega menu: click/tap toggle (desktop also opens on
+	// hover/focus via CSS alone). This click handler is what makes it work as
+	// an expandable accordion on mobile, where there is no hover.
+	document.querySelectorAll('.dropdown-toggle').forEach((toggle) => {
+		const parent = toggle.closest('.has-dropdown');
+		if (!parent) return;
+
+		toggle.addEventListener('click', () => {
+			const isOpen = parent.classList.toggle('is-open');
+			toggle.setAttribute('aria-expanded', String(isOpen));
+		});
+	});
+
+	document.addEventListener('click', (event) => {
+		document.querySelectorAll('.has-dropdown.is-open').forEach((el) => {
+			if (el.contains(event.target)) return;
+			el.classList.remove('is-open');
+			el.querySelector('.dropdown-toggle')?.setAttribute('aria-expanded', 'false');
+		});
+	});
+
+	document.addEventListener('keydown', (event) => {
+		if (event.key !== 'Escape') return;
+		document.querySelectorAll('.has-dropdown.is-open').forEach((el) => {
+			el.classList.remove('is-open');
+			const toggle = el.querySelector('.dropdown-toggle');
+			if (toggle instanceof HTMLElement) {
+				toggle.setAttribute('aria-expanded', 'false');
+				toggle.focus();
+			}
+		});
+	});
 </script>
 
 <style is:global>
@@ -348,7 +537,7 @@ const socialLinks = [
 		width: 16px;
 		height: 16px;
 		opacity: 0;
-		transition: opacity 0.25s ease, transform 0.25s ease;
+		transition: opacity 0.25s ease, transform 0.25s ease, width 0.3s ease 0.05s;
 		pointer-events: none;
 		z-index: 2;
 	}
@@ -387,11 +576,26 @@ const socialLinks = [
 		transform: translate(0, 0);
 	}
 
+	/* Tick-mark trace: the top-left bracket's top arm grows outward into a
+	   short trace along the card's top edge on hover, like a measurement
+	   mark being drawn out — an extension of the corner-bracket motif
+	   rather than a second, competing animation. */
+	.tech-card:hover::before,
+	.tech-card:focus-within::before {
+		width: 36px;
+	}
+
 	@media (prefers-reduced-motion: reduce) {
-		.tech-card,
+		.tech-card {
+			transition: none;
+		}
+
+		/* Keep a simple opacity fade for the corner brackets/trace instead of
+		   the sliding + growing motion — the brackets still land in their
+		   final position and length, just without an animated transform. */
 		.tech-card::before,
 		.tech-card::after {
-			transition: none;
+			transition: opacity 0.2s ease;
 		}
 	}
 </style>
@@ -435,7 +639,8 @@ const socialLinks = [
 		gap: 1.75rem;
 	}
 
-	.site-nav a {
+	.site-nav a,
+	.site-nav .dropdown-toggle {
 		display: inline-flex;
 		align-items: center;
 		font-family: var(--font-display);
@@ -446,6 +651,9 @@ const socialLinks = [
 		padding: 0.5rem 0.1rem;
 		position: relative;
 		white-space: nowrap;
+		background: none;
+		border: none;
+		cursor: pointer;
 	}
 
 	.external-icon {
@@ -454,7 +662,14 @@ const socialLinks = [
 		opacity: 0.7;
 	}
 
-	.site-nav a::after {
+	.chevron-icon {
+		flex-shrink: 0;
+		margin-left: 0.3rem;
+		transition: transform 0.2s ease;
+	}
+
+	.site-nav a::after,
+	.site-nav .dropdown-toggle::after {
 		content: '';
 		position: absolute;
 		left: 0;
@@ -466,13 +681,185 @@ const socialLinks = [
 	}
 
 	.site-nav a:hover::after,
-	.site-nav a:focus-visible::after {
+	.site-nav a:focus-visible::after,
+	.site-nav .dropdown-toggle:hover::after,
+	.site-nav .dropdown-toggle:focus-visible::after,
+	.has-dropdown:hover .dropdown-toggle::after,
+	.has-dropdown:focus-within .dropdown-toggle::after,
+	.has-dropdown.is-open .dropdown-toggle::after {
 		right: 0;
 	}
 
 	.site-nav a:hover,
-	.site-nav a:focus-visible {
+	.site-nav a:focus-visible,
+	.site-nav .dropdown-toggle:hover,
+	.site-nav .dropdown-toggle:focus-visible,
+	.has-dropdown:hover .dropdown-toggle,
+	.has-dropdown:focus-within .dropdown-toggle,
+	.has-dropdown.is-open .dropdown-toggle {
 		color: var(--color-teal);
+	}
+
+	/* Our Business mega menu */
+	.has-dropdown {
+		position: relative;
+	}
+
+	.dropdown-panel ul {
+		display: flex;
+		flex-direction: column;
+		/* Override .site-nav ul's align-items: center (meant for the
+		   horizontal top-level nav row) — it leaks into every nested <ul>
+		   here via descendant selector and was shrink-wrapping/centering
+		   each item instead of letting it stretch full-width and left-align. */
+		align-items: stretch;
+	}
+
+	.mega-menu-columns {
+		display: flex;
+	}
+
+	.mega-menu-column {
+		flex: 1;
+		min-width: 0;
+		padding-right: 1rem;
+	}
+
+	.mega-menu-column:not(:first-child) {
+		border-left: 1px solid var(--color-border);
+		padding-left: 1rem;
+	}
+
+	.mega-menu-column-title {
+		display: block;
+		font-family: var(--font-display);
+		font-size: 0.82rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--color-indigo);
+		padding-bottom: 0.5rem;
+		margin-bottom: 0.5rem;
+		border-bottom: 1px solid var(--color-border);
+		transition: color 0.15s ease;
+	}
+
+	.mega-menu-column-title:hover,
+	.mega-menu-column-title:focus-visible {
+		color: var(--color-teal);
+	}
+
+	/* Normal spacing between the main category items within a column */
+	.mega-menu-column > ul {
+		gap: 4px;
+	}
+
+	.mega-menu-column > ul > li > a {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		text-align: left;
+		padding: 8px 12px;
+		border-radius: 6px;
+		font-family: var(--font-display);
+		font-size: 0.92rem;
+		font-weight: 600;
+		color: var(--color-indigo);
+		white-space: normal;
+		transition: background 0.15s ease, color 0.15s ease;
+	}
+
+	/* An item with nested sub-items (e.g. "Customize Solution Provider",
+	   "Internet of Things (IoT)") sits directly above its group, so its own
+	   bottom padding is trimmed — the tight gap below is what visually groups
+	   it with its sub-items, versus the normal 16-20px gap elsewhere. */
+	.has-subitems > a {
+		padding-bottom: 3px;
+	}
+
+	.mega-menu-column > ul > li > a:hover,
+	.mega-menu-column > ul > li > a:focus-visible {
+		background: rgba(var(--color-teal-rgb), 0.1);
+		color: var(--color-teal);
+	}
+
+	.dropdown-subitems {
+		margin-top: 1px;
+		margin-bottom: 6px;
+		margin-left: 0.75rem;
+		padding-left: 0.5rem;
+		border-left: 2px solid var(--color-border);
+	}
+
+	.dropdown-subitems > li > a {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		text-align: left;
+		padding: 4px 10px;
+		border-radius: 6px;
+		font-size: 0.8rem;
+		font-weight: 500;
+		color: var(--color-text-muted);
+		white-space: normal;
+		transition: background 0.15s ease, color 0.15s ease;
+	}
+
+	.dropdown-subitems > li > a:hover,
+	.dropdown-subitems > li > a:focus-visible {
+		background: rgba(var(--color-teal-rgb), 0.08);
+		color: var(--color-teal);
+	}
+
+	/* Desktop: floating panel, opens on hover, focus, or click/tap toggle */
+	@media (min-width: 981px) {
+		.dropdown-panel {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			width: 280px;
+			background: var(--color-bg);
+			border: 1px solid var(--color-border);
+			border-radius: 10px;
+			box-shadow: 0 20px 40px rgba(11, 30, 58, 0.15);
+			padding: 0.75rem;
+			opacity: 0;
+			visibility: hidden;
+			pointer-events: none;
+			transform: translateY(8px) scale(0.97);
+			transform-origin: top left;
+			transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+			z-index: 200;
+		}
+
+		.mega-menu-panel {
+			width: 520px;
+			max-width: 90vw;
+		}
+
+		.has-dropdown:hover .dropdown-panel,
+		.has-dropdown:focus-within .dropdown-panel,
+		.has-dropdown.is-open .dropdown-panel {
+			opacity: 1;
+			visibility: visible;
+			pointer-events: auto;
+			transform: translateY(0) scale(1);
+		}
+
+		.has-dropdown:hover .chevron-icon,
+		.has-dropdown:focus-within .chevron-icon,
+		.has-dropdown.is-open .chevron-icon {
+			transform: rotate(180deg);
+		}
+
+		/* Reduced motion: keep the open/close a simple opacity fade — drop
+		   the slide + scale from the transition (the transform values still
+		   change, they just snap instantly instead of animating). */
+		@media (prefers-reduced-motion: reduce) {
+			.dropdown-panel {
+				transition: opacity 0.15s ease, visibility 0.15s;
+			}
+		}
 	}
 
 	.nav-toggle {
@@ -508,7 +895,7 @@ const socialLinks = [
 		max-width: var(--max-width);
 		margin: 0 auto;
 		display: grid;
-		grid-template-columns: 1.4fr 1fr 1fr;
+		grid-template-columns: 1.1fr 2.3fr 0.85fr;
 		gap: 2.5rem;
 		padding: 3.5rem 1.5rem 2.5rem;
 	}
@@ -535,19 +922,69 @@ const socialLinks = [
 	}
 
 	.footer-nav a {
-		display: inline-flex;
-		align-items: center;
 		font-size: 0.9rem;
 		color: #c3cede;
 		transition: color 0.15s ease;
 	}
 
-	.footer-nav .external-icon {
-		margin-left: 0.3rem;
-	}
-
 	.footer-nav a:hover,
 	.footer-nav a:focus-visible {
+		color: var(--color-teal);
+	}
+
+	/* Quick Links: company links + the two "Our Business" groups (Services,
+	   Products), laid out as their own row of columns so the extra depth
+	   doesn't crowd the flat company list next to it. */
+	.footer-link-groups {
+		display: grid;
+		grid-template-columns: 0.75fr 1fr 1fr;
+		gap: 0.5rem 2rem;
+	}
+
+	.footer-business-group ul {
+		gap: 0.55rem;
+	}
+
+	.footer-group-title {
+		display: block;
+		font-family: var(--font-display);
+		font-size: 0.9rem;
+		font-weight: 700;
+		color: #fff;
+		margin-bottom: 0.75rem;
+		transition: color 0.15s ease;
+	}
+
+	.footer-group-title:hover,
+	.footer-group-title:focus-visible {
+		color: var(--color-teal);
+	}
+
+	.footer-business-group > ul > li > a {
+		font-size: 0.85rem;
+	}
+
+	/* Sub-items (e.g. "Electronic Design Service", "Integrated Alarm System")
+	   sit visibly smaller/lighter than their group heading and parent item,
+	   so the extra depth reads as detail rather than adding visual weight. */
+	.footer-subitems {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+		margin-top: 0.4rem;
+		margin-bottom: 0;
+		padding-left: 0.65rem;
+		border-left: 1px solid rgba(255, 255, 255, 0.15);
+	}
+
+	.footer-subitems a {
+		font-size: 0.75rem;
+		font-weight: 400;
+		color: #93a2b8;
+	}
+
+	.footer-subitems a:hover,
+	.footer-subitems a:focus-visible {
 		color: var(--color-teal);
 	}
 
@@ -641,14 +1078,62 @@ const socialLinks = [
 			border-bottom: 1px solid var(--color-border);
 		}
 
-		.site-nav a {
+		.site-nav a,
+		.site-nav .dropdown-toggle {
 			display: flex;
+			width: 100%;
 			white-space: normal;
 			padding: 0.85rem 0.1rem;
 		}
 
+		.site-nav .dropdown-toggle {
+			justify-content: space-between;
+			text-align: left;
+		}
+
 		.nav-toggle:checked ~ .site-nav {
-			max-height: 400px;
+			max-height: calc(100vh - var(--header-height));
+			overflow-y: auto;
+		}
+
+		/* Mobile: "Our Business" becomes an inline expandable accordion section,
+		   with its two columns stacked as two grouped blocks */
+		.dropdown-panel {
+			position: static;
+			max-height: 0;
+			overflow: hidden;
+			opacity: 1;
+			visibility: visible;
+			background: transparent;
+			border: none;
+			box-shadow: none;
+			padding: 0;
+			transition: max-height 0.25s ease;
+		}
+
+		.has-dropdown.is-open .dropdown-panel {
+			max-height: 1200px;
+			padding-bottom: 0.5rem;
+		}
+
+		.has-dropdown.is-open .chevron-icon {
+			transform: rotate(180deg);
+		}
+
+		.mega-menu-columns {
+			flex-direction: column;
+		}
+
+		.mega-menu-column {
+			padding-right: 0;
+		}
+
+		.mega-menu-column:not(:first-child) {
+			border-left: none;
+			border-top: 1px solid var(--color-border);
+			padding-left: 0;
+			padding-top: 1rem;
+			margin-top: 1rem;
 		}
 
 		.nav-toggle:checked ~ .nav-toggle-label span:nth-child(1) {
@@ -667,6 +1152,23 @@ const socialLinks = [
 			grid-template-columns: 1fr;
 			gap: 2rem;
 			padding: 2.75rem 1.5rem 2rem;
+		}
+	}
+
+	/* Below ~700px the three Quick Links columns (Company, Services,
+	   Products) get too narrow for the nested sub-items to read
+	   comfortably, so drop to two, then one, before that happens. */
+	@media (max-width: 700px) {
+		.footer-link-groups {
+			grid-template-columns: 1fr 1fr;
+			gap: 1.5rem 2rem;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.footer-link-groups {
+			grid-template-columns: 1fr;
+			gap: 1.75rem;
 		}
 	}
 </style>

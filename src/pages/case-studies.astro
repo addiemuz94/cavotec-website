@@ -1,0 +1,257 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Representative, illustrative examples of the type of work Cavotec Malaysia
+// delivers — not real client names. See the intro paragraph below, which
+// makes that explicit to visitors.
+const caseStudies = [
+	{
+		title: 'Streamlining Calibration for a Telecommunications Provider',
+		icon: 'tower',
+		problem:
+			'A telecommunications provider operated an aging test equipment fleet with inconsistent calibration records, creating uncertainty around measurement accuracy and audit readiness.',
+		solution:
+			'Cavotec Malaysia implemented a scheduled calibration program with NATA-traceable reporting, bringing the entire fleet onto a consistent, documented calibration cycle.',
+		outcome: 'Reduced equipment downtime and audit-ready documentation across the fleet.',
+	},
+	{
+		title: 'Securing Facility Access with Smart Key Management',
+		icon: 'key',
+		problem:
+			'Manual key tracking across a multi-site facility created accountability gaps, with no reliable record of who accessed which area and when.',
+		solution:
+			"Deployment of Cavotec's Smart Key Management System (eKMS) centralized access logging into a single connected dashboard.",
+		outcome: 'A full audit trail of key usage and a measurable reduction in unauthorized access incidents.',
+	},
+	{
+		title: 'Custom RF Testing Solution for a Manufacturing Client',
+		icon: 'circuit',
+		problem: 'A manufacturing client had a specific RF testing requirement that no off-the-shelf equipment could meet.',
+		solution:
+			"Cavotec's Electronic Design Service engineered and built a custom test rig tailored to the client's exact specifications.",
+		outcome: "Faster in-house testing turnaround, removing a bottleneck from the client's production line.",
+	},
+];
+---
+
+<Layout
+	title="Case Studies — Cavotec Malaysia Sdn Bhd"
+	description="Representative examples of calibration, smart access, and custom test equipment engineering work delivered by Cavotec Malaysia."
+>
+	<section class="page-header">
+		<div class="page-header-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="page-header-inner" data-reveal>
+			<span class="eyebrow">Our Work</span>
+			<h1>Case Studies</h1>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="case-studies">
+		<div class="case-studies-inner">
+			<p class="case-studies-intro" data-reveal>
+				The following are representative examples of the type of work Cavotec Malaysia delivers
+				for clients across telecommunications, security, and manufacturing — illustrating our
+				approach rather than naming specific clients.
+			</p>
+			<div class="case-studies-grid">
+				{caseStudies.map((study, index) => (
+					<article class="case-study-card tech-card" data-reveal style={`--reveal-i: ${index};`}>
+						<span class="case-study-icon" aria-hidden="true">
+							{study.icon === 'tower' && (
+								<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M12 2l7 20M12 2L5 22" />
+									<path d="M8.5 12h7M6.5 17h11" />
+									<path d="M12 2v4" />
+								</svg>
+							)}
+							{study.icon === 'key' && (
+								<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+									<circle cx="8" cy="8" r="4" />
+									<path d="M11 11l9 9" />
+									<path d="M17 17l2-2" />
+									<path d="M15 19l2-2" />
+								</svg>
+							)}
+							{study.icon === 'circuit' && (
+								<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+									<rect x="9" y="9" width="6" height="6" rx="1" />
+									<path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3" />
+								</svg>
+							)}
+						</span>
+						<h2>{study.title}</h2>
+						<dl class="case-study-details">
+							<div class="case-study-row">
+								<dt>Problem</dt>
+								<dd>{study.problem}</dd>
+							</div>
+							<div class="case-study-row">
+								<dt>Solution</dt>
+								<dd>{study.solution}</dd>
+							</div>
+							<div class="case-study-row">
+								<dt>Outcome</dt>
+								<dd>{study.outcome}</dd>
+							</div>
+						</dl>
+					</article>
+				))}
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	section {
+		width: 100%;
+	}
+
+	/* Page header */
+	.page-header {
+		position: relative;
+		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
+		color: #ffffff;
+		padding: 4.5rem 1.5rem 3.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.page-header-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image:
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px),
+			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: radial-gradient(ellipse at center, black 15%, transparent 75%);
+	}
+
+	.page-header-inner {
+		max-width: 760px;
+		margin: 0 auto;
+		position: relative;
+	}
+
+	.eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-amber);
+		margin-bottom: 0.75rem;
+	}
+
+	.page-header h1 {
+		font-size: clamp(2rem, 4.5vw, 2.75rem);
+		font-weight: 700;
+		margin: 0;
+	}
+
+	/* Case studies */
+	.case-studies {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.case-studies-inner {
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+
+	.case-studies-intro {
+		max-width: 700px;
+		margin: 0 auto 3rem;
+		text-align: center;
+		font-size: 1.05rem;
+		line-height: 1.75;
+		color: var(--color-text-muted);
+	}
+
+	.case-studies-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 1.75rem;
+	}
+
+	.case-study-card {
+		background: var(--color-bg-alt);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		padding: 2rem 1.75rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+		text-align: left;
+	}
+
+	.case-study-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 52px;
+		height: 52px;
+		border-radius: 50%;
+		background: rgba(var(--color-teal-rgb), 0.12);
+		color: var(--color-teal-dark, #018b96);
+	}
+
+	.case-study-card h2 {
+		font-family: var(--font-display);
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: var(--color-indigo);
+		margin: 0;
+		line-height: 1.35;
+	}
+
+	/* Problem / Solution / Outcome — labeled like the site's other
+	   instrument-readout rows (mono, uppercase, teal), reusing the same
+	   visual language as the hero readout and category badges. */
+	.case-study-details {
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+	}
+
+	.case-study-row {
+		margin: 0;
+	}
+
+	.case-study-row dt {
+		margin: 0 0 0.3rem;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-teal-dark, #018b96);
+	}
+
+	.case-study-row dd {
+		margin: 0;
+		font-size: 0.9rem;
+		line-height: 1.6;
+		color: var(--color-text-muted);
+	}
+
+	@media (max-width: 600px) {
+		.page-header {
+			padding: 3.5rem 1.25rem 2.75rem;
+		}
+
+		.case-studies {
+			padding: 3.5rem 1.25rem;
+		}
+
+		.case-study-card {
+			padding: 1.5rem;
+		}
+	}
+</style>

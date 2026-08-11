@@ -46,6 +46,15 @@ function buildWaveSegment(offsetX) {
 }
 
 const signalWavePath = `${buildWaveSegment(0)} ${buildWaveSegment(800).replace(/^M[\d.]+,20/, 'L800,20')}`;
+
+// "By the numbers" stats strip — general capability stats only, no
+// certification/accreditation claims (those live on the Services page).
+const stats = [
+	{ value: '10+', label: 'Years of Technical Expertise' },
+	{ value: '2,400+', label: 'Manufacturers Supported' },
+	{ value: '5', label: 'Core Service Areas' },
+	{ value: '24/7', label: 'Equipment Support Availability' },
+];
 ---
 
 <Layout
@@ -53,20 +62,68 @@ const signalWavePath = `${buildWaveSegment(0)} ${buildWaveSegment(800).replace(/
 	description="Cavotec Malaysia Sdn Bhd provides test and measurement solutions, telecommunication equipment, RF & microwave accessories, repair, calibration, training and rental services."
 >
 	<section class="hero">
-		<div class="hero-grid" aria-hidden="true"></div>
+		<div class="hero-grid" aria-hidden="true" data-parallax-bg></div>
 		<div class="hero-inner">
-			<h1 data-reveal>Welcome to Cavotec Malaysia Sdn Bhd</h1>
-			<p class="hero-subheading" data-reveal style="--reveal-i: 1;">
-				Home for repair and services of your favorite test and measurement equipment
-			</p>
+			<div class="hero-layout">
+				<div class="hero-content">
+					<h1 data-reveal>Welcome to Cavotec Malaysia Sdn Bhd</h1>
+					<p class="hero-subheading" data-reveal style="--reveal-i: 1;">
+						Home for repair and services of your favorite test and measurement equipment
+					</p>
+					<a href="/services" class="btn btn-accent" data-reveal style="--reveal-i: 2;">Learn More</a>
+				</div>
 
-			<div class="signal-wave" aria-hidden="true">
-				<svg class="signal-wave-svg" viewBox="0 0 1600 40" preserveAspectRatio="none">
-					<path d={signalWavePath} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-				</svg>
+				<!-- Illustrative "live monitoring" readout — a visual accompaniment,
+				     not real telemetry. The signal-wave lives inside it so the two
+				     animated pieces read as one instrument rather than two separate
+				     competing motions. Hidden from assistive tech: it's decorative
+				     flavor, and auto-updating text without aria-live would be a
+				     confusing announcement anyway. -->
+				<div class="hero-readout" data-reveal style="--reveal-i: 3;" aria-hidden="true">
+					<div class="hero-readout-ticks"></div>
+					<div class="hero-readout-header">
+						<span class="hero-readout-dot"></span>
+						<span class="hero-readout-title">Live System Status</span>
+					</div>
+
+					<div class="signal-wave">
+						<svg class="signal-wave-svg" viewBox="0 0 1600 40" preserveAspectRatio="none">
+							<path d={signalWavePath} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+						</svg>
+					</div>
+
+					<ul class="hero-readout-rows">
+						<li>
+							<span class="row-label">Signal</span>
+							<span class="row-value spec-mono" data-readout="signal">Stable</span>
+						</li>
+						<li>
+							<span class="row-label">Status</span>
+							<span class="row-value spec-mono" data-readout="status">Monitoring</span>
+						</li>
+						<li>
+							<span class="row-label">Uptime</span>
+							<span class="row-value spec-mono" data-readout="uptime">99.9%</span>
+						</li>
+					</ul>
+				</div>
 			</div>
+		</div>
+	</section>
 
-			<a href="/services" class="btn btn-accent" data-reveal style="--reveal-i: 2;">Learn More</a>
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="stats-strip">
+		<div class="stats-strip-inner">
+			<span class="stats-eyebrow" data-reveal>By the Numbers</span>
+			<ul class="stats-grid">
+				{stats.map((stat, index) => (
+					<li class="stat-item" data-reveal style={`--reveal-i: ${index + 1};`}>
+						<span class="stat-number spec-mono" data-value={stat.value}>{stat.value}</span>
+						<span class="stat-label">{stat.label}</span>
+					</li>
+				))}
+			</ul>
 		</div>
 	</section>
 
@@ -124,13 +181,105 @@ const signalWavePath = `${buildWaveSegment(0)} ${buildWaveSegment(800).replace(/
 	<div class="tick-divider" aria-hidden="true"></div>
 
 	<section class="closing-cta">
-		<div class="closing-cta-grid" aria-hidden="true"></div>
+		<div class="closing-cta-grid" aria-hidden="true" data-parallax-bg></div>
 		<div class="closing-cta-inner" data-reveal>
 			<h2>Need High Quality Services? Call Us!</h2>
 			<a href="/contact" class="btn btn-warm">Get in Touch</a>
 		</div>
 	</section>
 </Layout>
+
+<script>
+	// "By the numbers" count-up. Follows the same intersection + reduced-motion
+	// pattern as the scroll-reveal in Layout.astro: default to the final value
+	// (server-rendered) so nothing ever gets stuck at 0, and only animate when
+	// motion is allowed and the section actually scrolls into view.
+	const statNumbers = document.querySelectorAll('.stat-number[data-value]');
+	const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+	function zeroState(value: string) {
+		// Preserve everything but the leading digit run, e.g. "2,400+" -> "0+",
+		// "24/7" -> "0/7", "5" -> "0".
+		const match = value.match(/^([\d,]+)(.*)$/);
+		if (!match) return value;
+		return `0${match[2]}`;
+	}
+
+	function animateCount(el: Element) {
+		const target = el.getAttribute('data-value') ?? '';
+		const match = target.match(/^([\d,]+)(.*)$/);
+		if (!match) return;
+		const [, digits, suffix] = match;
+		const endValue = parseInt(digits.replace(/,/g, ''), 10);
+		const duration = 1400;
+		const start = performance.now();
+
+		function tick(now: number) {
+			const progress = Math.min((now - start) / duration, 1);
+			const eased = 1 - Math.pow(1 - progress, 3);
+			const current = Math.round(endValue * eased);
+			el.textContent = `${current.toLocaleString('en-US')}${suffix}`;
+			if (progress < 1) {
+				requestAnimationFrame(tick);
+			} else {
+				el.textContent = target;
+			}
+		}
+
+		requestAnimationFrame(tick);
+	}
+
+	if (!prefersReducedMotion && 'IntersectionObserver' in window && statNumbers.length) {
+		statNumbers.forEach((el) => {
+			const value = el.getAttribute('data-value');
+			if (value) el.textContent = zeroState(value);
+		});
+
+		const statsObserver = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting) {
+						animateCount(entry.target);
+						statsObserver.unobserve(entry.target);
+					}
+				}
+			},
+			{ threshold: 0.4 }
+		);
+
+		statNumbers.forEach((el) => statsObserver.observe(el));
+	}
+	// If motion is reduced or IntersectionObserver is unavailable, the
+	// server-rendered final values (e.g. "10+") are left exactly as-is.
+
+	// Hero "live system status" readout — purely illustrative, cycles through
+	// a small set of representative (never alarming, never real) values on a
+	// timer so the panel reads as "live" without being tied to any real data.
+	const READOUT_VALUES: Record<string, string[]> = {
+		signal: ['Stable', 'Optimal', 'Nominal'],
+		status: ['Monitoring', 'Active', 'Online'],
+		uptime: ['99.9%', '99.8%', '99.9%'],
+	};
+	const readoutRows = document.querySelectorAll<HTMLElement>('.hero-readout-rows [data-readout]');
+
+	if (!prefersReducedMotion && readoutRows.length) {
+		setInterval(() => {
+			readoutRows.forEach((el) => {
+				const key = el.getAttribute('data-readout');
+				const options = key ? READOUT_VALUES[key] : undefined;
+				if (!options) return;
+				el.classList.add('is-updating');
+				setTimeout(() => {
+					const current = options.indexOf(el.textContent?.trim() ?? '');
+					el.textContent = options[(current + 1) % options.length];
+					el.classList.remove('is-updating');
+				}, 220);
+			});
+		}, 2600);
+	}
+	// If motion is reduced, the rows stay exactly as server-rendered — a
+	// complete, valid static state, never a half-updated flicker.
+</script>
 
 <style>
 	section {
@@ -198,9 +347,21 @@ const signalWavePath = `${buildWaveSegment(0)} ${buildWaveSegment(800).replace(/
 	}
 
 	.hero-inner {
-		max-width: 760px;
+		max-width: 1100px;
 		margin: 0 auto;
 		position: relative;
+	}
+
+	.hero-layout {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 3rem;
+	}
+
+	.hero-content {
+		flex: 1 1 380px;
+		max-width: 620px;
 	}
 
 	.hero h1 {
@@ -217,12 +378,12 @@ const signalWavePath = `${buildWaveSegment(0)} ${buildWaveSegment(800).replace(/
 		margin: 0 0 2.25rem;
 	}
 
-	/* Animated signal-wave line */
+	/* Animated signal-wave line — lives inside the readout panel so it and
+	   the "live" data rows read as one instrument. */
 	.signal-wave {
 		width: 100%;
-		max-width: 280px;
-		height: 32px;
-		margin: 0 auto 2.25rem;
+		height: 28px;
+		margin: 0 0 1.1rem;
 		overflow: hidden;
 		color: var(--color-teal);
 		opacity: 0.85;
@@ -247,6 +408,164 @@ const signalWavePath = `${buildWaveSegment(0)} ${buildWaveSegment(800).replace(/
 		to {
 			transform: translateX(-50%);
 		}
+	}
+
+	/* Hero "live system status" readout panel — instrument-readout styling
+	   (dark panel, teal/mono text, tick-mark strip) matching the site's
+	   tick-divider motif, scaled down. Illustrative only, not real data. */
+	.hero-readout {
+		flex: 0 1 300px;
+		width: 100%;
+		max-width: 300px;
+		text-align: left;
+		background: rgba(6, 18, 36, 0.55);
+		border: 1px solid rgba(var(--color-teal-rgb), 0.3);
+		border-radius: 10px;
+		padding: 1.1rem 1.25rem 1.25rem;
+		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+	}
+
+	.hero-readout-ticks {
+		height: 10px;
+		margin-bottom: 1rem;
+		background-image:
+			repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0, rgba(255, 255, 255, 0.14) 1px, transparent 1px, transparent 10px),
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.6) 0, rgba(var(--color-teal-rgb), 0.6) 1.5px, transparent 1.5px, transparent 40px);
+		background-repeat: repeat-x, repeat-x;
+		background-position: center, center;
+		background-size: auto 6px, auto 10px;
+	}
+
+	.hero-readout-header {
+		display: flex;
+		align-items: center;
+		gap: 0.55rem;
+		margin-bottom: 1rem;
+	}
+
+	.hero-readout-dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--color-teal);
+		flex-shrink: 0;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.hero-readout-dot {
+			animation: pulse-dot 2s ease-in-out infinite;
+		}
+	}
+
+	@keyframes pulse-dot {
+		0%,
+		100% {
+			opacity: 1;
+			box-shadow: 0 0 0 0 rgba(var(--color-teal-rgb), 0.55);
+		}
+		50% {
+			opacity: 0.7;
+			box-shadow: 0 0 0 4px rgba(var(--color-teal-rgb), 0);
+		}
+	}
+
+	.hero-readout-title {
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-teal);
+	}
+
+	.hero-readout-rows {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+	}
+
+	.hero-readout-rows li {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.75rem;
+		font-size: 0.78rem;
+	}
+
+	.row-label {
+		color: rgba(255, 255, 255, 0.5);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.row-value {
+		color: var(--color-teal);
+		font-weight: 600;
+		transition: opacity 0.2s ease;
+	}
+
+	.row-value.is-updating {
+		opacity: 0.2;
+	}
+
+	/* "By the numbers" stats strip — sits between the dark hero and the
+	   white services section, so bg-alt keeps the light/dark rhythm going
+	   without repeating either neighbor's background. */
+	.stats-strip {
+		background: var(--color-bg-alt);
+		padding: 3.5rem 1.5rem;
+	}
+
+	.stats-strip-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.stats-eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-amber-dark);
+		margin-bottom: 2rem;
+	}
+
+	.stats-grid {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 2rem 1.5rem;
+	}
+
+	.stat-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.6rem;
+	}
+
+	.stat-number {
+		font-size: clamp(2.1rem, 4.5vw, 2.9rem);
+		font-weight: 600;
+		line-height: 1;
+		color: var(--color-teal-dark, #018b96);
+	}
+
+	.stat-label {
+		font-family: var(--font-display);
+		font-size: 0.85rem;
+		font-weight: 600;
+		letter-spacing: 0.01em;
+		color: var(--color-indigo);
+		max-width: 18ch;
 	}
 
 	/* Services */
@@ -356,11 +675,34 @@ const signalWavePath = `${buildWaveSegment(0)} ${buildWaveSegment(800).replace(/
 		margin: 0;
 	}
 
+	@media (max-width: 700px) {
+		.stats-grid {
+			grid-template-columns: repeat(2, 1fr);
+			gap: 2.25rem 1.5rem;
+		}
+	}
+
+	@media (max-width: 860px) {
+		.hero-layout {
+			flex-direction: column;
+			gap: 2.25rem;
+		}
+
+		.hero-content {
+			max-width: 620px;
+		}
+
+		.hero-readout {
+			max-width: 340px;
+		}
+	}
+
 	@media (max-width: 600px) {
 		.hero {
 			padding: 4.5rem 1.25rem;
 		}
 
+		.stats-strip,
 		.services,
 		.closing-cta {
 			padding: 3.5rem 1.25rem;

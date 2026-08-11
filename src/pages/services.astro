@@ -1,208 +1,192 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const mainServices = [
-	{
-		title: 'Repairs',
-		description:
-			"Cavotec Malaysia has been providing repair and service solutions since 2006, covering defense, manufacturing, and other high-tech sectors, with deep experience in Tektronix and Fluke equipment.",
-		icon: 'wrench',
-	},
-	{
-		title: 'Calibration',
-		description:
-			'Cavotec Malaysia has calibrated equipment from over 2,400 manufacturers. All laboratories, including the Mobile Calibration Laboratory, are NATA accredited and ISO certified, with calibration provided to manufacturers’ specifications and NATA reporting available.',
-		icon: 'badge',
-	},
-	{
-		title: 'Products and Services',
-		description:
-			'Cavotec Malaysia provides test and measurement products, services, training, customized solutions, and equipment rental, plus RF and microwave accessories such as antennas, cables, adapters, connectors, and multi-couplers.',
-		icon: 'package',
-	},
+// Mirrors the "Our Business" mega-menu structure in Layout.astro — keep the
+// anchors and hierarchy here in sync with `ourBusinessMenu` there.
+const tocLinks = [
+	{ href: '#calibration', label: 'Calibration' },
+	{ href: '#repair-work', label: 'Repair Work' },
+	{ href: '#equipment-rental', label: 'Equipment Rental' },
+	{ href: '#training', label: 'Training' },
+	{ href: '#customize-solution-provider', label: 'Customize Solution Provider' },
 ];
 
-const productCategories = [
+const customizeSubServices = [
 	{
-		title: 'Radio Test Set',
-		description: 'Analog and digital radio testing for mobile, repeater, and base station',
-		icon: 'antenna',
+		id: 'electronic-design-service',
+		title: 'Electronic Design Service',
+		description:
+			"Custom PCB and embedded electronics design tailored to your test and measurement application — full service details are coming soon.",
+		icon: 'circuit',
 	},
 	{
-		title: 'Signal Sources',
-		description: 'Analog and digital RF signal generators',
-		icon: 'wave',
+		id: '3d-design-service',
+		title: '3D Design Service',
+		description:
+			'3D modelling, mechanical design, and prototyping support for custom enclosures, fixtures, and hardware — full service details are coming soon.',
+		icon: 'cube',
 	},
 	{
-		title: 'Signal Analyzers',
-		description: 'Vector signal analysis',
-		icon: 'analyzer',
-	},
-	{
-		title: 'Avionics',
-		description: 'Civil, commercial, and military aviation/aerospace testing',
-		icon: 'plane',
-	},
-	{
-		title: 'Telecommunication',
-		description: 'Digital analyzers',
-		icon: 'phone',
-	},
-	{
-		title: 'Microwave',
-		description: 'Scalar network analyzers, system analyzers, counters, power meters',
-		icon: 'dish',
-	},
-	{
-		title: 'Spectrum Analyzer',
-		description: 'Portable and bench-type',
-		icon: 'spectrum',
-	},
-	{
-		title: 'PXI System',
-		description: 'RF modular instruments for lab, R&D, and manufacturing',
-		icon: 'chip',
-	},
-	{
-		title: 'Wireless',
-		description: 'LTE test sets and conformance testing',
-		icon: 'wifi',
-	},
-	{
-		title: 'Broadband Systems',
-		description: 'Broadband RF signal analysis, recording, and generation',
-		icon: 'tower',
+		id: 'new-product-rd-innovation',
+		title: 'New Product R&D and Innovation',
+		description:
+			'End-to-end research and development for new products, from concept through prototyping to production-ready design — full service details are coming soon.',
+		icon: 'bulb',
 	},
 ];
 ---
 
 <Layout
 	title="Services — Cavotec Malaysia Sdn Bhd"
-	description="Repair, calibration, and test and measurement products and services from Cavotec Malaysia, covering a full range of radio, RF, microwave, and telecommunication product categories."
+	description="Calibration, repair work, equipment rental, training, and customized solution development from Cavotec Malaysia."
 >
 	<section class="page-header">
-		<div class="page-header-grid" aria-hidden="true"></div>
+		<div class="page-header-grid" aria-hidden="true" data-parallax-bg></div>
 		<div class="page-header-inner" data-reveal>
 			<span class="eyebrow">What We Offer</span>
 			<h1>Services</h1>
 		</div>
 	</section>
 
+	<nav class="page-subnav" aria-label="Services on this page">
+		<div class="page-subnav-inner">
+			{tocLinks.map((link) => (
+				<a href={link.href}>{link.label}</a>
+			))}
+		</div>
+	</nav>
+
 	<div class="tick-divider" aria-hidden="true"></div>
 
-	<section class="services-detail">
-		<div class="services-detail-inner">
-			<div class="service-detail-grid">
-				{mainServices.map((service, index) => (
-					<div class="service-detail-card tech-card" data-reveal style={`--reveal-i: ${index};`}>
-						<span class="service-detail-icon" aria-hidden="true">
-							{service.icon === 'wrench' && (
-								<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M14.7 6.3a4 4 0 0 0-5.4 4.6L4 16.2V20h3.8l5.3-5.3a4 4 0 0 0 4.6-5.4l-2.6 2.6-2-2 2.6-2.6z" />
-								</svg>
-							)}
-							{service.icon === 'badge' && (
-								<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<circle cx="12" cy="9" r="6" />
-									<path d="M9 14.5L7 22l5-3 5 3-2-7.5" />
-									<path d="M9.5 9l1.8 1.8L14.5 7.5" />
-								</svg>
-							)}
-							{service.icon === 'package' && (
-								<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M3.5 7.5L12 3l8.5 4.5v9L12 21l-8.5-4.5v-9z" />
-									<path d="M3.5 7.5L12 12l8.5-4.5" />
-									<path d="M12 12v9" />
-								</svg>
-							)}
-						</span>
-						<h2>{service.title}</h2>
-						<p>{service.description}</p>
-					</div>
-				))}
+	<section class="service-block anchor" id="calibration">
+		<div class="service-block-inner">
+			<span class="service-block-icon" aria-hidden="true">
+				<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="12" cy="9" r="6" />
+					<path d="M9 14.5L7 22l5-3 5 3-2-7.5" />
+					<path d="M9.5 9l1.8 1.8L14.5 7.5" />
+				</svg>
+			</span>
+			<div class="service-block-body" data-reveal>
+				<h2>Calibration</h2>
+				<p>
+					Cavotec Malaysia has calibrated equipment from over 2,400 manufacturers. All
+					laboratories, including the Mobile Calibration Laboratory, are NATA accredited and ISO
+					certified, with calibration provided to manufacturers' specifications and NATA
+					reporting available.
+				</p>
 			</div>
 		</div>
 	</section>
 
 	<div class="tick-divider" aria-hidden="true"></div>
 
-	<section class="product-categories">
-		<div class="product-categories-inner">
-			<h2 class="section-heading" data-reveal>Product Categories</h2>
-			<div class="category-grid">
-				{productCategories.map((category, index) => (
-					<div class="category-card tech-card" data-reveal style={`--reveal-i: ${index % 5};`}>
-						<span class="category-icon" aria-hidden="true">
-							{category.icon === 'antenna' && (
+	<section class="service-block alt anchor" id="repair-work">
+		<div class="service-block-inner">
+			<span class="service-block-icon" aria-hidden="true">
+				<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M14.7 6.3a4 4 0 0 0-5.4 4.6L4 16.2V20h3.8l5.3-5.3a4 4 0 0 0 4.6-5.4l-2.6 2.6-2-2 2.6-2.6z" />
+				</svg>
+			</span>
+			<div class="service-block-body" data-reveal>
+				<h2>Repair Work</h2>
+				<p>
+					Cavotec Malaysia has been providing repair and service solutions since 2006, covering
+					defense, manufacturing, and other high-tech sectors, with deep experience in Tektronix
+					and Fluke equipment.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="service-block anchor" id="equipment-rental">
+		<div class="service-block-inner">
+			<span class="service-block-icon" aria-hidden="true">
+				<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+					<rect x="3" y="5" width="18" height="16" rx="2" />
+					<path d="M3 10h18M8 3v4M16 3v4" />
+					<path d="M12 14v3l2 1" />
+				</svg>
+			</span>
+			<div class="service-block-body" data-reveal>
+				<span class="placeholder-tag">Coming soon</span>
+				<h2>Equipment Rental</h2>
+				<p>
+					Short-term and long-term rental of calibrated test and measurement equipment, so teams
+					can scale up capacity without a capital purchase — full rental terms and available
+					inventory will be published here soon.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="service-block alt anchor" id="training">
+		<div class="service-block-inner">
+			<span class="service-block-icon" aria-hidden="true">
+				<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M2 9l10-5 10 5-10 5-10-5z" />
+					<path d="M6 11v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5" />
+					<path d="M22 9v6" />
+				</svg>
+			</span>
+			<div class="service-block-body" data-reveal>
+				<span class="placeholder-tag">Coming soon</span>
+				<h2>Training</h2>
+				<p>
+					Hands-on and classroom training on test equipment operation, calibration procedures,
+					and best practices for in-house maintenance teams — a detailed course catalog and
+					schedule will be published here soon.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="customize-section anchor" id="customize-solution-provider">
+		<div class="customize-inner">
+			<span class="service-block-icon customize-icon" aria-hidden="true">
+				<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="12" cy="12" r="3" />
+					<path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z" />
+				</svg>
+			</span>
+			<h2 class="section-heading" data-reveal>Customize Solution Provider</h2>
+			<p class="customize-intro" data-reveal style="--reveal-i: 1;">
+				For requirements that off-the-shelf equipment can't meet, our engineering team designs
+				and builds custom solutions end-to-end — from electronics, through mechanical design, to
+				new product development.
+			</p>
+			<div class="customize-grid">
+				{customizeSubServices.map((service, index) => (
+					<div class="customize-card tech-card anchor" id={service.id} data-reveal style={`--reveal-i: ${index + 2};`}>
+						<span class="customize-card-icon" aria-hidden="true">
+							{service.icon === 'circuit' && (
 								<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M4 10a8 8 0 0 1 16 0" />
-									<path d="M7.5 10a4.5 4.5 0 0 1 9 0" />
-									<circle cx="12" cy="10" r="1.3" fill="currentColor" stroke="none" />
-									<path d="M12 11.3V21" />
-									<path d="M9 21h6" />
-								</svg>
-							)}
-							{category.icon === 'wave' && (
-								<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M2 12c1.5 0 1.5-6 3-6s1.5 12 3 12 1.5-12 3-12 1.5 12 3 12 1.5-6 3-6 1.5-6 3-6" />
-								</svg>
-							)}
-							{category.icon === 'analyzer' && (
-								<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M3 20h18" />
-									<path d="M6 20v-6M11 20V8M16 20v-10M21 20v-4" />
-								</svg>
-							)}
-							{category.icon === 'plane' && (
-								<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M2 16l20-6-3 7 3 7-8-3-4 4-1-6-6-3z" />
-								</svg>
-							)}
-							{category.icon === 'phone' && (
-								<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M5 4h4l1.5 5-2.5 1.5a12 12 0 0 0 5.5 5.5L15 13.5l5 1.5v4a2 2 0 0 1-2 2C10.5 21 3 13.5 3 6a2 2 0 0 1 2-2z" />
-								</svg>
-							)}
-							{category.icon === 'dish' && (
-								<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M3 12a15 15 0 0 1 18 0" />
-									<path d="M12 12v9" />
-									<circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" />
-									<path d="M9 21h6" />
-									<path d="M17 6l3-3" />
-								</svg>
-							)}
-							{category.icon === 'spectrum' && (
-								<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M4 20V10M9 20V4M14 20v-8M19 20v-5" />
-								</svg>
-							)}
-							{category.icon === 'chip' && (
-								<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<rect x="7" y="7" width="10" height="10" rx="1.5" />
+									<rect x="9" y="9" width="6" height="6" rx="1" />
 									<path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3" />
 								</svg>
 							)}
-							{category.icon === 'wifi' && (
+							{service.icon === 'cube' && (
 								<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M2 8.5a16 16 0 0 1 20 0" />
-									<path d="M5.5 12.5a11 11 0 0 1 13 0" />
-									<path d="M9 16.5a6 6 0 0 1 6 0" />
-									<circle cx="12" cy="20" r="1.2" fill="currentColor" stroke="none" />
+									<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" />
+									<path d="M12 12l8-4.5M12 12v9M12 12L4 7.5" />
 								</svg>
 							)}
-							{category.icon === 'tower' && (
+							{service.icon === 'bulb' && (
 								<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M12 2l7 20M12 2L5 22" />
-									<path d="M8.5 12h7M6.5 17h11" />
-									<path d="M12 2v4" />
+									<path d="M9 18h6M10 21h4" />
+									<path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1.1 1.3 1.1 2.2h5c0-.9.5-1.7 1.1-2.2A6 6 0 0 0 12 3z" />
 								</svg>
 							)}
 						</span>
-						<div>
-							<h3>{category.title}</h3>
-							<p>{category.description}</p>
-						</div>
+						<span class="placeholder-tag">Coming soon</span>
+						<h3>{service.title}</h3>
+						<p>{service.description}</p>
 					</div>
 				))}
 			</div>
@@ -259,10 +243,55 @@ const productCategories = [
 		margin: 0;
 	}
 
+	/* In-page table of contents, mirrors the mega-menu's section list so
+	   visitors arriving from the header dropdown (or scrolling manually)
+	   can jump straight to any section. */
+	.page-subnav {
+		background: var(--color-bg);
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.page-subnav-inner {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 1rem 1.5rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+		justify-content: center;
+	}
+
+	.page-subnav a {
+		font-family: var(--font-mono);
+		font-size: 0.76rem;
+		font-weight: 500;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+		background: var(--color-bg-alt);
+		border: 1px solid var(--color-border);
+		border-radius: 999px;
+		padding: 0.45rem 0.95rem;
+		transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+	}
+
+	.page-subnav a:hover,
+	.page-subnav a:focus-visible {
+		color: var(--color-teal-dark, #018b96);
+		border-color: var(--color-teal);
+		background: rgba(var(--color-teal-rgb), 0.08);
+	}
+
+	/* Anchor targets sit under a sticky header, so give scroll position
+	   some breathing room instead of tucking straight under it. */
+	.anchor {
+		scroll-margin-top: calc(var(--header-height) + 1.25rem);
+	}
+
 	.section-heading {
 		font-size: clamp(1.6rem, 3vw, 2.2rem);
 		color: var(--color-indigo);
-		margin: 0 0 3rem;
+		margin: 0 0 0.75rem;
 		text-align: center;
 		position: relative;
 	}
@@ -277,136 +306,164 @@ const productCategories = [
 		border-radius: 2px;
 	}
 
-	/* Main services */
-	.services-detail {
+	/* Standalone service section (Calibration, Repair Work, Equipment
+	   Rental, Training) — alternates bg/bg-alt like the rest of the site. */
+	.service-block {
 		background: var(--color-bg);
-		padding: 5rem 1.5rem;
+		padding: 4.5rem 1.5rem;
 	}
 
-	.services-detail-inner {
-		max-width: 1200px;
-		margin: 0 auto;
-	}
-
-	.service-detail-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-		gap: 2rem;
-	}
-
-	.service-detail-card {
+	.service-block.alt {
 		background: var(--color-bg-alt);
-		border: 1px solid var(--color-border);
-		border-radius: 12px;
-		padding: 2.5rem 2rem;
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		transition: transform 0.25s ease, box-shadow 0.25s ease;
 	}
 
-	.service-detail-icon {
+	.service-block-inner {
+		max-width: 800px;
+		margin: 0 auto;
+		display: flex;
+		align-items: flex-start;
+		gap: 1.75rem;
+	}
+
+	.service-block-icon {
+		flex-shrink: 0;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 60px;
-		height: 60px;
+		width: 64px;
+		height: 64px;
 		border-radius: 50%;
 		background: rgba(var(--color-teal-rgb), 0.12);
 		color: var(--color-teal-dark, #018b96);
 	}
 
-	.service-detail-card h2 {
-		font-size: 1.3rem;
+	.service-block-body h2 {
+		font-size: clamp(1.4rem, 2.5vw, 1.75rem);
 		font-weight: 700;
 		color: var(--color-indigo);
-		margin: 0;
+		margin: 0 0 0.75rem;
 	}
 
-	.service-detail-card p {
-		font-size: 0.96rem;
-		line-height: 1.7;
+	.service-block-body p {
+		font-size: 0.98rem;
+		line-height: 1.75;
 		color: var(--color-text-muted);
 		margin: 0;
+		max-width: 62ch;
 	}
 
-	/* Product categories */
-	.product-categories {
-		background: var(--color-bg-alt);
-		padding: 5rem 1.5rem;
+	.placeholder-tag {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-amber-dark);
+		background: rgba(var(--color-amber-rgb), 0.14);
+		padding: 0.3rem 0.7rem;
+		border-radius: 999px;
+		margin-bottom: 0.65rem;
 	}
 
-	.product-categories-inner {
-		max-width: 1200px;
+	/* Customize Solution Provider: intro + 3 nested sub-service cards */
+	.customize-section {
+		background: var(--color-bg);
+		padding: 4.5rem 1.5rem;
+	}
+
+	.customize-inner {
+		max-width: 1100px;
 		margin: 0 auto;
+		text-align: center;
 	}
 
-	.category-grid {
+	.customize-icon {
+		margin: 0 auto 1.25rem;
+	}
+
+	.customize-intro {
+		max-width: 62ch;
+		margin: 0 auto 3rem;
+		font-size: 1.02rem;
+		line-height: 1.75;
+		color: var(--color-text-muted);
+	}
+
+	.customize-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-		gap: 1.5rem;
+		gap: 1.75rem;
+		text-align: left;
 	}
 
-	.category-card {
-		background: var(--color-bg);
+	.customize-card {
+		background: var(--color-bg-alt);
 		border: 1px solid var(--color-border);
-		border-radius: 10px;
-		padding: 1.5rem;
+		border-radius: 12px;
+		padding: 2rem 1.75rem;
 		display: flex;
+		flex-direction: column;
 		align-items: flex-start;
-		gap: 1rem;
-		transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+		gap: 0.15rem;
 	}
 
-	.category-icon {
-		flex-shrink: 0;
+	.customize-card-icon {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 46px;
-		height: 46px;
+		width: 48px;
+		height: 48px;
 		border-radius: 50%;
 		background: rgba(11, 30, 58, 0.06);
 		color: var(--color-indigo);
-		transition: background 0.25s ease, color 0.25s ease;
+		margin-bottom: 1rem;
 	}
 
-	.category-card:hover .category-icon {
-		background: var(--color-teal);
-		color: var(--color-indigo);
-	}
-
-	.category-card h3 {
+	.customize-card h3 {
 		font-family: var(--font-display);
-		font-size: 1rem;
-		font-weight: 600;
-		color: var(--color-text);
-		margin: 0 0 0.35rem;
+		font-size: 1.05rem;
+		font-weight: 700;
+		color: var(--color-indigo);
+		margin: 0 0 0.5rem;
 	}
 
-	.category-card p {
-		font-size: 0.86rem;
-		line-height: 1.5;
+	.customize-card p {
+		font-size: 0.9rem;
+		line-height: 1.65;
 		color: var(--color-text-muted);
 		margin: 0;
 	}
 
-	@media (max-width: 600px) {
+	@media (max-width: 640px) {
 		.page-header {
 			padding: 3.5rem 1.25rem 2.75rem;
 		}
 
-		.services-detail,
-		.product-categories {
-			padding: 3.5rem 1.25rem;
+		.page-subnav-inner {
+			padding: 0.85rem 1.25rem;
+			justify-content: flex-start;
+			overflow-x: auto;
+			flex-wrap: nowrap;
+			-webkit-overflow-scrolling: touch;
 		}
 
-		.service-detail-card {
-			padding: 2rem 1.5rem;
+		.page-subnav a {
+			white-space: nowrap;
 		}
 
-		.category-card {
-			padding: 1.25rem;
+		.service-block,
+		.customize-section {
+			padding: 3.25rem 1.25rem;
+		}
+
+		.service-block-inner {
+			flex-direction: column;
+			gap: 1.25rem;
+		}
+
+		.customize-card {
+			padding: 1.5rem;
 		}
 	}
 </style>
