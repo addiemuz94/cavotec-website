@@ -179,7 +179,7 @@ const mapEmbedUrl =
 	.page-header {
 		position: relative;
 		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
-		color: #ffffff;
+		color: var(--color-ink);
 		padding: 4.5rem 1.5rem 3.5rem;
 		text-align: center;
 		overflow: hidden;
@@ -265,8 +265,8 @@ const mapEmbedUrl =
 		width: 44px;
 		height: 44px;
 		border-radius: 50%;
-		background: rgba(11, 30, 58, 0.06);
-		color: var(--color-indigo);
+		background: rgba(var(--color-teal-rgb), 0.12);
+		color: var(--color-teal);
 	}
 
 	.contact-text {
@@ -328,7 +328,7 @@ const mapEmbedUrl =
 	.form-field label {
 		font-size: 0.85rem;
 		font-weight: 600;
-		color: var(--color-indigo);
+		color: var(--color-ink);
 	}
 
 	.form-field input,
@@ -336,7 +336,10 @@ const mapEmbedUrl =
 		font: inherit;
 		font-size: 0.96rem;
 		color: var(--color-text);
-		background: var(--color-bg-alt);
+		/* Explicit surface (not the auto-cascaded bg-alt/base-black) — the
+		   form panel itself is already the elevated surface tone, so inputs
+		   need their own distinct dark fill rather than matching it. */
+		background: var(--color-surface);
 		border: 1px solid var(--color-border);
 		border-radius: 6px;
 		padding: 0.75rem 0.9rem;
@@ -382,9 +385,12 @@ const mapEmbedUrl =
 	}
 
 	.form-feedback.form-error {
-		background: rgba(217, 66, 47, 0.08);
-		border: 1px solid rgba(217, 66, 47, 0.25);
-		color: #a3341f;
+		/* Brightened from the original light-theme rust-red (#a3341f on a
+		   near-white tint) — that combination reads as near-black on
+		   near-black once the surface underneath is dark. */
+		background: rgba(217, 66, 47, 0.14);
+		border: 1px solid rgba(217, 66, 47, 0.4);
+		color: #ff8a75;
 		border-radius: 6px;
 		padding: 0.9rem 1.1rem;
 		font-size: 0.88rem;
@@ -402,11 +408,12 @@ const mapEmbedUrl =
 		text-align: center;
 		gap: 0.75rem;
 		padding: 2.5rem 1.5rem;
-		color: var(--color-indigo);
+		color: var(--color-ink);
 	}
 
 	.form-feedback.form-success svg {
-		color: #1f9d55;
+		/* Brightened from #1f9d55 for the same reason as .form-error above. */
+		color: #34d399;
 	}
 
 	.form-feedback.form-success h3 {

@@ -92,7 +92,7 @@ const socialLinks = [
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
-		<meta name="theme-color" content="#0B1E3A" />
+		<meta name="theme-color" content="#0A0A0C" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
@@ -372,6 +372,50 @@ const socialLinks = [
 			}
 		});
 	});
+
+	// Card shine — single shared utility for every [data-shine] card
+	// site-wide (service/product/pillar/IoT/customize/case-study cards all
+	// carry it alongside .tech-card). Tracks the cursor position within the
+	// card as a 0–100% coordinate and writes it to --shine-x/--shine-y; the
+	// CSS above (registered via @property) handles rendering the gradient
+	// and smoothly transitioning --shine-opacity on its own — this only
+	// ever sets target values, never animates anything itself.
+	const ACTIVE_SHINE_OPACITY = '0.15';
+
+	function updateShinePosition(card: HTMLElement, event: PointerEvent) {
+		const rect = card.getBoundingClientRect();
+		const x = Math.min(100, Math.max(0, ((event.clientX - rect.left) / rect.width) * 100));
+		const y = Math.min(100, Math.max(0, ((event.clientY - rect.top) / rect.height) * 100));
+		card.style.setProperty('--shine-x', `${x}%`);
+		card.style.setProperty('--shine-y', `${y}%`);
+	}
+
+	if (!prefersReducedMotion) {
+		document.querySelectorAll<HTMLElement>('[data-shine]').forEach((card) => {
+			card.addEventListener('pointermove', (event) => updateShinePosition(card, event), { passive: true });
+
+			card.addEventListener(
+				'pointerenter',
+				(event) => {
+					updateShinePosition(card, event);
+					card.style.setProperty('--shine-opacity', ACTIVE_SHINE_OPACITY);
+				},
+				{ passive: true }
+			);
+
+			card.addEventListener(
+				'pointerleave',
+				() => {
+					card.style.setProperty('--shine-opacity', '0');
+				},
+				{ passive: true }
+			);
+		});
+	}
+	// If motion is reduced, [data-shine] elements never get these listeners
+	// — the CSS reduced-motion rule instead shows a fixed, faint, centered
+	// glow (see [data-shine] in the global styles), never one that tracks
+	// the pointer.
 </script>
 
 <style is:global>
@@ -383,24 +427,52 @@ const socialLinks = [
 	 * own scoped <style> block.
 	 */
 	:root {
-		/* Base */
-		--color-indigo: #0b1e3a;
-		--color-indigo-dark: #061224;
-		--color-indigo-light: #14315c;
+		/* Base — premium black theme. "Indigo" names are kept so every
+		   existing var(--color-indigo*) reference (page-header gradients,
+		   button text, badge tints, …) repaints automatically; only the
+		   values changed, from navy to near-black. */
+		--color-indigo: #0a0a0c;
+		--color-indigo-rgb: 10, 10, 12;
+		--color-indigo-dark: #000000;
+		--color-surface: #16161a;
+		/* Gradient's lighter stop reuses the elevated-surface tone, so
+		   page-header/hero banners fade toward the same tone their cards
+		   and panels sit on. */
+		--color-indigo-light: var(--color-surface);
+		/* Hairline border for dark surfaces — tick-marks, dividers, card
+		   borders — used instead of translucent-white/black tricks so
+		   separation reads crisp against pure black. */
+		--color-border-dark: #26262c;
 
-		/* Accents */
+		/* Accents (unchanged) */
 		--color-teal: #00c2d1;
 		--color-teal-rgb: 0, 194, 209;
 		--color-amber: #f2a950;
 		--color-amber-dark: #d98f36;
 		--color-amber-rgb: 242, 169, 80;
 
-		/* Surfaces & text */
-		--color-bg: #ffffff;
-		--color-bg-alt: #f7f8fa;
-		--color-text: #3c4858;
-		--color-text-muted: #6b7686;
-		--color-border: #e1e6ee;
+		/* Text on dark/black surfaces */
+		--color-ink: #f2f3f5;
+		--color-ink-muted: #8a8f98;
+
+		/* Surfaces & text — the whole site is dark now, so these generic
+		   names (still used by every page's card/section CSS) are repointed
+		   at the black-theme tokens instead of holding their own light
+		   values: --color-bg-alt (was #f7f8fa, the "page" tone) now IS the
+		   base black, --color-bg (was #ffffff, the "card" tone) now IS the
+		   elevated surface, and text/border follow the same logic. Nothing
+		   in the site ever again resolves to an actual light color. */
+		--color-bg: var(--color-surface);
+		--color-bg-alt: var(--color-indigo);
+		--color-text: var(--color-ink);
+		--color-text-muted: var(--color-ink-muted);
+		--color-border: var(--color-border-dark);
+
+		/* var(--color-teal-dark, #018b96) is used ~9 times across the pages
+		   as a muted-teal accent tuned for light backgrounds; defining it
+		   here (rather than editing every call site) makes all of them
+		   resolve to the brighter base teal, which is what reads on black. */
+		--color-teal-dark: var(--color-teal);
 
 		/* Back-compat aliases so every existing var(--color-navy/--color-accent, …)
 		   reference across the site picks up the new palette automatically. */
@@ -504,22 +576,96 @@ const socialLinks = [
 	/* disappears without JS. Only once .reveal-enabled is set on <html> */
 	/* (JS ran + motion is allowed) do elements start hidden and animate */
 	/* in as they cross the viewport.                                    */
-	/* ---------------------------------------------------------------- */
+	/*                                                                    */
+	/* .reveal-enabled and .is-visible are wrapped in :where(...), which  */
+	/* matches identically but always contributes zero to specificity.    */
+	/* Without it, the settled-state rule below was                      */
+	/* html.reveal-enabled [data-reveal].is-visible — specificity (0,3,1) */
+	/* — which permanently beat any hover/focus rule with fewer than 3    */
+	/* classes (e.g. .tech-card:hover's translateY(-4px) lift, or         */
+	/* .btn-accent:hover's translateY(-2px), both (0,2,0)) on any element */
+	/* that also happens to carry [data-reveal], silently killing those   */
+	/* hover states once the card/button had scrolled into view and       */
+	/* settled. Keeping `html` and `[data-reveal]` outside :where() still */
+	/* gives this rule (0,1,1) — just enough to keep beating the plain    */
+	/* (0,1,0) base/pre-reveal rules below and above it, so the reveal    */
+	/* animation itself is untouched, while any interactive :hover/       */
+	/* :focus rule (2+ classes) now correctly wins afterward. */
 	[data-reveal] {
 		opacity: 1;
 		transform: none;
 	}
 
-	html.reveal-enabled [data-reveal] {
+	html:where(.reveal-enabled) [data-reveal] {
 		opacity: 0;
 		transform: translateY(22px);
 		transition: opacity 0.7s ease, transform 0.7s ease;
 		transition-delay: calc(var(--reveal-i, 0) * 70ms);
 	}
 
-	html.reveal-enabled [data-reveal].is-visible {
+	html:where(.reveal-enabled) [data-reveal]:where(.is-visible) {
 		opacity: 1;
 		transform: none;
+	}
+
+	/* ---------------------------------------------------------------- */
+	/* Card shine: a soft radial highlight that tracks the cursor within */
+	/* any [data-shine] card (every .tech-card site-wide — service,      */
+	/* product, IoT, case-study and "customize" cards all carry both).   */
+	/* Registering these as typed custom properties lets the browser     */
+	/* smoothly interpolate --shine-opacity on its own via a plain CSS   */
+	/* transition — no rAF loop needed, only the JS below setting the    */
+	/* target values on pointer events (see the script's CardShine bit). */
+	/* ---------------------------------------------------------------- */
+	@property --shine-x {
+		syntax: '<percentage>';
+		inherits: true;
+		initial-value: 50%;
+	}
+
+	@property --shine-y {
+		syntax: '<percentage>';
+		inherits: true;
+		initial-value: 50%;
+	}
+
+	@property --shine-opacity {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 0;
+	}
+
+	/* Implemented as an extra background-image layer, not a ::before/
+	   ::after pseudo-element: .tech-card already spends both pseudo-
+	   element slots on its corner-bracket marks (below), and a
+	   background layer sidesteps z-index/stacking entirely — backgrounds
+	   always paint behind an element's own content by definition, so
+	   this can never cover the card's text/icons no matter what, and it
+	   composes with the corner brackets (z-index: 2) and hover glow
+	   without any extra stacking-context work. --shine-x/-y/-opacity
+	   inherit, which is what lets .iot-card/.iot-flow below pick up the
+	   values JS sets on their shared ancestor .iot-item. */
+	[data-shine],
+	[data-shine] .iot-card,
+	[data-shine] .iot-flow {
+		background-image: radial-gradient(
+			circle at var(--shine-x) var(--shine-y),
+			rgba(var(--color-teal-rgb), var(--shine-opacity)) 0%,
+			transparent 40%
+		);
+		background-repeat: no-repeat;
+		transition: --shine-opacity 300ms ease;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		/* No pointer-tracking JS runs under reduced motion (see script) —
+		   instead a fixed, faint, centered glow that never animates. */
+		[data-shine],
+		[data-shine] .iot-card,
+		[data-shine] .iot-flow {
+			--shine-opacity: 0.08;
+			transition: none;
+		}
 	}
 
 	/* ---------------------------------------------------------------- */
@@ -562,7 +708,7 @@ const socialLinks = [
 	.tech-card:focus-within {
 		transform: translateY(-4px);
 		box-shadow:
-			0 20px 40px rgba(11, 30, 58, 0.14),
+			0 20px 40px rgba(var(--color-indigo-rgb), 0.14),
 			0 0 0 1px rgba(var(--color-teal-rgb), 0.3),
 			0 0 28px rgba(var(--color-teal-rgb), 0.2);
 		border-color: transparent;
@@ -608,7 +754,7 @@ const socialLinks = [
 		z-index: 100;
 		background: var(--color-bg);
 		border-bottom: 1px solid var(--color-border);
-		box-shadow: 0 1px 3px rgba(11, 30, 58, 0.06);
+		box-shadow: 0 1px 3px rgba(var(--color-indigo-rgb), 0.06);
 	}
 
 	.header-inner {
@@ -631,6 +777,10 @@ const socialLinks = [
 		display: block;
 		height: 34px;
 		width: auto;
+		/* The header is now a dark surface like the footer, so the logo
+		   gets the same brightness(0) invert(1) treatment already used on
+		   .footer-brand img to render it in solid white. */
+		filter: brightness(0) invert(1);
 	}
 
 	.site-nav ul {
@@ -646,7 +796,7 @@ const socialLinks = [
 		font-family: var(--font-display);
 		font-size: 0.95rem;
 		font-weight: 600;
-		color: var(--color-indigo);
+		color: var(--color-ink);
 		letter-spacing: 0.01em;
 		padding: 0.5rem 0.1rem;
 		position: relative;
@@ -737,7 +887,7 @@ const socialLinks = [
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
-		color: var(--color-indigo);
+		color: var(--color-ink);
 		padding-bottom: 0.5rem;
 		margin-bottom: 0.5rem;
 		border-bottom: 1px solid var(--color-border);
@@ -764,7 +914,7 @@ const socialLinks = [
 		font-family: var(--font-display);
 		font-size: 0.92rem;
 		font-weight: 600;
-		color: var(--color-indigo);
+		color: var(--color-ink);
 		white-space: normal;
 		transition: background 0.15s ease, color 0.15s ease;
 	}
@@ -811,17 +961,20 @@ const socialLinks = [
 		color: var(--color-teal);
 	}
 
-	/* Desktop: floating panel, opens on hover, focus, or click/tap toggle */
+	/* Desktop: floating panel, opens on hover, focus, or click/tap toggle.
+	   An elevated dark surface — same as every other card/panel on the
+	   site now, so its title/link/border colors need no per-context
+	   override; the base rules above already resolve to ink-on-dark. */
 	@media (min-width: 981px) {
 		.dropdown-panel {
 			position: absolute;
 			top: 100%;
 			left: 0;
 			width: 280px;
-			background: var(--color-bg);
-			border: 1px solid var(--color-border);
+			background: var(--color-surface);
+			border: 1px solid var(--color-border-dark);
 			border-radius: 10px;
-			box-shadow: 0 20px 40px rgba(11, 30, 58, 0.15);
+			box-shadow: 0 20px 40px rgba(var(--color-indigo-rgb), 0.3);
 			padding: 0.75rem;
 			opacity: 0;
 			visibility: hidden;
@@ -880,15 +1033,15 @@ const socialLinks = [
 		display: block;
 		height: 2px;
 		width: 100%;
-		background: var(--color-indigo);
+		background: var(--color-ink);
 		border-radius: 2px;
 		transition: transform 0.2s ease, opacity 0.2s ease;
 	}
 
-	/* Footer */
+	/* Footer — elevated dark surface, a shade up from the page's black base */
 	.site-footer {
-		background: var(--color-indigo);
-		color: #c3cede;
+		background: var(--color-surface);
+		color: var(--color-ink-muted);
 	}
 
 	.footer-inner {
@@ -911,7 +1064,7 @@ const socialLinks = [
 		margin: 0;
 		font-size: 0.9rem;
 		line-height: 1.6;
-		color: #93a2b8;
+		color: var(--color-ink-muted);
 		max-width: 32ch;
 	}
 
@@ -923,7 +1076,7 @@ const socialLinks = [
 
 	.footer-nav a {
 		font-size: 0.9rem;
-		color: #c3cede;
+		color: var(--color-ink-muted);
 		transition: color 0.15s ease;
 	}
 
@@ -950,7 +1103,7 @@ const socialLinks = [
 		font-family: var(--font-display);
 		font-size: 0.9rem;
 		font-weight: 700;
-		color: #fff;
+		color: var(--color-ink);
 		margin-bottom: 0.75rem;
 		transition: color 0.15s ease;
 	}
@@ -974,13 +1127,13 @@ const socialLinks = [
 		margin-top: 0.4rem;
 		margin-bottom: 0;
 		padding-left: 0.65rem;
-		border-left: 1px solid rgba(255, 255, 255, 0.15);
+		border-left: 1px solid var(--color-border-dark);
 	}
 
 	.footer-subitems a {
 		font-size: 0.75rem;
 		font-weight: 400;
-		color: #93a2b8;
+		color: var(--color-ink-muted);
 	}
 
 	.footer-subitems a:hover,
@@ -1001,7 +1154,7 @@ const socialLinks = [
 		font-weight: 500;
 		text-transform: uppercase;
 		letter-spacing: 0.1em;
-		color: #93a2b8;
+		color: var(--color-ink-muted);
 	}
 
 	.footer-social ul {
@@ -1017,7 +1170,7 @@ const socialLinks = [
 		height: 38px;
 		border-radius: 50%;
 		background: rgba(255, 255, 255, 0.08);
-		color: #c3cede;
+		color: var(--color-ink-muted);
 		transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 	}
 
@@ -1030,7 +1183,7 @@ const socialLinks = [
 	}
 
 	.footer-bottom {
-		border-top: 1px solid rgba(255, 255, 255, 0.12);
+		border-top: 1px solid var(--color-border-dark);
 		padding: 1.25rem 1.5rem;
 	}
 
@@ -1040,7 +1193,7 @@ const socialLinks = [
 		font-family: var(--font-mono);
 		font-size: 0.78rem;
 		letter-spacing: 0.02em;
-		color: #93a2b8;
+		color: var(--color-ink-muted);
 		text-align: center;
 	}
 
@@ -1061,7 +1214,7 @@ const socialLinks = [
 			right: 0;
 			background: var(--color-bg);
 			border-bottom: 1px solid var(--color-border);
-			box-shadow: 0 8px 16px rgba(11, 30, 58, 0.08);
+			box-shadow: 0 8px 16px rgba(var(--color-indigo-rgb), 0.08);
 			max-height: 0;
 			overflow: hidden;
 			transition: max-height 0.25s ease;

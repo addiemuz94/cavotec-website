@@ -163,7 +163,7 @@ const customizeSubServices = [
 			</p>
 			<div class="customize-grid">
 				{customizeSubServices.map((service, index) => (
-					<div class="customize-card tech-card anchor" id={service.id} data-reveal style={`--reveal-i: ${index + 2};`}>
+					<div class="customize-card tech-card anchor" id={service.id} data-shine data-reveal style={`--reveal-i: ${index + 2};`}>
 						<span class="customize-card-icon" aria-hidden="true">
 							{service.icon === 'circuit' && (
 								<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
@@ -203,7 +203,7 @@ const customizeSubServices = [
 	.page-header {
 		position: relative;
 		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
-		color: #ffffff;
+		color: var(--color-ink);
 		padding: 4.5rem 1.5rem 3.5rem;
 		text-align: center;
 		overflow: hidden;
@@ -290,7 +290,7 @@ const customizeSubServices = [
 
 	.section-heading {
 		font-size: clamp(1.6rem, 3vw, 2.2rem);
-		color: var(--color-indigo);
+		color: var(--color-ink);
 		margin: 0 0 0.75rem;
 		text-align: center;
 		position: relative;
@@ -340,7 +340,7 @@ const customizeSubServices = [
 	.service-block-body h2 {
 		font-size: clamp(1.4rem, 2.5vw, 1.75rem);
 		font-weight: 700;
-		color: var(--color-indigo);
+		color: var(--color-ink);
 		margin: 0 0 0.75rem;
 	}
 
@@ -398,7 +398,9 @@ const customizeSubServices = [
 	}
 
 	.customize-card {
-		background: var(--color-bg-alt);
+		/* background-color, not the background shorthand — see the matching
+		   comment on .service-card in index.astro for why. */
+		background-color: var(--color-bg-alt);
 		border: 1px solid var(--color-border);
 		border-radius: 12px;
 		padding: 2rem 1.75rem;
@@ -406,6 +408,12 @@ const customizeSubServices = [
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 0.15rem;
+		/* Matches .service-card/.pillar-card/.product-card/.iot-item — without
+		   its own transition, this card had nothing to compete with the
+		   scroll-reveal's lingering 0.7s transition (see the [data-reveal]
+		   comment in Layout.astro), making its hover-lift take up to ~1s
+		   instead of a snappy response once revealed. */
+		transition: transform 0.25s ease, box-shadow 0.25s ease;
 	}
 
 	.customize-card-icon {
@@ -415,8 +423,8 @@ const customizeSubServices = [
 		width: 48px;
 		height: 48px;
 		border-radius: 50%;
-		background: rgba(11, 30, 58, 0.06);
-		color: var(--color-indigo);
+		background: rgba(var(--color-teal-rgb), 0.12);
+		color: var(--color-teal);
 		margin-bottom: 1rem;
 	}
 
@@ -424,7 +432,7 @@ const customizeSubServices = [
 		font-family: var(--font-display);
 		font-size: 1.05rem;
 		font-weight: 700;
-		color: var(--color-indigo);
+		color: var(--color-ink);
 		margin: 0 0 0.5rem;
 	}
 

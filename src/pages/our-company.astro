@@ -79,7 +79,7 @@ const pillars = [
 
 			<div class="pillars-grid">
 				{pillars.map((pillar, index) => (
-					<div class="pillar-card tech-card" data-reveal style={`--reveal-i: ${index};`}>
+					<div class="pillar-card tech-card" data-shine data-reveal style={`--reveal-i: ${index};`}>
 						<span class="pillar-icon" aria-hidden="true">
 							{pillar.icon === 'gauge' && (
 								<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
@@ -140,7 +140,7 @@ const pillars = [
 	.page-header {
 		position: relative;
 		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
-		color: #ffffff;
+		color: var(--color-ink);
 		padding: 4.5rem 1.5rem 3.5rem;
 		text-align: center;
 		overflow: hidden;
@@ -184,7 +184,7 @@ const pillars = [
 	.mission h2,
 	.key-business h2 {
 		font-size: clamp(1.6rem, 3vw, 2.2rem);
-		color: var(--color-indigo);
+		color: var(--color-ink);
 		margin: 0 0 1.75rem;
 		text-align: center;
 		position: relative;
@@ -254,7 +254,9 @@ const pillars = [
 	}
 
 	.pillar-card {
-		background: var(--color-bg);
+		/* background-color, not the background shorthand — see the matching
+		   comment on .service-card in index.astro for why. */
+		background-color: var(--color-bg);
 		border: 1px solid var(--color-border);
 		border-radius: 10px;
 		padding: 1.75rem 1.5rem;
@@ -272,8 +274,8 @@ const pillars = [
 		width: 52px;
 		height: 52px;
 		border-radius: 50%;
-		background: rgba(11, 30, 58, 0.06);
-		color: var(--color-indigo);
+		background: rgba(var(--color-teal-rgb), 0.12);
+		color: var(--color-teal);
 	}
 
 	.pillar-card h3 {
@@ -323,7 +325,7 @@ const pillars = [
 		padding: 0.5rem 1.25rem;
 		font-size: 0.85rem;
 		font-weight: 500;
-		color: var(--color-indigo);
+		color: var(--color-ink);
 	}
 
 	@media (max-width: 600px) {

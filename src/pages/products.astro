@@ -106,7 +106,7 @@ const iotItems = [
 			<h2 class="section-heading" data-reveal>Calibration and Test Equipment Automation</h2>
 			<div class="products-grid">
 				{catalog.map((product, index) => (
-					<article class="product-card tech-card" data-reveal style={`--reveal-i: ${index};`}>
+					<article class="product-card tech-card" data-shine data-reveal style={`--reveal-i: ${index};`}>
 						<div class="product-image">
 							{product.imageSrc ? (
 								<img src={product.imageSrc} alt={product.name} loading="lazy" />
@@ -146,7 +146,7 @@ const iotItems = [
 				{iotItems.map((item, index) => {
 					const Tag = item.external ? 'a' : 'div';
 					return (
-						<div class="iot-item tech-card" data-reveal style={`--reveal-i: ${index + 2};`}>
+						<div class="iot-item tech-card" data-shine data-reveal style={`--reveal-i: ${index + 2};`}>
 							<Tag
 								class="iot-card anchor"
 								id={item.id}
@@ -295,7 +295,7 @@ const iotItems = [
 	.page-header {
 		position: relative;
 		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
-		color: #ffffff;
+		color: var(--color-ink);
 		padding: 4.5rem 1.5rem 3.5rem;
 		text-align: center;
 		overflow: hidden;
@@ -383,7 +383,7 @@ const iotItems = [
 	/* Shared section heading */
 	.section-heading {
 		font-size: clamp(1.6rem, 3vw, 2.2rem);
-		color: var(--color-indigo);
+		color: var(--color-ink);
 		margin: 0 0 3rem;
 		text-align: center;
 		position: relative;
@@ -431,7 +431,9 @@ const iotItems = [
 	}
 
 	.product-card {
-		background: var(--color-bg);
+		/* background-color, not the background shorthand — see the matching
+		   comment on .service-card in index.astro for why. */
+		background-color: var(--color-bg);
 		border: 1px solid var(--color-border);
 		border-radius: 12px;
 		overflow: hidden;
@@ -463,25 +465,28 @@ const iotItems = [
 		gap: 0.5rem;
 		text-align: center;
 		padding: 1.5rem;
-		color: #94a1b2;
+		color: var(--color-ink-muted);
+		/* Diagonal placeholder stripe, rebuilt from only the site's two dark
+		   tones (was a pair of near-white grays) so it still reads as a
+		   "no image yet" texture without introducing a third shade. */
 		background: repeating-linear-gradient(
 			135deg,
-			#eef1f5,
-			#eef1f5 10px,
-			#e6eaf0 10px,
-			#e6eaf0 20px
+			var(--color-indigo),
+			var(--color-indigo) 10px,
+			var(--color-surface) 10px,
+			var(--color-surface) 20px
 		);
 		border-bottom: 1px dashed var(--color-border);
 	}
 
 	.image-placeholder strong {
 		font-size: 0.95rem;
-		color: var(--color-indigo);
+		color: var(--color-ink);
 	}
 
 	.image-placeholder span {
 		font-size: 0.78rem;
-		color: #94a1b2;
+		color: var(--color-ink-muted);
 	}
 
 	.product-body {
@@ -499,8 +504,8 @@ const iotItems = [
 		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		color: var(--color-indigo);
-		background: rgba(11, 30, 58, 0.08);
+		color: var(--color-teal);
+		background: rgba(var(--color-teal-rgb), 0.12);
 		padding: 0.35rem 0.85rem;
 		border-radius: 999px;
 	}
@@ -520,9 +525,12 @@ const iotItems = [
 		font-family: var(--font-display);
 		font-size: 0.88rem;
 		font-weight: 600;
-		color: var(--color-indigo);
-		background: var(--color-bg-alt);
-		border: 1.5px solid var(--color-indigo);
+		/* Was indigo text/border on bg-alt — all three resolved to the same
+		   near-black once bg-alt became the base black, making the button
+		   invisible. Outlined in teal instead, matching its hover state. */
+		color: var(--color-teal);
+		background: var(--color-surface);
+		border: 1.5px solid var(--color-teal);
 		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 	}
 
@@ -574,7 +582,11 @@ const iotItems = [
 		align-items: center;
 		gap: 1.25rem;
 		text-align: left;
-		background: var(--color-bg-alt);
+		/* background-color, not the background shorthand — .iot-item (the
+		   [data-shine] element) has no background of its own, so the shine
+		   is painted here and on .iot-flow instead (see [data-shine] in
+		   Layout.astro); the shorthand would reset that background-image. */
+		background-color: var(--color-bg-alt);
 		border: 1px solid var(--color-border);
 		border-bottom: none;
 		border-radius: 12px 12px 0 0;
@@ -599,7 +611,7 @@ const iotItems = [
 		gap: 0.45rem;
 		font-size: 1.1rem;
 		font-weight: 700;
-		color: var(--color-indigo);
+		color: var(--color-ink);
 		margin: 0 0 0.35rem;
 	}
 
@@ -615,7 +627,9 @@ const iotItems = [
 	   dashed top border echoes the same motif already used to separate
 	   .image-placeholder above from its caption. */
 	.iot-flow {
-		background: var(--color-bg);
+		/* background-color, not the background shorthand — see the comment
+		   on .iot-card above. */
+		background-color: var(--color-bg);
 		border: 1px solid var(--color-border);
 		border-top: 1px dashed var(--color-border);
 		border-radius: 0 0 12px 12px;
@@ -672,7 +686,7 @@ const iotItems = [
 		line-height: 1.35;
 		letter-spacing: 0.01em;
 		text-transform: uppercase;
-		color: var(--color-indigo);
+		color: var(--color-ink);
 	}
 
 	.iot-flow-arrow {

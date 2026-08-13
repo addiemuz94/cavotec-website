@@ -24,28 +24,15 @@ const services = [
 	},
 ];
 
-// Build a seamless repeating sine-wave path for the hero's animated
-// "signal" line. The pattern is drawn twice back to back (0–800 and
-// 800–1600) so translating the rendered SVG by exactly half its width
-// loops without a visible seam.
-const SEGMENT_WIDTH = 40;
-const SEGMENTS_PER_CYCLE = 20; // 20 * 40 = 800 units per repeat
-const AMPLITUDE = 10;
-
-function buildWaveSegment(offsetX) {
-	let d = `M${offsetX},20`;
-	for (let i = 0; i < SEGMENTS_PER_CYCLE; i++) {
-		const x0 = offsetX + i * SEGMENT_WIDTH;
-		const x1 = x0 + SEGMENT_WIDTH / 4;
-		const x2 = x0 + (SEGMENT_WIDTH * 3) / 4;
-		const x3 = x0 + SEGMENT_WIDTH;
-		const cy = i % 2 === 0 ? 20 - AMPLITUDE : 20 + AMPLITUDE;
-		d += ` C${x1},${cy} ${x2},${cy} ${x3},20`;
-	}
-	return d;
-}
-
-const signalWavePath = `${buildWaveSegment(0)} ${buildWaveSegment(800).replace(/^M[\d.]+,20/, 'L800,20')}`;
+// Hero background crossfade — filenames only; the images themselves are
+// dropped into public/images/hero/ later. Kept as a plain array so adding a
+// 5th image later is a one-line change here (see the cycling script below).
+const heroBackgrounds = [
+	'/images/hero/hero-bg-1.jpg',
+	'/images/hero/hero-bg-2.jpg',
+	'/images/hero/hero-bg-3.jpg',
+	'/images/hero/hero-bg-4.jpg',
+];
 
 // "By the numbers" stats strip — general capability stats only, no
 // certification/accreditation claims (those live on the Services page).
@@ -62,51 +49,29 @@ const stats = [
 	description="Cavotec Malaysia Sdn Bhd provides test and measurement solutions, telecommunication equipment, RF & microwave accessories, repair, calibration, training and rental services."
 >
 	<section class="hero">
-		<div class="hero-grid" aria-hidden="true" data-parallax-bg></div>
+		<!-- Cycling backdrop: plain crossfading layers behind the oscilloscope
+		     grid and the dark overlay, so it reads as mood/texture rather than
+		     content. Cycling is driven by the vanilla-JS loop below; with no
+		     JS (or prefers-reduced-motion) the first image is simply static. -->
+		<div class="hero-bg" aria-hidden="true" data-hero-bg>
+			{heroBackgrounds.map((src, index) => (
+				<div class:list={['hero-bg-image', { 'is-active': index === 0 }]} style={`background-image: url(${src});`}></div>
+			))}
+		</div>
+		<!-- No [data-parallax-bg]: the hero owns this element's transform
+		     itself (see the cursor/tilt parallax script below), which folds
+		     in the same scroll-drift the shared Layout.astro treatment gives
+		     every other page's header/hero, so nothing fights over
+		     style.transform. -->
+		<div class="hero-grid" aria-hidden="true"></div>
+		<div class="hero-overlay" aria-hidden="true"></div>
 		<div class="hero-inner">
-			<div class="hero-layout">
-				<div class="hero-content">
-					<h1 data-reveal>Welcome to Cavotec Malaysia Sdn Bhd</h1>
-					<p class="hero-subheading" data-reveal style="--reveal-i: 1;">
-						Home for repair and services of your favorite test and measurement equipment
-					</p>
-					<a href="/services" class="btn btn-accent" data-reveal style="--reveal-i: 2;">Learn More</a>
-				</div>
-
-				<!-- Illustrative "live monitoring" readout — a visual accompaniment,
-				     not real telemetry. The signal-wave lives inside it so the two
-				     animated pieces read as one instrument rather than two separate
-				     competing motions. Hidden from assistive tech: it's decorative
-				     flavor, and auto-updating text without aria-live would be a
-				     confusing announcement anyway. -->
-				<div class="hero-readout" data-reveal style="--reveal-i: 3;" aria-hidden="true">
-					<div class="hero-readout-ticks"></div>
-					<div class="hero-readout-header">
-						<span class="hero-readout-dot"></span>
-						<span class="hero-readout-title">Live System Status</span>
-					</div>
-
-					<div class="signal-wave">
-						<svg class="signal-wave-svg" viewBox="0 0 1600 40" preserveAspectRatio="none">
-							<path d={signalWavePath} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-						</svg>
-					</div>
-
-					<ul class="hero-readout-rows">
-						<li>
-							<span class="row-label">Signal</span>
-							<span class="row-value spec-mono" data-readout="signal">Stable</span>
-						</li>
-						<li>
-							<span class="row-label">Status</span>
-							<span class="row-value spec-mono" data-readout="status">Monitoring</span>
-						</li>
-						<li>
-							<span class="row-label">Uptime</span>
-							<span class="row-value spec-mono" data-readout="uptime">99.9%</span>
-						</li>
-					</ul>
-				</div>
+			<div class="hero-content">
+				<h1 data-reveal>Welcome to Cavotec Malaysia Sdn Bhd</h1>
+				<p class="hero-subheading" data-reveal style="--reveal-i: 1;">
+					Home for repair and services of your favorite test and measurement equipment
+				</p>
+				<a href="/services" class="btn btn-accent" data-reveal style="--reveal-i: 2;">Learn More</a>
 			</div>
 		</div>
 	</section>
@@ -134,7 +99,7 @@ const stats = [
 			<h2 data-reveal>List of Services Offered</h2>
 			<div class="services-grid">
 				{services.map((service, index) => (
-					<div class="service-card tech-card" data-reveal style={`--reveal-i: ${index};`}>
+					<div class="service-card tech-card" data-shine data-reveal style={`--reveal-i: ${index};`}>
 						<span class="service-icon" aria-hidden="true">
 							{service.icon === 'gauge' && (
 								<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
@@ -252,33 +217,227 @@ const stats = [
 	// If motion is reduced or IntersectionObserver is unavailable, the
 	// server-rendered final values (e.g. "10+") are left exactly as-is.
 
-	// Hero "live system status" readout — purely illustrative, cycles through
-	// a small set of representative (never alarming, never real) values on a
-	// timer so the panel reads as "live" without being tied to any real data.
-	const READOUT_VALUES: Record<string, string[]> = {
-		signal: ['Stable', 'Optimal', 'Nominal'],
-		status: ['Monitoring', 'Active', 'Online'],
-		uptime: ['99.9%', '99.8%', '99.9%'],
-	};
-	const readoutRows = document.querySelectorAll<HTMLElement>('.hero-readout-rows [data-readout]');
+	// Hero background crossfade — cycles the stacked .hero-bg-image layers by
+	// toggling `is-active` (the fade itself is a CSS transition, see below).
+	// Reduced motion: leave the first image as the single static backdrop.
+	// Off-screen: pause the interval rather than cycling unseen.
+	class HeroBackgroundCycler {
+		private images: HTMLElement[];
+		private index = 0;
+		private timer: number | null = null;
+		private readonly intervalMs = 7000;
 
-	if (!prefersReducedMotion && readoutRows.length) {
-		setInterval(() => {
-			readoutRows.forEach((el) => {
-				const key = el.getAttribute('data-readout');
-				const options = key ? READOUT_VALUES[key] : undefined;
-				if (!options) return;
-				el.classList.add('is-updating');
-				setTimeout(() => {
-					const current = options.indexOf(el.textContent?.trim() ?? '');
-					el.textContent = options[(current + 1) % options.length];
-					el.classList.remove('is-updating');
-				}, 220);
-			});
-		}, 2600);
+		constructor(root: HTMLElement) {
+			this.images = Array.from(root.querySelectorAll<HTMLElement>('.hero-bg-image'));
+		}
+
+		private advance = () => {
+			if (this.images.length < 2) return;
+			this.images[this.index].classList.remove('is-active');
+			this.index = (this.index + 1) % this.images.length;
+			this.images[this.index].classList.add('is-active');
+		};
+
+		start() {
+			if (this.timer !== null || this.images.length < 2) return;
+			this.timer = window.setInterval(this.advance, this.intervalMs);
+		}
+
+		stop() {
+			if (this.timer === null) return;
+			window.clearInterval(this.timer);
+			this.timer = null;
+		}
 	}
-	// If motion is reduced, the rows stay exactly as server-rendered — a
-	// complete, valid static state, never a half-updated flicker.
+
+	const heroSection = document.querySelector<HTMLElement>('.hero');
+	const heroBgRoot = document.querySelector<HTMLElement>('[data-hero-bg]');
+
+	if (!prefersReducedMotion && heroSection && heroBgRoot) {
+		const cycler = new HeroBackgroundCycler(heroBgRoot);
+
+		if ('IntersectionObserver' in window) {
+			const heroBgObserver = new IntersectionObserver(
+				(entries) => {
+					for (const entry of entries) {
+						if (entry.isIntersecting) {
+							cycler.start();
+						} else {
+							cycler.stop();
+						}
+					}
+				},
+				{ threshold: 0 }
+			);
+			heroBgObserver.observe(heroSection);
+		} else {
+			cycler.start();
+		}
+	}
+	// If motion is reduced, .hero-bg-image:first-child keeps its server-
+	// rendered `is-active` class and every other layer stays at opacity 0 —
+	// a complete, valid static backdrop, no JS required.
+
+	// Hero background parallax — the oscilloscope-grid texture drifts a few
+	// pixels toward the cursor (desktop) or device tilt (touch), eased with
+	// a lerp so it reads as an ambient, instrument-panel-like response
+	// rather than a flashy effect. Confined entirely to this decorative
+	// layer: the heading/subtext/button live in .hero-inner, which this
+	// class never touches, so they stay fixed and fully readable. Folds in
+	// the same scroll-based drift Layout.astro's shared [data-parallax-bg]
+	// gives every other page's header — .hero-grid deliberately opts out of
+	// that attribute (see the markup above) so this class is the sole owner
+	// of its transform instead of two scripts fighting over the property.
+	class HeroParallax {
+		private readonly hero: HTMLElement;
+		private readonly grid: HTMLElement;
+		private readonly maxOffset = 60; // px — pushed further again after 40px/0.5 still read as too subtle
+		private readonly ease = 0.08; // lerp factor per frame toward the target
+		private targetX = 0;
+		private targetY = 0;
+		private currentX = 0;
+		private currentY = 0;
+		private scrollOffsetY = 0;
+		private rafId: number | null = null;
+		private visible = true;
+		private readonly controller = new AbortController();
+
+		constructor(hero: HTMLElement, grid: HTMLElement) {
+			this.hero = hero;
+			this.grid = grid;
+		}
+
+		start() {
+			const { signal } = this.controller;
+			const supportsHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+			if (supportsHover) {
+				this.hero.addEventListener('pointermove', this.handlePointerMove, { passive: true, signal });
+				this.hero.addEventListener('pointerleave', this.handlePointerLeave, { passive: true, signal });
+			} else if (typeof DeviceOrientationEvent !== 'undefined') {
+				this.attachOrientation(signal);
+			}
+			// No hover-capable pointer and no orientation support: targetX/Y
+			// simply never move, so the grid stays static — never an error.
+
+			window.addEventListener('scroll', this.updateScrollOffset, { passive: true, signal });
+			window.addEventListener('resize', this.updateScrollOffset, { passive: true, signal });
+			this.updateScrollOffset();
+
+			if ('IntersectionObserver' in window) {
+				const observer = new IntersectionObserver(
+					(entries) => {
+						for (const entry of entries) {
+							this.visible = entry.isIntersecting;
+							if (this.visible) this.wake();
+						}
+					},
+					{ threshold: 0 }
+				);
+				observer.observe(this.hero);
+				signal.addEventListener('abort', () => observer.disconnect());
+			}
+		}
+
+		destroy() {
+			this.controller.abort();
+			if (this.rafId !== null) cancelAnimationFrame(this.rafId);
+			this.rafId = null;
+		}
+
+		private attachOrientation(signal: AbortSignal) {
+			const requestPermission = (
+				DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> }
+			).requestPermission;
+
+			if (typeof requestPermission === 'function') {
+				// iOS 13+ gates orientation behind an explicit permission grant,
+				// which in turn normally requires an active user gesture to
+				// resolve as "granted". There's no gesture here, so this either
+				// silently succeeds (already granted) or rejects — either way
+				// the grid just stays static instead of throwing.
+				requestPermission()
+					.then((state) => {
+						if (state === 'granted') {
+							window.addEventListener('deviceorientation', this.handleOrientation, { passive: true, signal });
+						}
+					})
+					.catch(() => {});
+			} else {
+				window.addEventListener('deviceorientation', this.handleOrientation, { passive: true, signal });
+			}
+		}
+
+		private clamp(value: number, min: number, max: number) {
+			return Math.min(Math.max(value, min), max);
+		}
+
+		private handlePointerMove = (event: PointerEvent) => {
+			const rect = this.hero.getBoundingClientRect();
+			const relX = (event.clientX - rect.left) / rect.width - 0.5;
+			const relY = (event.clientY - rect.top) / rect.height - 0.5;
+			this.targetX = this.clamp(relX * this.maxOffset * 2, -this.maxOffset, this.maxOffset);
+			this.targetY = this.clamp(relY * this.maxOffset * 2, -this.maxOffset, this.maxOffset);
+			this.wake();
+		};
+
+		private handlePointerLeave = () => {
+			this.targetX = 0;
+			this.targetY = 0;
+			this.wake();
+		};
+
+		private handleOrientation = (event: DeviceOrientationEvent) => {
+			if (event.beta === null || event.gamma === null) return;
+			const tiltX = this.clamp(event.gamma, -25, 25);
+			const tiltY = this.clamp(event.beta - 45, -25, 25); // ~45° = phone held naturally, treated as centered
+			this.targetX = (tiltX / 25) * this.maxOffset;
+			this.targetY = (tiltY / 25) * this.maxOffset;
+			this.wake();
+		};
+
+		private updateScrollOffset = () => {
+			this.scrollOffsetY = this.hero.getBoundingClientRect().top * 0.12;
+			this.wake();
+		};
+
+		private wake() {
+			if (this.rafId === null && this.visible) {
+				this.rafId = requestAnimationFrame(this.tick);
+			}
+		}
+
+		private tick = () => {
+			this.currentX += (this.targetX - this.currentX) * this.ease;
+			this.currentY += (this.targetY - this.currentY) * this.ease;
+			this.grid.style.transform = `translate3d(${this.currentX.toFixed(2)}px, ${(this.currentY + this.scrollOffsetY).toFixed(2)}px, 0)`;
+
+			const settled = Math.abs(this.targetX - this.currentX) < 0.05 && Math.abs(this.targetY - this.currentY) < 0.05;
+
+			if (this.visible && !settled) {
+				this.rafId = requestAnimationFrame(this.tick);
+			} else {
+				this.rafId = null;
+			}
+		};
+	}
+
+	const heroGridEl = document.querySelector<HTMLElement>('.hero-grid');
+
+	if (!prefersReducedMotion && heroSection && heroGridEl) {
+		const parallax = new HeroParallax(heroSection, heroGridEl);
+		parallax.start();
+
+		// Defensive cleanup for client-side page navigation — a no-op today
+		// since this site doesn't run Astro's View Transitions router (each
+		// navigation is a full page load, which discards listeners/rAF for
+		// free), but keeps this safe to adopt later without leaking either.
+		document.addEventListener('astro:before-swap', () => parallax.destroy(), { once: true });
+		window.addEventListener('pagehide', () => parallax.destroy(), { once: true });
+	}
+	// If motion is reduced, .hero-grid keeps its default (untransformed)
+	// position — fully static, exactly like every other page's
+	// [data-parallax-bg] texture under reduced motion.
 </script>
 
 <style>
@@ -328,22 +487,30 @@ const stats = [
 	.hero {
 		position: relative;
 		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
-		color: #ffffff;
+		color: var(--color-ink);
 		padding: 6.5rem 1.5rem;
 		text-align: center;
 		overflow: hidden;
 		isolation: isolate;
 	}
 
-	/* Faint oscilloscope-style grid texture */
+	/* Faint oscilloscope-style grid texture. Line opacity bumped from the
+	   0.08–0.09 used on every other page's static header/hero grid, and the
+	   radial mask widened — this is the one grid texture on the site that
+	   carries the cursor/tilt parallax (see script below). Confirmed via an
+	   exaggerated sanity check (80px offset, 0.6 opacity, temporary debug
+	   border, mask disabled) that the transform pipeline itself was never
+	   the problem — the movement was real and measurable at every value
+	   tried; it just wasn't *visible* at the original 9%-opacity, tightly
+	   masked settings. This is a perceptibility tuning value, not a hack. */
 	.hero-grid {
 		position: absolute;
 		inset: 0;
-		z-index: -1;
+		z-index: -2;
 		background-image:
-			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.09) 0 1px, transparent 1px 48px),
-			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.09) 0 1px, transparent 1px 48px);
-		mask-image: radial-gradient(ellipse at center, black 15%, transparent 75%);
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.7) 0 1px, transparent 1px 48px),
+			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.7) 0 1px, transparent 1px 48px);
+		mask-image: radial-gradient(ellipse at center, black 25%, transparent 100%);
 	}
 
 	.hero-inner {
@@ -352,16 +519,9 @@ const stats = [
 		position: relative;
 	}
 
-	.hero-layout {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 3rem;
-	}
-
 	.hero-content {
-		flex: 1 1 380px;
 		max-width: 620px;
+		margin: 0 auto;
 	}
 
 	.hero h1 {
@@ -373,147 +533,49 @@ const stats = [
 
 	.hero-subheading {
 		font-size: clamp(1rem, 2vw, 1.25rem);
-		color: #cfdbe8;
+		color: var(--color-ink-muted);
 		line-height: 1.6;
 		margin: 0 0 2.25rem;
 	}
 
-	/* Animated signal-wave line — lives inside the readout panel so it and
-	   the "live" data rows read as one instrument. */
-	.signal-wave {
-		width: 100%;
-		height: 28px;
-		margin: 0 0 1.1rem;
-		overflow: hidden;
-		color: var(--color-teal);
-		opacity: 0.85;
+	/* Cycling backdrop — stacked, absolutely-positioned layers crossfade via
+	   opacity transitions (class-toggled by the vanilla-JS loop below). Sits
+	   behind both the oscilloscope grid (.hero-grid) and the dark overlay
+	   (.hero-overlay), so it always reads as a subtle, moody backdrop rather
+	   than competing with the heading/subtext/button in front. */
+	.hero-bg {
+		position: absolute;
+		inset: 0;
+		z-index: -3;
 	}
 
-	.signal-wave-svg {
-		display: block;
-		width: 200%;
-		height: 100%;
+	.hero-bg-image {
+		position: absolute;
+		inset: 0;
+		background-size: cover;
+		background-position: center;
+		opacity: 0;
+		transition: opacity 1.8s ease;
 	}
 
-	@media (prefers-reduced-motion: no-preference) {
-		.signal-wave-svg {
-			animation: signal-scroll 7s linear infinite;
-		}
+	.hero-bg-image.is-active {
+		opacity: 1;
 	}
 
-	@keyframes signal-scroll {
-		from {
-			transform: translateX(0);
-		}
-		to {
-			transform: translateX(-50%);
-		}
+	/* Dark indigo wash over the cycling images/grid texture — keeps heading,
+	   subtext and button fully readable regardless of what the backdrop
+	   image looks like. */
+	.hero-overlay {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background: rgba(var(--color-indigo-rgb), 0.85);
 	}
 
-	/* Hero "live system status" readout panel — instrument-readout styling
-	   (dark panel, teal/mono text, tick-mark strip) matching the site's
-	   tick-divider motif, scaled down. Illustrative only, not real data. */
-	.hero-readout {
-		flex: 0 1 300px;
-		width: 100%;
-		max-width: 300px;
-		text-align: left;
-		background: rgba(6, 18, 36, 0.55);
-		border: 1px solid rgba(var(--color-teal-rgb), 0.3);
-		border-radius: 10px;
-		padding: 1.1rem 1.25rem 1.25rem;
-		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-	}
-
-	.hero-readout-ticks {
-		height: 10px;
-		margin-bottom: 1rem;
-		background-image:
-			repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0, rgba(255, 255, 255, 0.14) 1px, transparent 1px, transparent 10px),
-			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.6) 0, rgba(var(--color-teal-rgb), 0.6) 1.5px, transparent 1.5px, transparent 40px);
-		background-repeat: repeat-x, repeat-x;
-		background-position: center, center;
-		background-size: auto 6px, auto 10px;
-	}
-
-	.hero-readout-header {
-		display: flex;
-		align-items: center;
-		gap: 0.55rem;
-		margin-bottom: 1rem;
-	}
-
-	.hero-readout-dot {
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
-		background: var(--color-teal);
-		flex-shrink: 0;
-	}
-
-	@media (prefers-reduced-motion: no-preference) {
-		.hero-readout-dot {
-			animation: pulse-dot 2s ease-in-out infinite;
-		}
-	}
-
-	@keyframes pulse-dot {
-		0%,
-		100% {
-			opacity: 1;
-			box-shadow: 0 0 0 0 rgba(var(--color-teal-rgb), 0.55);
-		}
-		50% {
-			opacity: 0.7;
-			box-shadow: 0 0 0 4px rgba(var(--color-teal-rgb), 0);
-		}
-	}
-
-	.hero-readout-title {
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		font-weight: 600;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
-		color: var(--color-teal);
-	}
-
-	.hero-readout-rows {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 0.6rem;
-	}
-
-	.hero-readout-rows li {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 0.75rem;
-		font-size: 0.78rem;
-	}
-
-	.row-label {
-		color: rgba(255, 255, 255, 0.5);
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-	}
-
-	.row-value {
-		color: var(--color-teal);
-		font-weight: 600;
-		transition: opacity 0.2s ease;
-	}
-
-	.row-value.is-updating {
-		opacity: 0.2;
-	}
-
-	/* "By the numbers" stats strip — sits between the dark hero and the
-	   white services section, so bg-alt keeps the light/dark rhythm going
-	   without repeating either neighbor's background. */
+	/* "By the numbers" stats strip — bg-alt (base black) sits between the
+	   hero and the services section (elevated surface), alternating the
+	   site's two dark tones the same way bg/bg-alt alternated light tones
+	   before the black retheme. */
 	.stats-strip {
 		background: var(--color-bg-alt);
 		padding: 3.5rem 1.5rem;
@@ -564,7 +626,7 @@ const stats = [
 		font-size: 0.85rem;
 		font-weight: 600;
 		letter-spacing: 0.01em;
-		color: var(--color-indigo);
+		color: var(--color-ink);
 		max-width: 18ch;
 	}
 
@@ -582,7 +644,7 @@ const stats = [
 	.services h2 {
 		text-align: center;
 		font-size: clamp(1.6rem, 3vw, 2.2rem);
-		color: var(--color-indigo);
+		color: var(--color-ink);
 		margin: 0 0 3rem;
 		position: relative;
 	}
@@ -604,8 +666,11 @@ const stats = [
 	}
 
 	.service-card {
-		background: var(--color-bg);
-		border: 1px solid var(--color-border, #e1e6ee);
+		/* background-color, not the background shorthand — the shine's
+		   background-image (see [data-shine] in Layout.astro) needs the
+		   image slot left alone, or this shorthand would reset it to none. */
+		background-color: var(--color-bg);
+		border: 1px solid var(--color-border);
 		border-radius: 10px;
 		padding: 2.25rem 1.5rem;
 		text-align: center;
@@ -623,8 +688,8 @@ const stats = [
 		width: 60px;
 		height: 60px;
 		border-radius: 50%;
-		background: rgba(11, 30, 58, 0.06);
-		color: var(--color-indigo);
+		background: rgba(var(--color-teal-rgb), 0.12);
+		color: var(--color-teal);
 		transition: background 0.25s ease, color 0.25s ease;
 	}
 
@@ -646,7 +711,7 @@ const stats = [
 	.closing-cta {
 		position: relative;
 		background: var(--color-indigo);
-		color: #ffffff;
+		color: var(--color-ink);
 		padding: 4.5rem 1.5rem;
 		text-align: center;
 		overflow: hidden;
@@ -679,21 +744,6 @@ const stats = [
 		.stats-grid {
 			grid-template-columns: repeat(2, 1fr);
 			gap: 2.25rem 1.5rem;
-		}
-	}
-
-	@media (max-width: 860px) {
-		.hero-layout {
-			flex-direction: column;
-			gap: 2.25rem;
-		}
-
-		.hero-content {
-			max-width: 620px;
-		}
-
-		.hero-readout {
-			max-width: 340px;
 		}
 	}
 

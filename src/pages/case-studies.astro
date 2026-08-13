@@ -57,7 +57,7 @@ const caseStudies = [
 			</p>
 			<div class="case-studies-grid">
 				{caseStudies.map((study, index) => (
-					<article class="case-study-card tech-card" data-reveal style={`--reveal-i: ${index};`}>
+					<article class="case-study-card tech-card" data-shine data-reveal style={`--reveal-i: ${index};`}>
 						<span class="case-study-icon" aria-hidden="true">
 							{study.icon === 'tower' && (
 								<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
@@ -112,7 +112,7 @@ const caseStudies = [
 	.page-header {
 		position: relative;
 		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
-		color: #ffffff;
+		color: var(--color-ink);
 		padding: 4.5rem 1.5rem 3.5rem;
 		text-align: center;
 		overflow: hidden;
@@ -179,7 +179,9 @@ const caseStudies = [
 	}
 
 	.case-study-card {
-		background: var(--color-bg-alt);
+		/* background-color, not the background shorthand — see the matching
+		   comment on .service-card in index.astro for why. */
+		background-color: var(--color-bg-alt);
 		border: 1px solid var(--color-border);
 		border-radius: 12px;
 		padding: 2rem 1.75rem;
@@ -187,6 +189,9 @@ const caseStudies = [
 		flex-direction: column;
 		gap: 1.25rem;
 		text-align: left;
+		/* Matches .service-card/.pillar-card/.product-card/.iot-item — see
+		   the identical comment on .customize-card in services.astro. */
+		transition: transform 0.25s ease, box-shadow 0.25s ease;
 	}
 
 	.case-study-icon {
@@ -204,7 +209,7 @@ const caseStudies = [
 		font-family: var(--font-display);
 		font-size: 1.1rem;
 		font-weight: 700;
-		color: var(--color-indigo);
+		color: var(--color-ink);
 		margin: 0;
 		line-height: 1.35;
 	}
