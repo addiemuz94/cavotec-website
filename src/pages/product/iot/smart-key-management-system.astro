@@ -1,0 +1,959 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+// No real product photo yet — renders the styled placeholder below.
+// Drop the real photo in at src/assets/products/smart-key-management-system.<ext>
+// (jpg/jpeg/png/webp) and swap it in via Astro's <Image> component
+// (see how src/layouts/Layout.astro imports the logo for the pattern).
+
+const features = [
+	'Real-time key tracking across every cabinet and access point',
+	'Remote access control, grantable or revocable from a central dashboard',
+	'Automated audit logging for every check-out and return event',
+	'Role-based permissions for individual users, teams, or shifts',
+	'Tamper and unauthorized-access alerts sent as they happen',
+];
+
+// PLACEHOLDER CONTENT — adjust step wording once real eKMS workflow details
+// are confirmed. Icons/markup reuse the exact "How It Works" flow pattern
+// already built for the IoT cards on products.astro (.iot-flow-*).
+const howItWorksSteps = [
+	{ label: 'Key Assignment', description: 'Admin assigns keys to authorized users via the eKMS portal', icon: 'key' },
+	{
+		label: 'Secure Access',
+		description: 'User authenticates at the cabinet (PIN/card/biometric) to release their assigned key',
+		icon: 'lock',
+	},
+	{
+		label: 'Real-Time Tracking',
+		description: 'System logs every check-in/check-out with timestamp and user ID',
+		icon: 'dashboard',
+	},
+	{
+		label: 'Audit & Reporting',
+		description: 'Admins review usage history and generate compliance reports anytime',
+		icon: 'database',
+	},
+];
+
+// PLACEHOLDER CONTENT — generic, plausible copy for an IoT key-management
+// product, written pending real product specs. Replace once confirmed
+// against Cavotec's actual eKMS documentation.
+const faqs = [
+	{
+		question: 'Does the Smart Key Management System require special hardware installation?',
+		answer:
+			"The system is built around a secure, connected key cabinet installed at your facility. Installation is straightforward and typically completed by a technician in a single visit, with minimal disruption to existing operations.",
+	},
+	{
+		question: 'Can it integrate with our existing access control or security systems?',
+		answer:
+			"Yes — the eKMS platform is designed to work alongside common access control and security systems, and can be configured to share event data with your existing monitoring setup.",
+	},
+	{
+		question: 'How many keys/users can one cabinet support?',
+		answer:
+			'Cabinet capacity and user counts scale to fit your site, from a single small cabinet supporting a handful of keys and users up to larger, multi-cabinet deployments for bigger teams and facilities.',
+	},
+	{
+		question: 'Is remote/off-site monitoring available?',
+		answer:
+			'Yes — authorized administrators can monitor key status, access activity, and alerts remotely through the eKMS portal from any authorized device with an internet connection.',
+	},
+	{
+		question: "What happens if there's a power outage or network disruption?",
+		answer:
+			'The system is designed with local fail-safes so authorized access remains available during short outages, with all activity synced back to the central dashboard once power and connectivity are restored.',
+	},
+];
+
+// PLACEHOLDER CONTENT — illustrative comparison rows pending confirmed
+// product data; replace once real specs/comparisons are available.
+const comparisonRows = [
+	{ capability: 'Key Tracking', traditional: 'Manual logbook', smart: 'Automatic real-time logging' },
+	{ capability: 'Access Control', traditional: 'Physical key/lock only', smart: 'PIN/card/biometric authentication' },
+	{ capability: 'Audit Trail', traditional: 'None or manual', smart: 'Full digital audit history' },
+	{ capability: 'Remote Monitoring', traditional: 'Not available', smart: 'Available via eKMS portal' },
+	{ capability: 'Lost Key Response', traditional: 'Re-key entire system', smart: 'Instant deactivation of single key' },
+];
+---
+
+<Layout
+	title="Smart Key Management System — Cavotec Malaysia Sdn Bhd"
+	description="An IoT-based electronic key management and access control solution from Cavotec Malaysia — secure key storage, real-time tracking, and a complete audit trail."
+>
+	<section class="page-header">
+		<div class="page-header-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="page-header-inner" data-reveal>
+			<span class="eyebrow">Internet of Things (IoT)</span>
+			<h1>Smart Key Management System</h1>
+			<p class="product-tagline">
+				Secure, connected key control — real-time tracking and a complete audit trail for every
+				access event.
+			</p>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="product-overview">
+		<div class="product-overview-inner">
+			<div class="product-image-placeholder" data-reveal>
+				<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<rect x="3" y="4" width="18" height="16" rx="2" />
+					<circle cx="8.5" cy="9.5" r="1.5" />
+					<path d="M21 16l-5.5-5.5a1.5 1.5 0 0 0-2.1 0L4 19" />
+				</svg>
+				<strong>Smart Key Management System</strong>
+				<span>Product image — coming soon</span>
+			</div>
+
+			<div class="product-description" data-reveal style="--reveal-i: 1;">
+				<h2>About the System</h2>
+				<p>
+					The Smart Key Management System (eKMS) is an IoT-based electronic key management and
+					access control solution built for facilities that need to know exactly who holds a key,
+					when, and why. Keys are stored in a secure, connected cabinet and released only to
+					authorized users, replacing manual sign-out sheets and unmonitored key boxes with a
+					fully auditable digital record.
+				</p>
+				<p>
+					Every check-out and return is logged automatically and reported in real time to a
+					central dashboard, giving facility and security managers instant visibility into key
+					usage across sites. Access rules can be configured per user, team, or shift, so the
+					right people have the right access without manual oversight.
+				</p>
+				<p>
+					Designed to integrate with Cavotec Malaysia's broader test and measurement and IoT
+					offerings, the system scales from a single cabinet to a multi-site deployment, giving
+					operations teams a consistent, connected view of key and access control across their
+					entire facility footprint.
+				</p>
+
+				<h3>Key Features</h3>
+				<ul class="product-features">
+					{features.map((feature) => (
+						<li>
+							<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<circle cx="12" cy="12" r="9" />
+								<path d="M8 12.5l2.5 2.5L5.5 9" />
+							</svg>
+							<span>{feature}</span>
+						</li>
+					))}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the 4 steps below are illustrative — adjust
+	     wording once real eKMS workflow details are confirmed. Markup/CSS
+	     reuse the exact "How It Works" flow pattern already built for the
+	     IoT cards on products.astro (.iot-flow / .iot-flow-step / …) rather
+	     than inventing a new diagram style. -->
+	<section class="product-how-it-works">
+		<div class="product-how-it-works-inner">
+			<h2 data-reveal>How It Works</h2>
+			<div class="iot-flow tech-card" data-shine data-reveal style="--reveal-i: 1;">
+				<ol class="iot-flow-steps">
+					{howItWorksSteps.map((step, index) => (
+						<>
+							<li class="iot-flow-step">
+								<span class="iot-flow-icon" aria-hidden="true">
+									{step.icon === 'key' && (
+										<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+											<circle cx="8" cy="8" r="4" />
+											<path d="M11 11l9 9" />
+											<path d="M17 17l2-2" />
+											<path d="M15 19l2-2" />
+										</svg>
+									)}
+									{step.icon === 'lock' && (
+										<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+											<rect x="5" y="11" width="14" height="9" rx="2" />
+											<path d="M8 11V7a4 4 0 0 1 8 0v4" />
+										</svg>
+									)}
+									{step.icon === 'dashboard' && (
+										<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+											<rect x="3" y="4" width="18" height="12" rx="2" />
+											<path d="M8 20h8M12 16v4" />
+										</svg>
+									)}
+									{step.icon === 'database' && (
+										<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+											<ellipse cx="12" cy="6" rx="7" ry="3" />
+											<path d="M5 6v12c0 1.66 3.13 3 7 3s7-1.34 7-3V6" />
+											<path d="M5 12c0 1.66 3.13 3 7 3s7-1.34 7-3" />
+										</svg>
+									)}
+								</span>
+								<span class="iot-flow-label spec-mono">{step.label}</span>
+								<span class="iot-flow-description">{step.description}</span>
+							</li>
+							{index < howItWorksSteps.length - 1 && (
+								<li class="iot-flow-arrow" aria-hidden="true">
+									<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M5 12h14M13 6l6 6-6 6" />
+									</svg>
+								</li>
+							)}
+						</>
+					))}
+				</ol>
+			</div>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the 5 Q&As below are generic, plausible copy
+	     for an IoT key-management product, written pending real product
+	     specs — replace once confirmed against Cavotec's actual eKMS
+	     documentation. -->
+	<section class="product-faq">
+		<div class="product-faq-inner">
+			<h2 data-reveal>Frequently Asked Questions</h2>
+			<div class="faq-list" data-reveal style="--reveal-i: 1;">
+				{faqs.map((faq, index) => (
+					<div class="faq-item">
+						<h3 class="faq-heading">
+							<button
+								type="button"
+								class="faq-question"
+								id={`faq-question-${index}`}
+								aria-expanded="false"
+								aria-controls={`faq-answer-${index}`}
+							>
+								<span>{faq.question}</span>
+								<svg class="faq-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+									<path d="M6 9l6 6 6-6" />
+								</svg>
+							</button>
+						</h3>
+						<div class="faq-answer" id={`faq-answer-${index}`} role="region" aria-labelledby={`faq-question-${index}`}>
+							<p>{faq.answer}</p>
+						</div>
+					</div>
+				))}
+			</div>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the comparison rows below are illustrative,
+	     pending confirmed product data — replace once real specs/
+	     comparisons are available. -->
+	<section class="product-comparison">
+		<div class="product-comparison-inner">
+			<h2 data-reveal>Smart Key Management vs. Traditional Key Cabinets</h2>
+			<div class="comparison-table-wrapper" data-reveal style="--reveal-i: 1;">
+				<table class="comparison-table">
+					<thead>
+						<tr>
+							<th scope="col">Capability</th>
+							<th scope="col">Traditional Key Cabinets</th>
+							<th scope="col" class="comparison-highlight">Smart Key Management System</th>
+						</tr>
+					</thead>
+					<tbody>
+						{comparisonRows.map((row) => (
+							<tr>
+								<th scope="row">{row.capability}</th>
+								<td>{row.traditional}</td>
+								<td class="comparison-highlight">{row.smart}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</section>
+
+	<section class="closing-cta">
+		<div class="closing-cta-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="closing-cta-inner" data-reveal>
+			<h2>See the Smart Key Management System in Action</h2>
+			<p>Book a demo with our team, or explore the eKMS portal to see the platform for yourself.</p>
+			<div class="product-cta-group">
+				<a href="/contact?subject=Smart%20Key%20Management%20System%20Demo" class="btn btn-accent">Book a Demo</a>
+				<a
+					href="https://kms-cvt.com"
+					class="btn btn-outline"
+					target="_blank"
+					rel="noopener noreferrer"
+					aria-label="eKMS Portal (opens in a new tab)"
+				>
+					eKMS Portal
+					<svg class="external-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M7 17L17 7" />
+						<path d="M8 7h9v9" />
+					</svg>
+				</a>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<script>
+	// FAQ accordion — single-open (opening one closes any other that was
+	// open). Height is animated by measuring each panel's real scrollHeight
+	// rather than a static max-height guess, so short and long answers both
+	// animate to their exact size. Buttons are native <button> elements, so
+	// Enter/Space activation and focus-visible styling come for free — no
+	// custom keydown handling needed here.
+	//
+	// Wrapped in a function and re-run via astro:page-load (fires on the
+	// true initial load and again after every subsequent ClientRouter
+	// transition, now that Layout.astro runs <ClientRouter />) instead of
+	// running once at the top of this script — this page's content lives
+	// inside <main>, which gets replaced on every navigation, so the
+	// accordion needs a fresh init on every visit here, not just the first.
+	// This page's own copy of the accordion is otherwise deliberately left
+	// untouched (kept as the original reference version — see
+	// FaqAccordion.astro's comment); this specific change is the minimum
+	// needed so it keeps working at all once ClientRouter is in play.
+	let faqController: AbortController | null = null;
+
+	function initFaq() {
+		faqController?.abort();
+		faqController = new AbortController();
+		const { signal } = faqController;
+
+		const faqItems = document.querySelectorAll<HTMLElement>('.faq-item');
+
+		function closeFaqItem(item: HTMLElement) {
+			const button = item.querySelector<HTMLButtonElement>('.faq-question');
+			const answer = item.querySelector<HTMLElement>('.faq-answer');
+			item.classList.remove('is-open');
+			button?.setAttribute('aria-expanded', 'false');
+			if (answer) answer.style.maxHeight = '0px';
+		}
+
+		function openFaqItem(item: HTMLElement) {
+			const button = item.querySelector<HTMLButtonElement>('.faq-question');
+			const answer = item.querySelector<HTMLElement>('.faq-answer');
+			faqItems.forEach((other) => {
+				if (other !== item) closeFaqItem(other);
+			});
+			item.classList.add('is-open');
+			button?.setAttribute('aria-expanded', 'true');
+			if (answer) answer.style.maxHeight = `${answer.scrollHeight}px`;
+		}
+
+		faqItems.forEach((item) => {
+			const button = item.querySelector<HTMLButtonElement>('.faq-question');
+			button?.addEventListener(
+				'click',
+				() => {
+					if (item.classList.contains('is-open')) {
+						closeFaqItem(item);
+					} else {
+						openFaqItem(item);
+					}
+				},
+				{ signal }
+			);
+		});
+
+		// If the window is resized while an item is open, its measured
+		// scrollHeight can go stale (e.g. text reflows to more/fewer lines) —
+		// re-measure the currently open item so it doesn't get clipped.
+		window.addEventListener(
+			'resize',
+			() => {
+				const openItem = document.querySelector<HTMLElement>('.faq-item.is-open');
+				const openAnswer = openItem?.querySelector<HTMLElement>('.faq-answer');
+				if (openAnswer) openAnswer.style.maxHeight = `${openAnswer.scrollHeight}px`;
+			},
+			{ signal }
+		);
+	}
+
+	document.addEventListener('astro:page-load', initFaq);
+	document.addEventListener('astro:before-swap', () => faqController?.abort());
+</script>
+
+<style>
+	/* Page header — same recipe used on every other page (services.astro,
+	   products.astro, …); each page keeps its own copy since this <style>
+	   block is scoped to this file. */
+	.page-header {
+		position: relative;
+		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem 3.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.page-header-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image:
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px),
+			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: radial-gradient(ellipse at center, black 15%, transparent 75%);
+	}
+
+	.page-header-inner {
+		max-width: 760px;
+		margin: 0 auto;
+		position: relative;
+	}
+
+	.eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-amber);
+		margin-bottom: 0.75rem;
+	}
+
+	.page-header h1 {
+		font-size: clamp(2rem, 4.5vw, 2.75rem);
+		font-weight: 700;
+		margin: 0 0 0.85rem;
+	}
+
+	.product-tagline {
+		font-size: 1.05rem;
+		line-height: 1.6;
+		color: var(--color-ink-muted);
+		max-width: 56ch;
+		margin: 0 auto;
+	}
+
+	/* Overview */
+	.product-overview {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-overview-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+		display: grid;
+		grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+		gap: 3rem;
+		align-items: start;
+	}
+
+	.product-image-placeholder {
+		aspect-ratio: 4 / 3;
+		/* No explicit width — a grid item stretches to fill its column by
+		   default. Declaring width: 100% here (content-box, the default)
+		   would add the padding below ON TOP of that 100%, overflowing the
+		   column by exactly the padding amount — confirmed on mobile, where
+		   this pushed 10px past the viewport. Same root cause as the
+		   sitewide `section { width: 100%; }` bug removed earlier. */
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.6rem;
+		text-align: center;
+		padding: 1.5rem;
+		color: var(--color-text-muted);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		/* Diagonal placeholder stripe built from the site's two dark tones,
+		   matching the fallback used for missing product photos elsewhere
+		   on the site (see products.astro's .image-placeholder). */
+		background: repeating-linear-gradient(
+			135deg,
+			var(--color-indigo),
+			var(--color-indigo) 10px,
+			var(--color-surface) 10px,
+			var(--color-surface) 20px
+		);
+		position: sticky;
+		top: calc(var(--header-height) + 1.5rem);
+	}
+
+	.product-image-placeholder strong {
+		font-size: 1rem;
+		color: var(--color-text);
+	}
+
+	.product-image-placeholder span {
+		font-size: 0.8rem;
+	}
+
+	.product-description h2 {
+		font-size: 1.4rem;
+		color: var(--color-text);
+		margin: 0 0 1.25rem;
+	}
+
+	.product-description h3 {
+		font-size: 1.05rem;
+		color: var(--color-text);
+		margin: 2rem 0 1rem;
+	}
+
+	.product-description p {
+		font-size: 0.98rem;
+		line-height: 1.75;
+		color: var(--color-text-muted);
+		margin: 0 0 1.25rem;
+	}
+
+	.product-features {
+		list-style: none;
+		margin: 0 0 2rem;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.product-features li {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.65rem;
+		font-size: 0.92rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
+	}
+
+	.product-features svg {
+		flex-shrink: 0;
+		margin-top: 0.1rem;
+		color: var(--color-teal);
+	}
+
+	.product-cta-group {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+	}
+
+	/* Buttons — .btn/.btn-accent match the shared recipe used on every page
+	   (see index.astro); .btn-outline is new here (no existing secondary/
+	   outline button on the site yet), built as a sibling variant of the
+	   same .btn base. */
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.85rem 2rem;
+		border-radius: 4px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: 0.01em;
+		border: none;
+		cursor: pointer;
+		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+	}
+
+	.btn-accent {
+		background: var(--color-teal);
+		color: var(--color-on-accent);
+		box-shadow: 0 6px 20px rgba(var(--color-teal-rgb), 0.35);
+	}
+
+	.btn-accent:hover,
+	.btn-accent:focus-visible {
+		background: #00d9eb;
+		transform: translateY(-2px);
+		box-shadow: 0 10px 26px rgba(var(--color-teal-rgb), 0.45);
+	}
+
+	.btn-outline {
+		background: transparent;
+		color: var(--color-teal);
+		border: 1.5px solid var(--color-teal);
+	}
+
+	.btn-outline:hover,
+	.btn-outline:focus-visible {
+		background: rgba(var(--color-teal-rgb), 0.1);
+		transform: translateY(-2px);
+	}
+
+	.btn-outline .external-icon {
+		opacity: 0.85;
+	}
+
+	@media (max-width: 860px) {
+		.product-overview-inner {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+
+		.product-image-placeholder {
+			position: static;
+			max-width: 380px;
+			margin: 0 auto;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.product-overview {
+			padding: 3.5rem 1.25rem;
+		}
+
+		.product-cta-group {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.btn {
+			justify-content: center;
+		}
+	}
+
+	/* ---------------------------------------------------------------- */
+	/* How It Works — reuses products.astro's .iot-flow diagram pattern   */
+	/* (icon circle → label → connecting arrow, same colors/spacing),     */
+	/* extended with a description line per step since this standalone   */
+	/* diagram needs a full sentence per step rather than a terse label.  */
+	/* ---------------------------------------------------------------- */
+	.product-how-it-works {
+		background: var(--color-bg-alt);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-how-it-works-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+	}
+
+	.product-how-it-works h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	.iot-flow {
+		background-color: var(--color-bg);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		padding: 2rem 1.75rem;
+	}
+
+	.iot-flow-steps {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		align-items: flex-start;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 1.5rem 0.75rem;
+	}
+
+	.iot-flow-step {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 0.6rem;
+		width: 190px;
+		flex-shrink: 0;
+	}
+
+	.iot-flow-icon {
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: rgba(var(--color-teal-rgb), 0.12);
+		color: var(--color-teal-dark, #018b96);
+	}
+
+	.iot-flow-label {
+		font-size: 0.78rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--color-text);
+	}
+
+	.iot-flow-description {
+		font-size: 0.82rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
+	}
+
+	.iot-flow-arrow {
+		display: flex;
+		align-items: center;
+		flex-shrink: 0;
+		color: var(--color-teal);
+		margin-top: 22px;
+	}
+
+	@media (max-width: 760px) {
+		.iot-flow-steps {
+			flex-direction: column;
+			align-items: center;
+			gap: 1.25rem;
+		}
+
+		.iot-flow-step {
+			width: auto;
+			max-width: 320px;
+		}
+
+		.iot-flow-arrow {
+			margin-top: 0;
+			transform: rotate(90deg);
+		}
+	}
+
+	@media (max-width: 600px) {
+		.product-how-it-works {
+			padding: 3.5rem 1.25rem;
+		}
+
+		.iot-flow {
+			padding: 1.75rem 1.25rem;
+		}
+	}
+
+	/* ---------------------------------------------------------------- */
+	/* FAQ accordion — elevated surface + hairline borders, single-open   */
+	/* (opening one closes the others). Height is animated by measuring   */
+	/* scrollHeight in JS rather than a static max-height guess, so it    */
+	/* always matches this content's actual size exactly. */
+	/* ---------------------------------------------------------------- */
+	.product-faq {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-faq-inner {
+		max-width: 760px;
+		margin: 0 auto;
+	}
+
+	.product-faq h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	.faq-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.85rem;
+	}
+
+	.faq-item {
+		background: var(--color-bg-elevated);
+		border: 1px solid var(--color-border);
+		border-radius: 10px;
+		overflow: hidden;
+		transition: border-color 0.2s ease;
+	}
+
+	.faq-item.is-open {
+		border-color: var(--color-teal);
+	}
+
+	.faq-heading {
+		margin: 0;
+	}
+
+	.faq-question {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		width: 100%;
+		padding: 1.1rem 1.35rem;
+		background: none;
+		border: none;
+		text-align: left;
+		font-family: var(--font-display);
+		font-size: 0.98rem;
+		font-weight: 600;
+		color: var(--color-text);
+		cursor: pointer;
+	}
+
+	.faq-question:focus-visible {
+		outline: 2px solid var(--color-teal);
+		outline-offset: -2px;
+	}
+
+	.faq-chevron {
+		flex-shrink: 0;
+		color: var(--color-text-muted);
+		transition: transform 0.2s ease, color 0.2s ease;
+	}
+
+	.faq-item.is-open .faq-chevron {
+		color: var(--color-teal);
+		transform: rotate(180deg);
+	}
+
+	.faq-answer {
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 0.3s ease;
+	}
+
+	.faq-answer p {
+		margin: 0;
+		padding: 0 1.35rem 1.25rem;
+		font-size: 0.92rem;
+		line-height: 1.65;
+		color: var(--color-text-muted);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.faq-answer {
+			transition: none;
+		}
+
+		.faq-chevron {
+			transition: none;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.product-faq {
+			padding: 3.5rem 1.25rem;
+		}
+	}
+
+	/* ---------------------------------------------------------------- */
+	/* Comparison table — horizontal scroll on narrow viewports rather    */
+	/* than a bespoke stacked-card transform, matching the same           */
+	/* "overflow-x: auto" pattern services.astro's .page-subnav already   */
+	/* uses for its mobile scroll strip. */
+	/* ---------------------------------------------------------------- */
+	.product-comparison {
+		background: var(--color-bg-alt);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-comparison-inner {
+		max-width: 900px;
+		margin: 0 auto;
+	}
+
+	.product-comparison h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	.comparison-table-wrapper {
+		background: var(--color-bg-elevated);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.comparison-table {
+		width: 100%;
+		min-width: 560px;
+		border-collapse: collapse;
+	}
+
+	.comparison-table th,
+	.comparison-table td {
+		padding: 0.95rem 1.25rem;
+		text-align: left;
+		font-size: 0.88rem;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.comparison-table thead th {
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+	}
+
+	.comparison-table tbody th {
+		font-family: var(--font-display);
+		font-weight: 600;
+		color: var(--color-text);
+		white-space: nowrap;
+	}
+
+	.comparison-table tbody td {
+		color: var(--color-text-muted);
+	}
+
+	.comparison-table tbody tr:last-child th,
+	.comparison-table tbody tr:last-child td {
+		border-bottom: none;
+	}
+
+	.comparison-table .comparison-highlight {
+		background: rgba(var(--color-teal-rgb), 0.08);
+		color: var(--color-text);
+		font-weight: 500;
+	}
+
+	@media (max-width: 600px) {
+		.product-comparison {
+			padding: 3.5rem 1.25rem;
+		}
+	}
+
+	/* ---------------------------------------------------------------- */
+	/* Closing CTA — same treatment as index.astro's .closing-cta band.  */
+	/* ---------------------------------------------------------------- */
+	.closing-cta {
+		position: relative;
+		background: var(--color-indigo);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.closing-cta-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image: repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: linear-gradient(to bottom, black, transparent);
+	}
+
+	.closing-cta-inner {
+		max-width: 640px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.closing-cta h2 {
+		font-size: clamp(1.5rem, 3vw, 2rem);
+		margin: 0;
+	}
+
+	.closing-cta p {
+		font-size: 1rem;
+		color: var(--color-ink-muted);
+		margin: -0.75rem 0 0;
+	}
+</style>

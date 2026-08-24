@@ -1,0 +1,504 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import HowItWorksFlow from '../../../components/product/HowItWorksFlow.astro';
+import FaqAccordion from '../../../components/product/FaqAccordion.astro';
+import ComparisonTable from '../../../components/product/ComparisonTable.astro';
+
+// PLACEHOLDER CONTENT — this page follows the reference structure built for
+// src/pages/product/iot/smart-key-management-system.astro. Copy below is
+// generic, plausible placeholder text for the Integrated Alarm System,
+// pending real product details from Cavotec Malaysia. How It Works steps
+// reuse the exact flow already defined for this product in products.astro
+// (iotItems > integrated-alarm-system > flow), just with descriptions added.
+
+const features = [
+	'Centralized alarm monitoring across your facility',
+	'Integration with a range of sensor types',
+	'Real-time alerts and notifications',
+	'Central dashboard for facility and security teams',
+	'Scalable from a single site to multiple facilities',
+];
+
+const howItWorksSteps = [
+	{
+		label: 'Sensor Trigger',
+		description: 'A connected sensor detects and triggers an alarm event',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.5" /><path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3" /></svg>',
+	},
+	{
+		label: 'Signal Processing',
+		description: 'The signal is processed and validated by the system',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1" /><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3" /></svg>',
+	},
+	{
+		label: 'Alert Dashboard',
+		description: 'The event appears on the central alert dashboard in real time',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4" /></svg>',
+	},
+	{
+		label: 'Notification Sent',
+		description: 'Notifications are sent to the relevant team members',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /><path d="M4 3.5L5.5 5M20 3.5L18.5 5" /></svg>',
+	},
+];
+
+// PLACEHOLDER CONTENT — generic, plausible Q&As for the Integrated Alarm
+// System, pending real product details.
+const faqs = [
+	{
+		question: 'What types of sensors can integrate with the system?',
+		answer: 'The system is designed to integrate with a range of sensor types — contact us to confirm compatibility with your existing sensors.',
+	},
+	{
+		question: 'Can alerts be sent to multiple people?',
+		answer: 'Yes — notifications can be configured to reach the right people or teams automatically.',
+	},
+	{
+		question: 'Is remote monitoring available?',
+		answer: 'Yes — the central dashboard is accessible remotely for authorized users.',
+	},
+	{
+		question: 'Can the system scale across multiple sites?',
+		answer: 'Yes — the system is designed to scale from a single facility to multiple connected sites.',
+	},
+	{
+		question: 'What happens if a sensor loses connectivity?',
+		answer: 'The system is designed to flag connectivity issues so they can be addressed promptly.',
+	},
+];
+
+// PLACEHOLDER CONTENT — illustrative comparison rows pending confirmed
+// product data.
+const comparisonRows = [
+	{ capability: 'Visibility', baseline: 'Scattered, per-device', cavotec: 'Centralized dashboard view' },
+	{ capability: 'Response Time', baseline: 'Manual, delayed', cavotec: 'Real-time notifications' },
+	{ capability: 'Scalability', baseline: 'Difficult to expand', cavotec: 'Scales across sites' },
+	{ capability: 'Sensor Integration', baseline: 'Siloed by device', cavotec: 'Multiple sensor types, one system' },
+	{ capability: 'Historical Data', baseline: 'Little to none', cavotec: 'Logged alarm event history' },
+];
+---
+
+<Layout
+	title="Integrated Alarm System — Cavotec Malaysia Sdn Bhd"
+	description="A centralized, connected alarm monitoring and control solution from Cavotec Malaysia for your facility."
+>
+	<section class="page-header">
+		<div class="page-header-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="page-header-inner" data-reveal>
+			<span class="eyebrow">Internet of Things (IoT)</span>
+			<h1>Integrated Alarm System</h1>
+			<p class="product-tagline">Centralized, connected alarm monitoring and control for your facility.</p>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="product-overview">
+		<div class="product-overview-inner">
+			<div class="product-image-placeholder" data-reveal>
+				<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<rect x="3" y="4" width="18" height="16" rx="2" />
+					<circle cx="8.5" cy="9.5" r="1.5" />
+					<path d="M21 16l-5.5-5.5a1.5 1.5 0 0 0-2.1 0L4 19" />
+				</svg>
+				<strong>Integrated Alarm System</strong>
+				<span>Product image — coming soon</span>
+			</div>
+
+			<div class="product-description" data-reveal style="--reveal-i: 1;">
+				<h2>About the System</h2>
+				<p>
+					The Integrated Alarm System is a connected, centralized solution for alarm monitoring
+					and control across your facility. Sensor triggers are processed and routed to a central
+					dashboard, giving facility and security teams real-time visibility into alarm events as
+					they happen.
+				</p>
+				<p>
+					The system is designed to integrate with a range of sensor types, consolidating alerts
+					into a single, connected view rather than a collection of disconnected point solutions.
+					Notifications can be routed to the right people automatically when an alarm is triggered.
+				</p>
+				<p>
+					Built on the same connected, IoT-driven approach as Cavotec Malaysia's other connected
+					products, the Integrated Alarm System is designed to scale from a single facility to
+					multiple sites.
+				</p>
+
+				<h3>Key Features</h3>
+				<ul class="product-features">
+					{features.map((feature) => (
+						<li>
+							<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<circle cx="12" cy="12" r="9" />
+								<path d="M8 12.5l2.5 2.5L16 9" />
+							</svg>
+							<span>{feature}</span>
+						</li>
+					))}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the 4 steps below reuse the existing flow data
+	     from products.astro's Integrated Alarm System card, with
+	     descriptions added — adjust wording once real product details are
+	     confirmed. -->
+	<section class="product-how-it-works">
+		<div class="product-how-it-works-inner">
+			<h2 data-reveal>How It Works</h2>
+			<HowItWorksFlow steps={howItWorksSteps} />
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the 5 Q&As below are generic, plausible copy
+	     pending real product specs — replace once confirmed. -->
+	<section class="product-faq">
+		<div class="product-faq-inner">
+			<h2 data-reveal>Frequently Asked Questions</h2>
+			<FaqAccordion faqs={faqs} />
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the comparison rows below are illustrative,
+	     pending confirmed product data. -->
+	<section class="product-comparison">
+		<div class="product-comparison-inner">
+			<h2 data-reveal>Integrated Alarm System vs. Standalone/Disconnected Alarms</h2>
+			<ComparisonTable baselineLabel="Standalone / Disconnected Alarms" cavotecLabel="Integrated Alarm System" rows={comparisonRows} />
+		</div>
+	</section>
+
+	<section class="closing-cta">
+		<div class="closing-cta-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="closing-cta-inner" data-reveal>
+			<h2>See the Integrated Alarm System in Action</h2>
+			<p>Book a demo with our team to see what a connected alarm system could look like for you.</p>
+			<div class="product-cta-group">
+				<a href="/contact?subject=Integrated%20Alarm%20System" class="btn btn-accent">Book a Demo</a>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	/* Page header — same recipe used on every other page; each page keeps
+	   its own copy since this <style> block is scoped to this file. */
+	.page-header {
+		position: relative;
+		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem 3.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.page-header-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image:
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px),
+			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: radial-gradient(ellipse at center, black 15%, transparent 75%);
+	}
+
+	.page-header-inner {
+		max-width: 760px;
+		margin: 0 auto;
+		position: relative;
+	}
+
+	.eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-amber);
+		margin-bottom: 0.75rem;
+	}
+
+	.page-header h1 {
+		font-size: clamp(2rem, 4.5vw, 2.75rem);
+		font-weight: 700;
+		margin: 0 0 0.85rem;
+	}
+
+	.product-tagline {
+		font-size: 1.05rem;
+		line-height: 1.6;
+		color: var(--color-ink-muted);
+		max-width: 56ch;
+		margin: 0 auto;
+	}
+
+	/* Overview */
+	.product-overview {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-overview-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+		display: grid;
+		grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+		gap: 3rem;
+		align-items: start;
+	}
+
+	.product-image-placeholder {
+		aspect-ratio: 4 / 3;
+		/* No explicit width — a grid item stretches to fill its column by
+		   default; see the equivalent comment on the SKMS page for why
+		   width: 100% here would overflow under content-box sizing. */
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.6rem;
+		text-align: center;
+		padding: 1.5rem;
+		color: var(--color-text-muted);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		background: repeating-linear-gradient(
+			135deg,
+			var(--color-indigo),
+			var(--color-indigo) 10px,
+			var(--color-surface) 10px,
+			var(--color-surface) 20px
+		);
+		position: sticky;
+		top: calc(var(--header-height) + 1.5rem);
+	}
+
+	.product-image-placeholder strong {
+		font-size: 1rem;
+		color: var(--color-text);
+	}
+
+	.product-image-placeholder span {
+		font-size: 0.8rem;
+	}
+
+	.product-description h2 {
+		font-size: 1.4rem;
+		color: var(--color-text);
+		margin: 0 0 1.25rem;
+	}
+
+	.product-description h3 {
+		font-size: 1.05rem;
+		color: var(--color-text);
+		margin: 2rem 0 1rem;
+	}
+
+	.product-description p {
+		font-size: 0.98rem;
+		line-height: 1.75;
+		color: var(--color-text-muted);
+		margin: 0 0 1.25rem;
+	}
+
+	.product-features {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.product-features li {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.65rem;
+		font-size: 0.92rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
+	}
+
+	.product-features svg {
+		flex-shrink: 0;
+		margin-top: 0.1rem;
+		color: var(--color-teal);
+	}
+
+	.product-cta-group {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 1rem;
+	}
+
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.85rem 2rem;
+		border-radius: 4px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: 0.01em;
+		border: none;
+		cursor: pointer;
+		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+	}
+
+	.btn-accent {
+		background: var(--color-teal);
+		color: var(--color-on-accent);
+		box-shadow: 0 6px 20px rgba(var(--color-teal-rgb), 0.35);
+	}
+
+	.btn-accent:hover,
+	.btn-accent:focus-visible {
+		background: #00d9eb;
+		transform: translateY(-2px);
+		box-shadow: 0 10px 26px rgba(var(--color-teal-rgb), 0.45);
+	}
+
+	@media (max-width: 860px) {
+		.product-overview-inner {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+
+		.product-image-placeholder {
+			position: static;
+			max-width: 380px;
+			margin: 0 auto;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.product-overview {
+			padding: 3.5rem 1.25rem;
+		}
+
+		.product-cta-group {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.btn {
+			justify-content: center;
+		}
+	}
+
+	/* How It Works */
+	.product-how-it-works {
+		background: var(--color-bg-alt);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-how-it-works-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+	}
+
+	.product-how-it-works h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	/* FAQ */
+	.product-faq {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-faq-inner {
+		max-width: 760px;
+		margin: 0 auto;
+	}
+
+	.product-faq h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	/* Comparison */
+	.product-comparison {
+		background: var(--color-bg-alt);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-comparison-inner {
+		max-width: 900px;
+		margin: 0 auto;
+	}
+
+	.product-comparison h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	@media (max-width: 600px) {
+		.product-how-it-works,
+		.product-faq,
+		.product-comparison {
+			padding: 3.5rem 1.25rem;
+		}
+	}
+
+	/* Closing CTA */
+	.closing-cta {
+		position: relative;
+		background: var(--color-indigo);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.closing-cta-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image: repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: linear-gradient(to bottom, black, transparent);
+	}
+
+	.closing-cta-inner {
+		max-width: 640px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.closing-cta h2 {
+		font-size: clamp(1.5rem, 3vw, 2rem);
+		margin: 0;
+	}
+
+	.closing-cta p {
+		font-size: 1rem;
+		color: var(--color-ink-muted);
+		margin: -0.75rem 0 0;
+	}
+</style>

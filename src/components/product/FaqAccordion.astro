@@ -1,0 +1,209 @@
+---
+// Shared FAQ accordion for product/category pages — extracted from the
+// pattern built for src/pages/product/iot/smart-key-management-system.astro
+// (that page's own inline copy is left untouched). Single-open behavior:
+// opening one item closes any other that was open. Class names here are
+// deliberately distinct from SKMS's own .faq-item/.faq-question/… (this
+// component's CSS is `is:global`, which is required for the toggle script
+// below to reach across the component boundary — using different names
+// keeps this fully independent of SKMS's page-scoped styles rather than
+// silently doubling up on the same selectors).
+export interface FaqEntry {
+	question: string;
+	answer: string;
+}
+
+interface Props {
+	faqs: FaqEntry[];
+}
+
+const { faqs } = Astro.props;
+---
+
+<div class="faq-accordion" data-reveal style="--reveal-i: 1;">
+	{
+		faqs.map((faq, index) => (
+			<div class="faq-accordion-item">
+				<h3 class="faq-accordion-heading">
+					<button
+						type="button"
+						class="faq-accordion-question"
+						id={`faq-accordion-question-${index}`}
+						aria-expanded="false"
+						aria-controls={`faq-accordion-answer-${index}`}
+					>
+						<span>{faq.question}</span>
+						<svg class="faq-accordion-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<path d="M6 9l6 6 6-6" />
+						</svg>
+					</button>
+				</h3>
+				<div class="faq-accordion-answer" id={`faq-accordion-answer-${index}`} role="region" aria-labelledby={`faq-accordion-question-${index}`}>
+					<p>{faq.answer}</p>
+				</div>
+			</div>
+		))
+	}
+</div>
+
+<script>
+	// Single-open accordion: opening one item closes any other that was
+	// open. Height is animated by measuring each panel's real scrollHeight
+	// rather than a static max-height guess, so answers of any length
+	// animate to their exact size. Buttons are native <button> elements, so
+	// Enter/Space activation and focus-visible styling come for free.
+	//
+	// Scoped to `.faq-accordion` containers specifically (not a bare
+	// `.faq-accordion-item` query) so this safely supports a page that has
+	// more than one accordion instance, initializing each independently.
+	//
+	// Wrapped in a function and re-run via astro:page-load (fires on the
+	// true initial load and again after every subsequent ClientRouter
+	// transition) instead of running once at the top of this script — this
+	// component is used on ~15 different product/category pages, all
+	// rendered inside <main>, which gets replaced on every navigation, so
+	// a fresh page's accordion needs a fresh init every time. Each run's
+	// `resize` listener is torn down via AbortController on
+	// astro:before-swap so it doesn't accumulate one more live copy (still
+	// doing work against that run's now-detached elements) on every visit
+	// to a page using this component.
+	let faqAccordionController: AbortController | null = null;
+
+	function initFaqAccordion() {
+		faqAccordionController?.abort();
+		faqAccordionController = new AbortController();
+		const { signal } = faqAccordionController;
+
+		document.querySelectorAll<HTMLElement>('.faq-accordion').forEach((accordion) => {
+			const items = accordion.querySelectorAll<HTMLElement>('.faq-accordion-item');
+
+			function closeItem(item: HTMLElement) {
+				const button = item.querySelector<HTMLButtonElement>('.faq-accordion-question');
+				const answer = item.querySelector<HTMLElement>('.faq-accordion-answer');
+				item.classList.remove('is-open');
+				button?.setAttribute('aria-expanded', 'false');
+				if (answer) answer.style.maxHeight = '0px';
+			}
+
+			function openItem(item: HTMLElement) {
+				const button = item.querySelector<HTMLButtonElement>('.faq-accordion-question');
+				const answer = item.querySelector<HTMLElement>('.faq-accordion-answer');
+				items.forEach((other) => {
+					if (other !== item) closeItem(other);
+				});
+				item.classList.add('is-open');
+				button?.setAttribute('aria-expanded', 'true');
+				if (answer) answer.style.maxHeight = `${answer.scrollHeight}px`;
+			}
+
+			items.forEach((item) => {
+				const button = item.querySelector<HTMLButtonElement>('.faq-accordion-question');
+				button?.addEventListener(
+					'click',
+					() => {
+						if (item.classList.contains('is-open')) {
+							closeItem(item);
+						} else {
+							openItem(item);
+						}
+					},
+					{ signal }
+				);
+			});
+
+			// If the window is resized while an item is open, its measured
+			// scrollHeight can go stale (e.g. text reflows to more/fewer lines)
+			// — re-measure the currently open item so it doesn't get clipped.
+			window.addEventListener(
+				'resize',
+				() => {
+					const openItem = accordion.querySelector<HTMLElement>('.faq-accordion-item.is-open');
+					const openAnswer = openItem?.querySelector<HTMLElement>('.faq-accordion-answer');
+					if (openAnswer) openAnswer.style.maxHeight = `${openAnswer.scrollHeight}px`;
+				},
+				{ signal }
+			);
+		});
+	}
+
+	document.addEventListener('astro:page-load', initFaqAccordion);
+	document.addEventListener('astro:before-swap', () => faqAccordionController?.abort());
+</script>
+
+<style is:global>
+	.faq-accordion {
+		display: flex;
+		flex-direction: column;
+		gap: 0.85rem;
+	}
+
+	.faq-accordion-item {
+		background: var(--color-bg-elevated);
+		border: 1px solid var(--color-border);
+		border-radius: 10px;
+		overflow: hidden;
+		transition: border-color 0.2s ease;
+	}
+
+	.faq-accordion-item.is-open {
+		border-color: var(--color-teal);
+	}
+
+	.faq-accordion-heading {
+		margin: 0;
+	}
+
+	.faq-accordion-question {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		width: 100%;
+		padding: 1.1rem 1.35rem;
+		background: none;
+		border: none;
+		text-align: left;
+		font-family: var(--font-display);
+		font-size: 0.98rem;
+		font-weight: 600;
+		color: var(--color-text);
+		cursor: pointer;
+	}
+
+	.faq-accordion-question:focus-visible {
+		outline: 2px solid var(--color-teal);
+		outline-offset: -2px;
+	}
+
+	.faq-accordion-chevron {
+		flex-shrink: 0;
+		color: var(--color-text-muted);
+		transition: transform 0.2s ease, color 0.2s ease;
+	}
+
+	.faq-accordion-item.is-open .faq-accordion-chevron {
+		color: var(--color-teal);
+		transform: rotate(180deg);
+	}
+
+	.faq-accordion-answer {
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 0.3s ease;
+	}
+
+	.faq-accordion-answer p {
+		margin: 0;
+		padding: 0 1.35rem 1.25rem;
+		font-size: 0.92rem;
+		line-height: 1.65;
+		color: var(--color-text-muted);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.faq-accordion-answer,
+		.faq-accordion-chevron {
+			transition: none;
+		}
+	}
+</style>

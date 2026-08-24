@@ -1,26 +1,103 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ShowcaseCarousel, { type ShowcaseItem } from '../components/ShowcaseCarousel.astro';
+
+// PLACEHOLDER CONTENT — working set for the homepage showcase carousel,
+// pulled from the actual product/service pages already built. One card per
+// item rather than expanding "Customize Solution Provider" into its 3
+// sub-services (electronic design / 3D design / R&D) — keeps the carousel
+// at a manageable 9 cards; its own page links out to those sub-services.
+// Final product/service list, taglines, and icons to be confirmed later.
+const showcaseItems: ShowcaseItem[] = [
+	{
+		href: '/product/calibration-test-measurement/',
+		title: 'ATE System',
+		tagline: 'Automated functional and parametric testing',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1" /><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3" /></svg>',
+	},
+	{
+		href: '/product/iot/smart-key-management-system',
+		title: 'Smart Key Management System',
+		tagline: 'Secure, trackable key access control',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" /></svg>',
+	},
+	{
+		href: '/product/iot/integrated-alarm-system',
+		title: 'Integrated Alarm System',
+		tagline: 'Centralized monitoring and instant alerts',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>',
+	},
+	{
+		href: '/product/iot/bms',
+		title: 'Smart Building Management System',
+		tagline: 'Monitor and manage your building systems',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1" /><path d="M9 21v-4h6v4" /><path d="M8 7h2M14 7h2M8 11h2M14 11h2" /></svg>',
+	},
+	{
+		href: '/product/calibration/',
+		title: 'Calibration and Test Measurement',
+		tagline: 'Precision calibration for test equipment',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0-9-9" /><path d="M12 21a9 9 0 0 0 9-9" /><path d="M12 12L16 8" /><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" /></svg>',
+	},
+	{
+		href: '/product/repair-work-service/',
+		title: 'Repair Work',
+		tagline: 'Expert repair for test and measurement gear',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 4.6L4 16.2V20h3.8l5.3-5.3a4 4 0 0 0 4.6-5.4l-2.6 2.6-2-2 2.6-2.6z" /></svg>',
+	},
+	{
+		href: '/product/equipment-rental/',
+		title: 'Equipment Rental',
+		tagline: 'Calibrated equipment, ready when you need it',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" /></svg>',
+	},
+	{
+		href: '/product/training/',
+		title: 'Training',
+		tagline: 'Hands-on training for your technical team',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L2 8l10 5 10-5-10-5z" /><path d="M6 10.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-5.5" /><path d="M22 8v6" /></svg>',
+	},
+	{
+		href: '/product/customize-solution-provider/',
+		title: 'Customize Solution Provider',
+		tagline: 'Tailored electronic and 3D design services',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M4 12h16M4 18h7" /><circle cx="17" cy="6" r="2" /><circle cx="9" cy="12" r="2" /><circle cx="14" cy="18" r="2" /></svg>',
+	},
+];
 
 const services = [
+	{
+		title: 'Calibration and Training',
+		icon: 'award',
+	},
+	{
+		title: 'Test Equipment Repair',
+		icon: 'wrench',
+	},
 	{
 		title: 'Test and Measurement Solutions',
 		icon: 'gauge',
 	},
 	{
-		title: 'Telecommunication Equipment',
-		icon: 'tower',
+		title: 'Test Equipment Rental',
+		icon: 'clock',
 	},
 	{
 		title: 'RF, Microwave & Radio Accessories',
 		icon: 'signal',
 	},
 	{
-		title: 'Test Equipment Repair, Calibration and Training',
-		icon: 'wrench',
-	},
-	{
-		title: 'Test Equipment Rental',
-		icon: 'clock',
+		title: 'Telecommunication Equipment',
+		icon: 'tower',
 	},
 ];
 
@@ -34,14 +111,6 @@ const heroBackgrounds = [
 	'/images/hero/hero-bg-4.jpg',
 ];
 
-// "By the numbers" stats strip — general capability stats only, no
-// certification/accreditation claims (those live on the Services page).
-const stats = [
-	{ value: '10+', label: 'Years of Technical Expertise' },
-	{ value: '2,400+', label: 'Manufacturers Supported' },
-	{ value: '5', label: 'Core Service Areas' },
-	{ value: '24/7', label: 'Equipment Support Availability' },
-];
 ---
 
 <Layout
@@ -78,19 +147,7 @@ const stats = [
 
 	<div class="tick-divider" aria-hidden="true"></div>
 
-	<section class="stats-strip">
-		<div class="stats-strip-inner">
-			<span class="stats-eyebrow" data-reveal>By the Numbers</span>
-			<ul class="stats-grid">
-				{stats.map((stat, index) => (
-					<li class="stat-item" data-reveal style={`--reveal-i: ${index + 1};`}>
-						<span class="stat-number spec-mono" data-value={stat.value}>{stat.value}</span>
-						<span class="stat-label">{stat.label}</span>
-					</li>
-				))}
-			</ul>
-		</div>
-	</section>
+	<ShowcaseCarousel items={showcaseItems} />
 
 	<div class="tick-divider" aria-hidden="true"></div>
 
@@ -129,6 +186,13 @@ const stats = [
 									<path d="M14.7 6.3a4 4 0 0 0-5.4 4.6L4 16.2V20h3.8l5.3-5.3a4 4 0 0 0 4.6-5.4l-2.6 2.6-2-2 2.6-2.6z" />
 								</svg>
 							)}
+							{service.icon === 'award' && (
+								<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+									<circle cx="12" cy="9" r="6" />
+									<path d="M9 14.5L7 22l5-3 5 3-2-7.5" />
+									<path d="M9.5 9l1.8 1.8L14.5 7.5" />
+								</svg>
+							)}
 							{service.icon === 'clock' && (
 								<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
 									<circle cx="12" cy="12" r="9" />
@@ -152,70 +216,68 @@ const stats = [
 			<a href="/contact" class="btn btn-warm">Get in Touch</a>
 		</div>
 	</section>
+
+	<!-- Site-upgrade notice modal — homepage only. Closed by default in CSS;
+	     the script below opens it unless "upgrade-notice-dismissed" is
+	     already set in sessionStorage for this tab. -->
+	<div class="upgrade-modal-overlay" id="upgrade-modal-overlay">
+		<div
+			class="upgrade-modal"
+			id="upgrade-modal"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="upgrade-modal-title"
+			aria-describedby="upgrade-modal-desc"
+			tabindex="-1"
+		>
+			<span class="upgrade-modal-eyebrow">Site Notice</span>
+			<h2 id="upgrade-modal-title">We're Upgrading Our Website</h2>
+			<p id="upgrade-modal-desc">
+				Cavotec Malaysia's website is currently being upgraded. We're in the process of migrating
+				from our previous site to this new one, so some information may still be in progress.
+				Thank you for your patience as we complete the transition.
+			</p>
+			<button type="button" class="btn btn-accent upgrade-modal-dismiss" id="upgrade-modal-dismiss">Got it</button>
+		</div>
+	</div>
 </Layout>
 
 <script>
-	// "By the numbers" count-up. Follows the same intersection + reduced-motion
-	// pattern as the scroll-reveal in Layout.astro: default to the final value
-	// (server-rendered) so nothing ever gets stuck at 0, and only animate when
-	// motion is allowed and the section actually scrolls into view.
-	const statNumbers = document.querySelectorAll('.stat-number[data-value]');
-	const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	// Site-upgrade notice modal — homepage only, shown once per session
+	// (sessionStorage, not localStorage: it should come back if the tab or
+	// browser is closed and reopened, per the spec). Dismissing it also
+	// reveals the persistent reminder bar rendered by Layout.astro — that
+	// bar's own on-load check (in Layout.astro's script) is what makes it
+	// keep showing automatically on every other page for the rest of the
+	// session; this only needs to reveal it immediately on this page too,
+	// without waiting for a reload.
+	const UPGRADE_STORAGE_KEY = 'upgrade-notice-dismissed';
 
-	function zeroState(value: string) {
-		// Preserve everything but the leading digit run, e.g. "2,400+" -> "0+",
-		// "24/7" -> "0/7", "5" -> "0".
-		const match = value.match(/^([\d,]+)(.*)$/);
-		if (!match) return value;
-		return `0${match[2]}`;
-	}
-
-	function animateCount(el: Element) {
-		const target = el.getAttribute('data-value') ?? '';
-		const match = target.match(/^([\d,]+)(.*)$/);
-		if (!match) return;
-		const [, digits, suffix] = match;
-		const endValue = parseInt(digits.replace(/,/g, ''), 10);
-		const duration = 1400;
-		const start = performance.now();
-
-		function tick(now: number) {
-			const progress = Math.min((now - start) / duration, 1);
-			const eased = 1 - Math.pow(1 - progress, 3);
-			const current = Math.round(endValue * eased);
-			el.textContent = `${current.toLocaleString('en-US')}${suffix}`;
-			if (progress < 1) {
-				requestAnimationFrame(tick);
-			} else {
-				el.textContent = target;
-			}
+	function isUpgradeNoticeDismissed(): boolean {
+		try {
+			return sessionStorage.getItem(UPGRADE_STORAGE_KEY) === '1';
+		} catch (e) {
+			return false;
 		}
-
-		requestAnimationFrame(tick);
 	}
 
-	if (!prefersReducedMotion && 'IntersectionObserver' in window && statNumbers.length) {
-		statNumbers.forEach((el) => {
-			const value = el.getAttribute('data-value');
-			if (value) el.textContent = zeroState(value);
-		});
+	function markUpgradeNoticeDismissed() {
+		try {
+			sessionStorage.setItem(UPGRADE_STORAGE_KEY, '1');
+		} catch (e) {
+			// sessionStorage unavailable (privacy mode, etc.) — the modal
+			// will just show again next load in that case, which is an
+			// acceptable degradation rather than a broken dismiss button.
+		}
+	}
 
-		const statsObserver = new IntersectionObserver(
-			(entries) => {
-				for (const entry of entries) {
-					if (entry.isIntersecting) {
-						animateCount(entry.target);
-						statsObserver.unobserve(entry.target);
-					}
-				}
-			},
-			{ threshold: 0.4 }
+	function getFocusableElements(container: HTMLElement): HTMLElement[] {
+		return Array.from(
+			container.querySelectorAll<HTMLElement>(
+				'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+			)
 		);
-
-		statNumbers.forEach((el) => statsObserver.observe(el));
 	}
-	// If motion is reduced or IntersectionObserver is unavailable, the
-	// server-rendered final values (e.g. "10+") are left exactly as-is.
 
 	// Hero background crossfade — cycles the stacked .hero-bg-image layers by
 	// toggling `is-active` (the fade itself is a CSS transition, see below).
@@ -249,34 +311,6 @@ const stats = [
 			this.timer = null;
 		}
 	}
-
-	const heroSection = document.querySelector<HTMLElement>('.hero');
-	const heroBgRoot = document.querySelector<HTMLElement>('[data-hero-bg]');
-
-	if (!prefersReducedMotion && heroSection && heroBgRoot) {
-		const cycler = new HeroBackgroundCycler(heroBgRoot);
-
-		if ('IntersectionObserver' in window) {
-			const heroBgObserver = new IntersectionObserver(
-				(entries) => {
-					for (const entry of entries) {
-						if (entry.isIntersecting) {
-							cycler.start();
-						} else {
-							cycler.stop();
-						}
-					}
-				},
-				{ threshold: 0 }
-			);
-			heroBgObserver.observe(heroSection);
-		} else {
-			cycler.start();
-		}
-	}
-	// If motion is reduced, .hero-bg-image:first-child keeps its server-
-	// rendered `is-active` class and every other layer stays at opacity 0 —
-	// a complete, valid static backdrop, no JS required.
 
 	// Hero background parallax — the oscilloscope-grid texture drifts a few
 	// pixels toward the cursor (desktop) or device tilt (touch), eased with
@@ -422,27 +456,239 @@ const stats = [
 		};
 	}
 
-	const heroGridEl = document.querySelector<HTMLElement>('.hero-grid');
+	// ------------------------------------------------------------------
+	// Homepage-only setup — everything below queries elements that live
+	// inside <main> (the modal overlay, the hero section), which DOES get
+	// replaced on every ClientRouter navigation, unlike Layout.astro's
+	// persisted header/footer. Wrapped in its own function and re-run via
+	// astro:page-load (fires once on the true initial load and again
+	// after every subsequent transition) instead of running once at the
+	// top of this script, which would only ever have applied to whichever
+	// page happened to load first and silently done nothing on every
+	// return visit to "/" after that.
+	//
+	// astro:page-load fires globally on every navigation site-wide, not
+	// only while "/" is the active page, so this also runs (harmlessly)
+	// when landing on any other page — every DOM query below returns
+	// null/empty there and the guarded blocks just no-op, same as the
+	// original top-level code already relied on before ClientRouter.
+	// ------------------------------------------------------------------
+	function initHomePage() {
+		const upgradeModalOverlay = document.getElementById('upgrade-modal-overlay');
+		const upgradeModal = document.getElementById('upgrade-modal');
+		const upgradeModalDismiss = document.getElementById('upgrade-modal-dismiss');
+		let upgradeModalPreviouslyFocused: HTMLElement | null = null;
 
-	if (!prefersReducedMotion && heroSection && heroGridEl) {
-		const parallax = new HeroParallax(heroSection, heroGridEl);
-		parallax.start();
+		function onUpgradeModalKeydown(event: KeyboardEvent) {
+			if (event.key === 'Escape') {
+				event.preventDefault();
+				closeUpgradeModal();
+				return;
+			}
+			if (event.key !== 'Tab' || !upgradeModal) return;
+			// Basic focus trap: with exactly one focusable element (the dismiss
+			// button) this just keeps Tab/Shift+Tab from ever leaving it; with
+			// more it wraps last→first and first→last.
+			const focusable = getFocusableElements(upgradeModal);
+			if (focusable.length === 0) {
+				event.preventDefault();
+				return;
+			}
+			const first = focusable[0];
+			const last = focusable[focusable.length - 1];
+			if (event.shiftKey && document.activeElement === first) {
+				event.preventDefault();
+				last.focus();
+			} else if (!event.shiftKey && document.activeElement === last) {
+				event.preventDefault();
+				first.focus();
+			}
+		}
 
-		// Defensive cleanup for client-side page navigation — a no-op today
-		// since this site doesn't run Astro's View Transitions router (each
-		// navigation is a full page load, which discards listeners/rAF for
-		// free), but keeps this safe to adopt later without leaking either.
-		document.addEventListener('astro:before-swap', () => parallax.destroy(), { once: true });
-		window.addEventListener('pagehide', () => parallax.destroy(), { once: true });
+		function openUpgradeModal() {
+			if (!upgradeModalOverlay || !upgradeModal) return;
+			upgradeModalPreviouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+			upgradeModalOverlay.classList.add('is-open');
+			upgradeModal.focus();
+			document.addEventListener('keydown', onUpgradeModalKeydown);
+		}
+
+		function closeUpgradeModal() {
+			if (!upgradeModalOverlay) return;
+			upgradeModalOverlay.classList.remove('is-open');
+			document.removeEventListener('keydown', onUpgradeModalKeydown);
+			markUpgradeNoticeDismissed();
+			document.getElementById('upgrade-reminder-bar')?.classList.add('is-visible');
+			upgradeModalPreviouslyFocused?.focus();
+		}
+
+		upgradeModalDismiss?.addEventListener('click', closeUpgradeModal);
+		upgradeModalOverlay?.addEventListener('click', (event) => {
+			if (event.target === upgradeModalOverlay) closeUpgradeModal();
+		});
+
+		if (!isUpgradeNoticeDismissed()) {
+			openUpgradeModal();
+		}
+
+		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const heroSection = document.querySelector<HTMLElement>('.hero');
+
+		// Hero background crossfade.
+		const heroBgRoot = document.querySelector<HTMLElement>('[data-hero-bg]');
+
+		if (!prefersReducedMotion && heroSection && heroBgRoot) {
+			const cycler = new HeroBackgroundCycler(heroBgRoot);
+
+			if ('IntersectionObserver' in window) {
+				const heroBgObserver = new IntersectionObserver(
+					(entries) => {
+						for (const entry of entries) {
+							if (entry.isIntersecting) {
+								cycler.start();
+							} else {
+								cycler.stop();
+							}
+						}
+					},
+					{ threshold: 0 }
+				);
+				heroBgObserver.observe(heroSection);
+				document.addEventListener('astro:before-swap', () => heroBgObserver.disconnect(), { once: true });
+			} else {
+				cycler.start();
+			}
+		}
+		// If motion is reduced, .hero-bg-image:first-child keeps its server-
+		// rendered `is-active` class and every other layer stays at opacity 0 —
+		// a complete, valid static backdrop, no JS required.
+
+		// Hero background parallax.
+		const heroGridEl = document.querySelector<HTMLElement>('.hero-grid');
+
+		if (!prefersReducedMotion && heroSection && heroGridEl) {
+			const parallax = new HeroParallax(heroSection, heroGridEl);
+			parallax.start();
+
+			// Self-cleaning: HeroParallax owns its own AbortController, torn
+			// down here on the next transition (astro:before-swap) or on a
+			// genuine tab close/hide (pagehide) — either way, exactly once,
+			// so scroll/resize/pointer listeners never accumulate across
+			// repeated visits to "/".
+			document.addEventListener('astro:before-swap', () => parallax.destroy(), { once: true });
+			window.addEventListener('pagehide', () => parallax.destroy(), { once: true });
+		}
+		// If motion is reduced, .hero-grid keeps its default (untransformed)
+		// position — fully static, exactly like every other page's
+		// [data-parallax-bg] texture under reduced motion.
 	}
-	// If motion is reduced, .hero-grid keeps its default (untransformed)
-	// position — fully static, exactly like every other page's
-	// [data-parallax-bg] texture under reduced motion.
+
+	document.addEventListener('astro:page-load', initHomePage);
 </script>
 
 <style>
-	section {
+	/* Upgrade-notice modal. Overlay uses --color-shadow-rgb (a constant
+	   near-black, same token used for card/header drop-shadows) rather than
+	   --color-bg — --color-bg is theme-linked and resolves to white in
+	   light mode, which would render as a barely-there white haze instead
+	   of a dimming backdrop. A modal scrim needs to stay dark in both
+	   themes for the same reason shadows do. */
+	.upgrade-modal-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 300;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1.5rem;
+		background: rgba(var(--color-shadow-rgb), 0.65);
+		opacity: 0;
+		visibility: hidden;
+		pointer-events: none;
+		/* `visibility` is deliberately NOT in this list — transitioning it
+		   means the hidden→visible flip only applies once the transition
+		   actually starts (next style/animation flush), not synchronously.
+		   openUpgradeModal() calls .focus() on the modal the same tick
+		   `.is-open` is added, so with visibility transitioned that call
+		   would silently no-op (the browser still evaluates the modal as
+		   `visibility: hidden` at that instant) — breaking the focus trap
+		   entirely, confirmed via a real Tab-key trace: focus escaped to
+		   the page header instead of staying on the dismiss button. Left
+		   as a plain, non-animated property, the flip is instant. */
+		transition: opacity 0.25s ease;
+	}
+
+	.upgrade-modal-overlay.is-open {
+		opacity: 1;
+		visibility: visible;
+		pointer-events: auto;
+	}
+
+	.upgrade-modal {
 		width: 100%;
+		max-width: 480px;
+		background: var(--color-bg-elevated);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		box-shadow: 0 24px 60px rgba(var(--color-shadow-rgb), 0.4);
+		padding: 2.25rem 2rem;
+		text-align: center;
+		transform: scale(0.94) translateY(8px);
+		transition: transform 0.25s ease;
+	}
+
+	.upgrade-modal:focus {
+		outline: none;
+	}
+
+	.upgrade-modal-overlay.is-open .upgrade-modal {
+		transform: scale(1) translateY(0);
+	}
+
+	.upgrade-modal-eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-teal);
+		margin-bottom: 0.75rem;
+	}
+
+	.upgrade-modal h2 {
+		font-size: 1.4rem;
+		margin: 0 0 0.85rem;
+		color: var(--color-text);
+	}
+
+	.upgrade-modal p {
+		font-size: 0.95rem;
+		line-height: 1.65;
+		color: var(--color-text-muted);
+		margin: 0 0 1.75rem;
+	}
+
+	.upgrade-modal-dismiss {
+		border: none;
+		cursor: pointer;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.upgrade-modal-overlay {
+			transition: opacity 0.15s ease;
+		}
+
+		.upgrade-modal {
+			transition: none;
+			transform: none;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.upgrade-modal {
+			padding: 1.75rem 1.5rem;
+		}
 	}
 
 	.btn {
@@ -458,7 +704,7 @@ const stats = [
 
 	.btn-accent {
 		background: var(--color-teal);
-		color: var(--color-indigo);
+		color: var(--color-on-accent);
 		box-shadow: 0 6px 20px rgba(var(--color-teal-rgb), 0.35);
 	}
 
@@ -472,7 +718,7 @@ const stats = [
 	/* Warm, customer-facing CTA — the one place amber takes the lead */
 	.btn-warm {
 		background: var(--color-amber);
-		color: var(--color-indigo);
+		color: var(--color-on-accent);
 		box-shadow: 0 6px 20px rgba(var(--color-amber-rgb), 0.35);
 	}
 
@@ -572,64 +818,6 @@ const stats = [
 		background: rgba(var(--color-indigo-rgb), 0.85);
 	}
 
-	/* "By the numbers" stats strip — bg-alt (base black) sits between the
-	   hero and the services section (elevated surface), alternating the
-	   site's two dark tones the same way bg/bg-alt alternated light tones
-	   before the black retheme. */
-	.stats-strip {
-		background: var(--color-bg-alt);
-		padding: 3.5rem 1.5rem;
-	}
-
-	.stats-strip-inner {
-		max-width: 1100px;
-		margin: 0 auto;
-		text-align: center;
-	}
-
-	.stats-eyebrow {
-		display: inline-block;
-		font-family: var(--font-mono);
-		font-size: 0.8rem;
-		font-weight: 500;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		color: var(--color-amber-dark);
-		margin-bottom: 2rem;
-	}
-
-	.stats-grid {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 2rem 1.5rem;
-	}
-
-	.stat-item {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.6rem;
-	}
-
-	.stat-number {
-		font-size: clamp(2.1rem, 4.5vw, 2.9rem);
-		font-weight: 600;
-		line-height: 1;
-		color: var(--color-teal-dark, #018b96);
-	}
-
-	.stat-label {
-		font-family: var(--font-display);
-		font-size: 0.85rem;
-		font-weight: 600;
-		letter-spacing: 0.01em;
-		color: var(--color-ink);
-		max-width: 18ch;
-	}
-
 	/* Services */
 	.services {
 		background: var(--color-bg);
@@ -695,7 +883,7 @@ const stats = [
 
 	.service-card:hover .service-icon {
 		background: var(--color-teal);
-		color: var(--color-indigo);
+		color: var(--color-on-accent);
 	}
 
 	.service-card h3 {
@@ -740,19 +928,11 @@ const stats = [
 		margin: 0;
 	}
 
-	@media (max-width: 700px) {
-		.stats-grid {
-			grid-template-columns: repeat(2, 1fr);
-			gap: 2.25rem 1.5rem;
-		}
-	}
-
 	@media (max-width: 600px) {
 		.hero {
 			padding: 4.5rem 1.25rem;
 		}
 
-		.stats-strip,
 		.services,
 		.closing-cta {
 			padding: 3.5rem 1.25rem;

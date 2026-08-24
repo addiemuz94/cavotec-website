@@ -1,0 +1,513 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import HowItWorksFlow from '../../../components/product/HowItWorksFlow.astro';
+import FaqAccordion from '../../../components/product/FaqAccordion.astro';
+import ComparisonTable from '../../../components/product/ComparisonTable.astro';
+
+// PLACEHOLDER CONTENT — this page follows the reference structure built for
+// src/pages/product/iot/smart-key-management-system.astro. The
+// description/features/How It Works/FAQ/comparison content below was moved
+// here (verbatim) from src/pages/product/calibration-test-measurement,
+// which has been repurposed into a dedicated ATE System product page — this
+// general calibration/test-measurement placeholder content fits the
+// Services > Calibration page better. Pending real service details from
+// Cavotec Malaysia. The hero (eyebrow/h1/tagline) and closing CTA below are
+// unchanged from this page's own original content.
+
+const features = [
+	'Calibration for a wide range of test and measurement equipment',
+	'Equipment testing against manufacturer specifications',
+	'Documented calibration results for your records',
+	'Mobile calibration service available for on-site needs',
+	'Fast turnaround to minimize equipment downtime',
+];
+
+const howItWorksSteps = [
+	{
+		label: 'Equipment Intake',
+		description: 'Equipment is submitted and logged for calibration or test service',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2" /><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" /></svg>',
+	},
+	{
+		label: 'Calibration & Testing',
+		description: 'Equipment is calibrated and tested against manufacturer specifications',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0-9-9" /><path d="M12 21a9 9 0 0 0 9-9" /><path d="M12 12L16 8" /><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" /></svg>',
+	},
+	{
+		label: 'Verification',
+		description: 'Results are verified and documented for accuracy',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.5 2.5L16 9" /></svg>',
+	},
+	{
+		label: 'Report & Return',
+		description: 'A calibration report is issued and the equipment is returned',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M9 13h6M9 17h6" /></svg>',
+	},
+];
+
+// PLACEHOLDER CONTENT — generic, plausible Q&As for a calibration/test
+// measurement service, pending real service details.
+const faqs = [
+	{
+		question: 'What types of equipment can be calibrated?',
+		answer:
+			"We support a wide range of test and measurement equipment from leading global brands. Contact us with your equipment list and we'll confirm coverage.",
+	},
+	{
+		question: 'How long does calibration typically take?',
+		answer:
+			'Turnaround time depends on the equipment and current workload, but we aim to minimize downtime and can discuss expedited options for urgent needs.',
+	},
+	{
+		question: 'Do you offer on-site or mobile calibration?',
+		answer: "Yes — a mobile calibration service is available for equipment that's difficult to transport or needs to stay on-site.",
+	},
+	{
+		question: 'Will I receive documentation for my records?',
+		answer: 'Yes — every calibration includes documented results you can keep for your internal records and equipment history.',
+	},
+	{
+		question: "Can you calibrate equipment that's out of specification?",
+		answer:
+			'In many cases, yes. Our team will assess the equipment and advise whether calibration, adjustment, or repair is the right path forward.',
+	},
+];
+
+// PLACEHOLDER CONTENT — illustrative comparison rows pending confirmed
+// service data.
+const comparisonRows = [
+	{ capability: 'Accuracy', baseline: 'Drifts over time, unchecked', cavotec: 'Verified against manufacturer specifications' },
+	{ capability: 'Documentation', baseline: 'Little to no record', cavotec: 'Documented calibration results provided' },
+	{ capability: 'Equipment Coverage', baseline: 'Limited to in-house expertise', cavotec: 'Wide range of brands and equipment types' },
+	{ capability: 'Turnaround', baseline: 'Unpredictable, ad hoc', cavotec: 'Scheduled service with fast turnaround' },
+	{ capability: 'Field Readiness', baseline: 'Uncertain accuracy', cavotec: 'Confidence-checked and ready for the field' },
+];
+---
+
+<Layout
+	title="Calibration and Test Measurement — Cavotec Malaysia Sdn Bhd"
+	description="Precision calibration and test measurement services from Cavotec Malaysia — equipment calibrated to manufacturer specifications with documented results."
+>
+	<section class="page-header">
+		<div class="page-header-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="page-header-inner" data-reveal>
+			<span class="eyebrow">Services</span>
+			<h1>Calibration and Test Measurement</h1>
+			<p class="product-tagline">
+				Precision calibration services for your test and measurement equipment — accurate,
+				documented, and ready when you need it.
+			</p>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="product-overview">
+		<div class="product-overview-inner">
+			<div class="product-image-placeholder" data-reveal>
+				<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<rect x="3" y="4" width="18" height="16" rx="2" />
+					<circle cx="8.5" cy="9.5" r="1.5" />
+					<path d="M21 16l-5.5-5.5a1.5 1.5 0 0 0-2.1 0L4 19" />
+				</svg>
+				<strong>Calibration and Test Measurement</strong>
+				<span>Product image — coming soon</span>
+			</div>
+
+			<div class="product-description" data-reveal style="--reveal-i: 1;">
+				<h2>About the Service</h2>
+				<p>
+					Cavotec Malaysia's Calibration and Test Measurement service supports a wide range of
+					test and measurement equipment, helping customers keep their instruments accurate and
+					dependable for day-to-day operations. Our team works with equipment from leading global
+					brands, providing calibration and testing tailored to each customer's specific
+					requirements.
+				</p>
+				<p>
+					Every piece of equipment that comes through our service is calibrated and tested against
+					manufacturer specifications, with results documented for your records. Whether it's a
+					single instrument or a full inventory of test equipment, we aim to minimize downtime
+					while maintaining the accuracy your operations depend on.
+				</p>
+				<p>
+					From routine calibration to equipment troubleshooting, our service is built to support
+					the test and measurement needs of defense, manufacturing, telecommunications, and other
+					high-tech sectors across Malaysia.
+				</p>
+
+				<h3>Key Features</h3>
+				<ul class="product-features">
+					{features.map((feature) => (
+						<li>
+							<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<circle cx="12" cy="12" r="9" />
+								<path d="M8 12.5l2.5 2.5L16 9" />
+							</svg>
+							<span>{feature}</span>
+						</li>
+					))}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the 4 steps below are illustrative — adjust
+	     wording once real service workflow details are confirmed. -->
+	<section class="product-how-it-works">
+		<div class="product-how-it-works-inner">
+			<h2 data-reveal>How It Works</h2>
+			<HowItWorksFlow steps={howItWorksSteps} />
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the 5 Q&As below are generic, plausible copy
+	     pending real service specs — replace once confirmed. -->
+	<section class="product-faq">
+		<div class="product-faq-inner">
+			<h2 data-reveal>Frequently Asked Questions</h2>
+			<FaqAccordion faqs={faqs} />
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the comparison rows below are illustrative,
+	     pending confirmed service data. -->
+	<section class="product-comparison">
+		<div class="product-comparison-inner">
+			<h2 data-reveal>Cavotec Calibration Service vs. In-House/Uncalibrated Equipment</h2>
+			<ComparisonTable baselineLabel="In-House / Uncalibrated" cavotecLabel="Cavotec Calibration Service" rows={comparisonRows} />
+		</div>
+	</section>
+
+	<section class="closing-cta">
+		<div class="closing-cta-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="closing-cta-inner" data-reveal>
+			<h2>Keep Your Instruments Accurate</h2>
+			<p>Request calibration and our team will follow up with next steps.</p>
+			<div class="product-cta-group">
+				<a href="/contact?subject=Calibration" class="btn btn-accent">Request Calibration</a>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	/* Page header — same recipe used on every other page; each page keeps
+	   its own copy since this <style> block is scoped to this file. */
+	.page-header {
+		position: relative;
+		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem 3.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.page-header-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image:
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px),
+			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: radial-gradient(ellipse at center, black 15%, transparent 75%);
+	}
+
+	.page-header-inner {
+		max-width: 760px;
+		margin: 0 auto;
+		position: relative;
+	}
+
+	.eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-amber);
+		margin-bottom: 0.75rem;
+	}
+
+	.page-header h1 {
+		font-size: clamp(2rem, 4.5vw, 2.75rem);
+		font-weight: 700;
+		margin: 0 0 0.85rem;
+	}
+
+	.product-tagline {
+		font-size: 1.05rem;
+		line-height: 1.6;
+		color: var(--color-ink-muted);
+		max-width: 56ch;
+		margin: 0 auto;
+	}
+
+	/* Overview */
+	.product-overview {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-overview-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+		display: grid;
+		grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+		gap: 3rem;
+		align-items: start;
+	}
+
+	.product-image-placeholder {
+		aspect-ratio: 4 / 3;
+		/* No explicit width — a grid item stretches to fill its column by
+		   default; see the equivalent comment on the SKMS page for why
+		   width: 100% here would overflow under content-box sizing. */
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.6rem;
+		text-align: center;
+		padding: 1.5rem;
+		color: var(--color-text-muted);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		background: repeating-linear-gradient(
+			135deg,
+			var(--color-indigo),
+			var(--color-indigo) 10px,
+			var(--color-surface) 10px,
+			var(--color-surface) 20px
+		);
+		position: sticky;
+		top: calc(var(--header-height) + 1.5rem);
+	}
+
+	.product-image-placeholder strong {
+		font-size: 1rem;
+		color: var(--color-text);
+	}
+
+	.product-image-placeholder span {
+		font-size: 0.8rem;
+	}
+
+	.product-description h2 {
+		font-size: 1.4rem;
+		color: var(--color-text);
+		margin: 0 0 1.25rem;
+	}
+
+	.product-description h3 {
+		font-size: 1.05rem;
+		color: var(--color-text);
+		margin: 2rem 0 1rem;
+	}
+
+	.product-description p {
+		font-size: 0.98rem;
+		line-height: 1.75;
+		color: var(--color-text-muted);
+		margin: 0 0 1.25rem;
+	}
+
+	.product-features {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.product-features li {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.65rem;
+		font-size: 0.92rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
+	}
+
+	.product-features svg {
+		flex-shrink: 0;
+		margin-top: 0.1rem;
+		color: var(--color-teal);
+	}
+
+	.product-cta-group {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 1rem;
+	}
+
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.85rem 2rem;
+		border-radius: 4px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: 0.01em;
+		border: none;
+		cursor: pointer;
+		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+	}
+
+	.btn-accent {
+		background: var(--color-teal);
+		color: var(--color-on-accent);
+		box-shadow: 0 6px 20px rgba(var(--color-teal-rgb), 0.35);
+	}
+
+	.btn-accent:hover,
+	.btn-accent:focus-visible {
+		background: #00d9eb;
+		transform: translateY(-2px);
+		box-shadow: 0 10px 26px rgba(var(--color-teal-rgb), 0.45);
+	}
+
+	@media (max-width: 860px) {
+		.product-overview-inner {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+
+		.product-image-placeholder {
+			position: static;
+			max-width: 380px;
+			margin: 0 auto;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.product-overview {
+			padding: 3.5rem 1.25rem;
+		}
+
+		.product-cta-group {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.btn {
+			justify-content: center;
+		}
+	}
+
+	/* How It Works */
+	.product-how-it-works {
+		background: var(--color-bg-alt);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-how-it-works-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+	}
+
+	.product-how-it-works h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	/* FAQ */
+	.product-faq {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-faq-inner {
+		max-width: 760px;
+		margin: 0 auto;
+	}
+
+	.product-faq h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	/* Comparison */
+	.product-comparison {
+		background: var(--color-bg-alt);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-comparison-inner {
+		max-width: 900px;
+		margin: 0 auto;
+	}
+
+	.product-comparison h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	@media (max-width: 600px) {
+		.product-how-it-works,
+		.product-faq,
+		.product-comparison {
+			padding: 3.5rem 1.25rem;
+		}
+	}
+
+	/* Closing CTA */
+	.closing-cta {
+		position: relative;
+		background: var(--color-indigo);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.closing-cta-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image: repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: linear-gradient(to bottom, black, transparent);
+	}
+
+	.closing-cta-inner {
+		max-width: 640px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.closing-cta h2 {
+		font-size: clamp(1.5rem, 3vw, 2rem);
+		margin: 0;
+	}
+
+	.closing-cta p {
+		font-size: 1rem;
+		color: var(--color-ink-muted);
+		margin: -0.75rem 0 0;
+	}
+</style>

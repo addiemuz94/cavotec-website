@@ -1,5 +1,8 @@
----
-import CavotecLogo from '../assets/cavotec-logo.svg';
+﻿---
+import { Image } from 'astro:assets';
+import { ClientRouter } from 'astro:transitions';
+import CavotecLogo from '../assets/cavotec-logo.png';
+import NavFlyout, { type MenuItem } from '../components/NavFlyout.astro';
 
 interface Props {
 	title?: string;
@@ -22,43 +25,46 @@ const footerCompanyLinks = [
 ];
 
 // Header nav: Services and Products are merged into a single "Our Business"
-// two-column mega menu instead of two standalone top-level links.
-const ourBusinessMenu = [
+// cascading flyout menu instead of two standalone top-level links. This is
+// one recursive tree — "Services"/"Products" are just the level-1 nodes —
+// rendered by <NavFlyout> for the header, and re-used flat (grouped by
+// these same top-level nodes) for the footer's Quick Links.
+const ourBusinessMenu: MenuItem[] = [
 	{
-		title: 'Services',
 		href: '/services',
-		items: [
-			{ href: '/services#calibration', label: 'Calibration' },
-			{ href: '/services#repair-work', label: 'Repair Work' },
-			{ href: '/services#equipment-rental', label: 'Equipment Rental' },
-			{ href: '/services#training', label: 'Training' },
+		label: 'Services',
+		children: [
+			{ href: '/product/calibration/', label: 'Calibration and Test Measurement' },
+			{ href: '/product/repair-work-service/', label: 'Repair Work' },
+			{ href: '/product/equipment-rental/', label: 'Equipment Rental' },
+			{ href: '/product/training/', label: 'Training' },
 			{
-				href: '/services#customize-solution-provider',
+				href: '/product/customize-solution-provider/',
 				label: 'Customize Solution Provider',
 				children: [
-					{ href: '/services#electronic-design-service', label: 'Electronic Design Service' },
-					{ href: '/services#3d-design-service', label: '3D Design Service' },
-					{ href: '/services#new-product-rd-innovation', label: 'New Product R&D and Innovation' },
+					{ href: '/product/customize-solution-provider/electronic-design-service', label: 'Electronic Design Service' },
+					{ href: '/product/customize-solution-provider/3d-design-service', label: '3D Design Service' },
+					{ href: '/product/rd-service/', label: 'New Product R&D and Innovation' },
 				],
 			},
 		],
 	},
 	{
-		title: 'Products',
 		href: '/products',
-		items: [
+		label: 'Products',
+		children: [
 			{
-				href: '/products#calibration-test-equipment-automation',
-				label: 'Calibration and Test Equipment Automation',
+				href: '/product/calibration-test-measurement/',
+				label: 'ATE System',
 			},
 			{
-				href: '/products#internet-of-things-iot',
+				href: '/product/iot/',
 				label: 'Internet of Things (IoT)',
 				children: [
-					{ href: 'https://kms-cvt.com', label: 'Smart Key Management System (eKMS)', external: true },
-					{ href: '/products#integrated-alarm-system', label: 'Integrated Alarm System' },
+					{ href: '/product/iot/smart-key-management-system', label: 'Smart Key Management System (eKMS)' },
+					{ href: '/product/iot/integrated-alarm-system', label: 'Integrated Alarm System' },
 					{
-						href: '/products#smart-building-management-monitoring-system',
+						href: '/product/iot/bms',
 						label: 'Smart Building Management and Monitoring System (BMS)',
 					},
 				],
@@ -75,11 +81,12 @@ const headerNavLinks = [
 	{ href: '/contact', label: 'Contact' },
 ];
 
+// Only Facebook and YouTube are confirmed accounts for now. YouTube's href
+// is a placeholder ("#") until the real channel URL is provided — do not
+// point it at a guessed URL.
 const socialLinks = [
-	{ label: 'LinkedIn', href: 'https://www.linkedin.com/company/cavotec', icon: 'linkedin' },
-	{ label: 'Facebook', href: 'https://www.facebook.com/cavotec', icon: 'facebook' },
-	{ label: 'X (Twitter)', href: 'https://twitter.com/cavotec', icon: 'x' },
-	{ label: 'YouTube', href: 'https://www.youtube.com/cavotec', icon: 'youtube' },
+	{ label: 'Facebook', href: 'https://www.facebook.com/cavotecmalaysia', icon: 'facebook' },
+	{ label: 'YouTube', href: '#', icon: 'youtube' },
 ];
 ---
 
@@ -87,12 +94,52 @@ const socialLinks = [
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
+		<script is:inline>
+			// Sets [data-theme] on <html> before anything paints, so there is
+			// never a flash of the wrong theme on load/refresh. Precedence:
+			// explicit past choice (localStorage) > OS preference (matchMedia)
+			// > dark fallback if matchMedia itself is unsupported. Must run
+			// here, before the stylesheet below, since the [data-theme="light"]
+			// CSS block keys off this attribute being present at first paint.
+			function applyStoredTheme() {
+				var root = document.documentElement;
+				var theme = 'dark';
+				try {
+					var stored = localStorage.getItem('theme-preference');
+					if (stored === 'light' || stored === 'dark') {
+						theme = stored;
+					} else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+						theme = 'light';
+					}
+				} catch (e) {
+					// localStorage/matchMedia unavailable (privacy mode, old
+					// browser, etc.) — the 'dark' fallback above already covers it.
+				}
+				root.setAttribute('data-theme', theme);
+			}
+
+			applyStoredTheme();
+
+			// [data-theme] is set by JS only — it's never part of the
+			// server-rendered <html> tag, so it isn't something
+			// transition:persist can carry over on its own. ClientRouter
+			// syncs the persisted <html> element's attributes to match each
+			// newly-fetched document's <html> tag on every swap, which wipes
+			// this attribute right back off (confirmed via Playwright: it
+			// read as null immediately after a soft navigation) since the
+			// fetched document never has it either. astro:after-swap fires
+			// synchronously right when that swap happens, before the new
+			// page paints, so reapplying here closes that gap with no
+			// visible flash — same guarantee as the first-paint call above,
+			// just repeated on every subsequent transition.
+			document.addEventListener('astro:after-swap', applyStoredTheme);
+		</script>
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
-		<meta name="theme-color" content="#0A0A0C" />
+		<meta name="theme-color" content="#1A1D24" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
@@ -100,13 +147,53 @@ const socialLinks = [
 			rel="stylesheet"
 		/>
 		<title>{title}</title>
+		<!-- Client-side page transitions: intercepts same-origin link clicks and
+		     swaps the document in place instead of a full unload/reload, which
+		     is what was causing the flash/jitter between page navigations (a
+		     hard reload shows a blank browser-default frame between the old
+		     and new document, and re-runs every script from scratch). Persisted
+		     elements below (header/footer/reminder bar) opt out of the
+		     swap/crossfade entirely — see their `transition:persist` — so only
+		     the actual page content (<main>) animates between navigations. -->
+		<ClientRouter />
 	</head>
 	<body>
-		<header class="site-header">
+		<!-- Persistent "site upgrade" reminder bar. Hidden by default (SSR
+		     can't know sessionStorage) — the script below reveals it on every
+		     page load once index.astro's upgrade-notice modal has been
+		     dismissed this session. Sits above the sticky header, in normal
+		     flow, so it scrolls away with the page rather than stacking with
+		     the header's own sticky position. -->
+		<div class="upgrade-reminder-bar" id="upgrade-reminder-bar" transition:persist transition:name="upgrade-reminder-bar">
+			<div class="upgrade-reminder-bar-inner">
+				<span class="upgrade-reminder-bar-text">Site upgrade in progress — some content may be incomplete.</span>
+				<button type="button" class="upgrade-reminder-bar-close" id="upgrade-reminder-bar-close" aria-label="Dismiss this reminder">
+					<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M18 6L6 18M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+		</div>
+
+		<header class="site-header" transition:persist transition:name="site-header">
 			<div class="header-inner">
-				<a href="/" class="logo" aria-label="Cavotec home">
-					<img src={CavotecLogo.src} alt="Cavotec" width="150" height="34" />
-				</a>
+				<div class="header-left">
+					<a href="/" class="logo" aria-label="Cavotec home">
+						<span class="logo-chip">
+							<Image src={CavotecLogo} alt="Cavotec Malaysia Sdn Bhd" width={839} height={147} class="logo-img" />
+						</span>
+					</a>
+
+					<button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme">
+						<svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<circle cx="12" cy="12" r="4" />
+							<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+						</svg>
+						<svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+						</svg>
+					</button>
+				</div>
 
 				<input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true" />
 				<label for="nav-toggle" class="nav-toggle-label" aria-label="Toggle navigation menu">
@@ -119,58 +206,21 @@ const socialLinks = [
 					<ul>
 						{headerNavLinks.map((link) =>
 							link.megaMenu ? (
-								<li class="has-dropdown">
-									<button
-										type="button"
-										class="dropdown-toggle"
-										aria-expanded="false"
-										aria-haspopup="true"
-										aria-controls="our-business-menu"
-									>
-										{link.label}
-										<svg class="chevron-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-											<path d="M6 9l6 6 6-6" />
-										</svg>
-									</button>
-									<div class="dropdown-panel mega-menu-panel" id="our-business-menu">
-										<div class="mega-menu-columns">
-											{link.megaMenu.map((column) => (
-												<div class="mega-menu-column">
-													<a href={column.href} class="mega-menu-column-title">{column.title}</a>
-													<ul>
-														{column.items.map((item) => (
-															<li class={item.children ? 'has-subitems' : undefined}>
-																<a href={item.href}>{item.label}</a>
-																{item.children && (
-																	<ul class="dropdown-subitems">
-																		{item.children.map((child) => (
-																			<li>
-																				<a
-																					href={child.href}
-																					target={child.external ? '_blank' : undefined}
-																					rel={child.external ? 'noopener noreferrer' : undefined}
-																					aria-label={child.external ? `${child.label} (opens in a new tab)` : undefined}
-																				>
-																					{child.label}
-																					{child.external && (
-																						<svg class="external-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-																							<path d="M7 17L17 7" />
-																							<path d="M8 7h9v9" />
-																						</svg>
-																					)}
-																				</a>
-																			</li>
-																		))}
-																	</ul>
-																)}
-															</li>
-														))}
-													</ul>
-												</div>
-											))}
-										</div>
-									</div>
-								</li>
+							<li class="has-dropdown">
+								<button
+									type="button"
+									class="dropdown-toggle"
+									aria-expanded="false"
+									aria-haspopup="true"
+									aria-controls="our-business-menu"
+								>
+									{link.label}
+									<svg class="chevron-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+										<path d="M6 9l6 6 6-6" />
+									</svg>
+								</button>
+								<NavFlyout items={link.megaMenu} id="our-business-menu" />
+							</li>
 							) : (
 								<li>
 									<a href={link.href}>{link.label}</a>
@@ -186,10 +236,12 @@ const socialLinks = [
 			<slot />
 		</main>
 
-		<footer class="site-footer">
+		<footer class="site-footer" transition:persist transition:name="site-footer">
 			<div class="footer-inner">
 				<div class="footer-brand">
-					<img src={CavotecLogo.src} alt="Cavotec" width="140" height="32" class="footer-logo" />
+					<span class="logo-chip footer-logo-chip">
+						<Image src={CavotecLogo} alt="Cavotec Malaysia Sdn Bhd" width={839} height={147} class="footer-logo" />
+					</span>
 					<p>Connection and electrification solutions for ports, airports and industry.</p>
 				</div>
 
@@ -205,10 +257,10 @@ const socialLinks = [
 					</nav>
 
 					{ourBusinessMenu.map((column) => (
-						<nav class="footer-nav footer-business-group" aria-label={`${column.title} links`}>
-							<a href={column.href} class="footer-group-title">{column.title}</a>
+						<nav class="footer-nav footer-business-group" aria-label={`${column.label} links`}>
+							<a href={column.href} class="footer-group-title">{column.label}</a>
 							<ul>
-								{column.items.map((item) => (
+								{(column.children ?? []).map((item) => (
 									<li class={item.children ? 'has-subitems' : undefined}>
 										<a href={item.href}>{item.label}</a>
 										{item.children && (
@@ -246,19 +298,9 @@ const socialLinks = [
 						{socialLinks.map((social) => (
 							<li>
 								<a href={social.href} aria-label={social.label} target="_blank" rel="noopener noreferrer">
-									{social.icon === 'linkedin' && (
-										<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
-											<path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.24 8.25h4.5V23h-4.5V8.25zM8.5 8.25h4.31v2.01h.06c.6-1.14 2.07-2.35 4.26-2.35 4.56 0 5.4 3 5.4 6.9V23h-4.5v-6.77c0-1.62-.03-3.7-2.25-3.7-2.26 0-2.6 1.76-2.6 3.58V23h-4.5V8.25z"/>
-										</svg>
-									)}
 									{social.icon === 'facebook' && (
 										<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
 											<path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94z"/>
-										</svg>
-									)}
-									{social.icon === 'x' && (
-										<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
-											<path d="M18.9 2H22l-7.6 8.68L23 22h-6.9l-5.4-6.86L4.6 22H1.5l8.13-9.29L1 2h7.1l4.88 6.27L18.9 2zm-1.2 18h1.7L6.4 4h-1.8l13.1 16z"/>
 										</svg>
 									)}
 									{social.icon === 'youtube' && (
@@ -281,141 +323,466 @@ const socialLinks = [
 </html>
 
 <script>
-	// Lightweight scroll-reveal: progressive enhancement only.
-	// If JS never runs, or the user prefers reduced motion, [data-reveal]
-	// elements stay at full opacity (see the CSS default in the global
-	// stylesheet) — nothing ever gets stuck hidden.
-	const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	// Persistent "site upgrade" reminder bar. Runs on every page (not just
+	// home) — index.astro's upgrade-notice modal sets this same
+	// sessionStorage flag on dismiss, and this check is what makes the bar
+	// reappear automatically on every subsequent page/reload within the
+	// session without re-showing the modal itself.
+	const UPGRADE_STORAGE_KEY = 'upgrade-notice-dismissed';
+	const upgradeReminderBar = document.getElementById('upgrade-reminder-bar');
+	const upgradeReminderBarClose = document.getElementById('upgrade-reminder-bar-close');
 
-	if (!prefersReducedMotion && 'IntersectionObserver' in window) {
-		document.documentElement.classList.add('reveal-enabled');
-
-		const observer = new IntersectionObserver(
-			(entries) => {
-				for (const entry of entries) {
-					if (entry.isIntersecting) {
-						entry.target.classList.add('is-visible');
-						observer.unobserve(entry.target);
-					}
-				}
-			},
-			{ threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
-		);
-
-		document.querySelectorAll('[data-reveal]').forEach((el) => observer.observe(el));
+	function isUpgradeNoticeDismissed(): boolean {
+		try {
+			return sessionStorage.getItem(UPGRADE_STORAGE_KEY) === '1';
+		} catch (e) {
+			return false;
+		}
 	}
 
-	// Subtle scroll-based depth for hero/page-header/closing-CTA background
-	// grid textures (marked with [data-parallax-bg]) — the background drifts
-	// at a fraction of scroll speed, so it lags slightly behind the
-	// foreground content instead of scrolling in lockstep. Disabled for
-	// reduced motion and on touch/narrow-viewport devices, where scroll-
-	// linked transforms tend to read as janky rather than smooth.
-	const parallaxEls = document.querySelectorAll('[data-parallax-bg]');
-	const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
-	const isNarrowViewport = window.innerWidth <= 768;
+	if (upgradeReminderBar && isUpgradeNoticeDismissed()) {
+		upgradeReminderBar.classList.add('is-visible');
+	}
 
-	if (!prefersReducedMotion && !isCoarsePointer && !isNarrowViewport && parallaxEls.length) {
-		let parallaxTicking = false;
+	// Closing the bar itself is per-page-view only (no new storage write) —
+	// the modal's dismissal is what's permanent for the session; this "x"
+	// just declutters the current page without demoting that.
+	upgradeReminderBarClose?.addEventListener('click', () => {
+		upgradeReminderBar?.classList.remove('is-visible');
+	});
 
-		const updateParallax = () => {
-			parallaxEls.forEach((el) => {
-				const parent = el.parentElement;
-				if (!parent) return;
-				const offset = parent.getBoundingClientRect().top * 0.12;
-				el.style.transform = `translate3d(0, ${offset}px, 0)`;
-			});
-			parallaxTicking = false;
-		};
+	// Light/dark theme toggle. The inline <head> script already set
+	// [data-theme] before first paint (localStorage > OS preference > dark
+	// fallback) — this just wires up the button and keeps localStorage/the
+	// meta theme-color in sync from here on.
+	const THEME_STORAGE_KEY = 'theme-preference';
+	const root = document.documentElement;
+	const themeToggle = document.getElementById('theme-toggle');
+	const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+	const themeColorByMode: Record<'dark' | 'light', string> = { dark: '#1A1D24', light: '#FAFAF9' };
 
-		const onParallaxScroll = () => {
-			if (!parallaxTicking) {
-				requestAnimationFrame(updateParallax);
-				parallaxTicking = true;
+	function currentTheme(): 'dark' | 'light' {
+		return root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+	}
+
+	function applyTheme(theme: 'dark' | 'light', { persist }: { persist: boolean }) {
+		root.setAttribute('data-theme', theme);
+		if (themeColorMeta) themeColorMeta.setAttribute('content', themeColorByMode[theme]);
+		if (themeToggle) {
+			themeToggle.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+		}
+		if (persist) {
+			try {
+				localStorage.setItem(THEME_STORAGE_KEY, theme);
+			} catch (e) {
+				// Storage unavailable (privacy mode, etc.) — the toggle still
+				// works for this page view, it just won't persist.
 			}
-		};
-
-		window.addEventListener('scroll', onParallaxScroll, { passive: true });
-		window.addEventListener('resize', onParallaxScroll, { passive: true });
-		updateParallax();
+		}
 	}
 
-	// "Our Business" nav mega menu: click/tap toggle (desktop also opens on
-	// hover/focus via CSS alone). This click handler is what makes it work as
-	// an expandable accordion on mobile, where there is no hover.
-	document.querySelectorAll('.dropdown-toggle').forEach((toggle) => {
-		const parent = toggle.closest('.has-dropdown');
-		if (!parent) return;
+	// Reflect the theme the head script already picked into the button's
+	// label immediately (it only set the attribute, not the label/meta).
+	applyTheme(currentTheme(), { persist: false });
+
+	themeToggle?.addEventListener('click', () => {
+		applyTheme(currentTheme() === 'light' ? 'dark' : 'light', { persist: true });
+	});
+
+	// Live-follow the OS setting ONLY until the user makes an explicit
+	// choice of their own — once localStorage has a value, that choice
+	// always wins over the system preference from then on.
+	if (window.matchMedia) {
+		window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (event) => {
+			let hasExplicitChoice = false;
+			try {
+				hasExplicitChoice = localStorage.getItem(THEME_STORAGE_KEY) !== null;
+			} catch (e) {
+				hasExplicitChoice = false;
+			}
+			if (hasExplicitChoice) return;
+			applyTheme(event.matches ? 'light' : 'dark', { persist: false });
+		});
+	}
+
+	// ------------------------------------------------------------------
+	// Page-content effects (scroll-reveal, header/page-header/closing-CTA
+	// parallax backgrounds, card shine) — everything in this function
+	// targets elements that live inside <main>, which DOES get replaced on
+	// every ClientRouter navigation (unlike the persisted header/footer/
+	// reminder bar above, whose own listeners are bound once, further
+	// down, and never need to be re-bound since those elements are never
+	// destroyed). Wrapped in its own function and re-run via the
+	// astro:page-load event — which fires once on the true initial load
+	// and again after every subsequent transition — instead of running
+	// once at the top of this script, which would only ever apply to
+	// whichever page happened to load first and silently do nothing on
+	// every page after that. Each run gets its own AbortController so the
+	// previous run's window-level listeners (scroll, resize) are torn down
+	// on astro:before-swap rather than silently accumulating one more
+	// live copy — each still doing work against that run's now-detached
+	// elements — on every navigation.
+	// ------------------------------------------------------------------
+	let contentEffectsController: AbortController | null = null;
+
+	function initPageContentEffects() {
+		contentEffectsController?.abort();
+		contentEffectsController = new AbortController();
+		const { signal } = contentEffectsController;
+
+		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+		// Lightweight scroll-reveal: progressive enhancement only.
+		// If JS never runs, or the user prefers reduced motion, [data-reveal]
+		// elements stay at full opacity (see the CSS default in the global
+		// stylesheet) — nothing ever gets stuck hidden.
+		if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+			document.documentElement.classList.add('reveal-enabled');
+
+			const revealEls = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
+
+			// Elements already on-screen at this exact moment get marked
+			// visible in the SAME synchronous pass as the .reveal-enabled
+			// class above, not asynchronously via the observer's first
+			// callback — otherwise there's a frame where they sit hidden
+			// (opacity: 0, just freshly hidden by that class landing) before
+			// the observer fires and re-reveals them: a visible flash/pop of
+			// already-settled content on every single page load, and the
+			// single biggest contributor to the reported nav jitter, since
+			// it fired on every page load even before ClientRouter existed.
+			// Only elements NOT yet on-screen get observed for a genuine
+			// scroll-triggered reveal.
+			const viewportBottom = window.innerHeight + 40; // matches the observer's rootMargin below
+			const toObserve: HTMLElement[] = [];
+			revealEls.forEach((el) => {
+				const rect = el.getBoundingClientRect();
+				if (rect.top < viewportBottom && rect.bottom > 0) {
+					el.classList.add('is-visible');
+				} else {
+					toObserve.push(el);
+				}
+			});
+
+			const observer = new IntersectionObserver(
+				(entries) => {
+					for (const entry of entries) {
+						if (entry.isIntersecting) {
+							entry.target.classList.add('is-visible');
+							observer.unobserve(entry.target);
+						}
+					}
+				},
+				{ threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+			);
+
+			toObserve.forEach((el) => observer.observe(el));
+			signal.addEventListener('abort', () => observer.disconnect());
+		}
+
+		// Subtle scroll-based depth for hero/page-header/closing-CTA background
+		// grid textures (marked with [data-parallax-bg]) — the background drifts
+		// at a fraction of scroll speed, so it lags slightly behind the
+		// foreground content instead of scrolling in lockstep. Disabled for
+		// reduced motion and on touch/narrow-viewport devices, where scroll-
+		// linked transforms tend to read as janky rather than smooth.
+		const parallaxEls = document.querySelectorAll<HTMLElement>('[data-parallax-bg]');
+		const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+		const isNarrowViewport = window.innerWidth <= 768;
+
+		if (!prefersReducedMotion && !isCoarsePointer && !isNarrowViewport && parallaxEls.length) {
+			let parallaxTicking = false;
+
+			const updateParallax = () => {
+				parallaxEls.forEach((el) => {
+					const parent = el.parentElement;
+					if (!parent) return;
+					const offset = parent.getBoundingClientRect().top * 0.12;
+					el.style.transform = `translate3d(0, ${offset}px, 0)`;
+				});
+				parallaxTicking = false;
+			};
+
+			const onParallaxScroll = () => {
+				if (!parallaxTicking) {
+					requestAnimationFrame(updateParallax);
+					parallaxTicking = true;
+				}
+			};
+
+			window.addEventListener('scroll', onParallaxScroll, { passive: true, signal });
+			window.addEventListener('resize', onParallaxScroll, { passive: true, signal });
+			updateParallax();
+		}
+
+		// Card shine — single shared utility for every [data-shine] card
+		// site-wide (service/product/pillar/IoT/customize/case-study cards all
+		// carry it alongside .tech-card). Tracks the cursor position within the
+		// card as a 0–100% coordinate and writes it to --shine-x/--shine-y; the
+		// CSS above (registered via @property) handles rendering the gradient
+		// and smoothly transitioning --shine-opacity on its own — this only
+		// ever sets target values, never animates anything itself.
+		const ACTIVE_SHINE_OPACITY = '0.15';
+
+		function updateShinePosition(card: HTMLElement, event: PointerEvent) {
+			const rect = card.getBoundingClientRect();
+			const x = Math.min(100, Math.max(0, ((event.clientX - rect.left) / rect.width) * 100));
+			const y = Math.min(100, Math.max(0, ((event.clientY - rect.top) / rect.height) * 100));
+			card.style.setProperty('--shine-x', `${x}%`);
+			card.style.setProperty('--shine-y', `${y}%`);
+		}
+
+		if (!prefersReducedMotion) {
+			document.querySelectorAll<HTMLElement>('[data-shine]').forEach((card) => {
+				card.addEventListener('pointermove', (event) => updateShinePosition(card, event), { passive: true, signal });
+
+				card.addEventListener(
+					'pointerenter',
+					(event) => {
+						updateShinePosition(card, event);
+						card.style.setProperty('--shine-opacity', ACTIVE_SHINE_OPACITY);
+					},
+					{ passive: true, signal }
+				);
+
+				card.addEventListener(
+					'pointerleave',
+					() => {
+						card.style.setProperty('--shine-opacity', '0');
+					},
+					{ passive: true, signal }
+				);
+			});
+		}
+		// If motion is reduced, [data-shine] elements never get these listeners
+		// — the CSS reduced-motion rule instead shows a fixed, faint, centered
+		// glow (see [data-shine] in the global styles), never one that tracks
+		// the pointer.
+	}
+
+	// astro:page-load fires once on the true initial load and again after
+	// every subsequent ClientRouter transition — the "re-run this setup on
+	// every page" hook DOMContentLoaded can't provide beyond the first
+	// load. astro:before-swap fires just before the outgoing page's <main>
+	// is torn down, which is when this run's window-level listeners need
+	// to go with it.
+	document.addEventListener('astro:page-load', initPageContentEffects);
+	document.addEventListener('astro:before-swap', () => contentEffectsController?.abort());
+
+	// "Our Business" nav: a cascading flyout menu on desktop (hover-intent
+	// with a short open/close delay, plus arrow-key navigation), falling
+	// back to a click/tap accordion on touch, where the whole tree is just
+	// shown/hidden by the top-level toggle (see the mobile CSS in
+	// NavFlyout.astro — nested panels render inline there, not as flyouts).
+	//
+	// "Owner" = any element that has its own flyout panel as a direct DOM
+	// child: the top-level `.has-dropdown` <li> (panel = the root
+	// <NavFlyout>) and every `.flyout-row.has-children` <li> (panel = its
+	// nested <NavFlyout>). Both cases are handled identically below.
+	const HOVER_DELAY = 150;
+	const desktopFlyoutQuery = window.matchMedia('(min-width: 981px) and (hover: hover) and (pointer: fine)');
+	const isDesktopFlyout = () => desktopFlyoutQuery.matches;
+
+	function ownerTrigger(owner: Element): HTMLElement | null {
+		return owner.querySelector(':scope > .dropdown-toggle, :scope > .flyout-link');
+	}
+
+	function ownerPanel(owner: Element): HTMLElement | null {
+		return owner.querySelector(':scope > .flyout-panel');
+	}
+
+	function closeBranch(owner: Element) {
+		owner.classList.remove('is-open');
+		ownerPanel(owner)?.classList.remove('is-open');
+		owner.querySelectorAll('.flyout-row.is-open, .flyout-panel.is-open').forEach((el) => el.classList.remove('is-open'));
+		ownerTrigger(owner)?.setAttribute('aria-expanded', 'false');
+	}
+
+	// A panel that would run off the right edge of the viewport (e.g. a
+	// 3rd-level flyout on a narrower desktop window) flips to open toward
+	// the left instead, so it's never clipped or forced into horizontal
+	// page scroll. Measured fresh on every open, since which rows are open
+	// above it can change how far right this panel already sits.
+	function positionPanel(panel: HTMLElement) {
+		panel.classList.remove('flyout-panel--flip');
+		if (panel.getBoundingClientRect().right > window.innerWidth - 8) {
+			panel.classList.add('flyout-panel--flip');
+		}
+	}
+
+	function focusFirstLink(owner: HTMLElement) {
+		owner.querySelector<HTMLElement>(':scope > .flyout-panel .flyout-link')?.focus();
+	}
+
+	function openOwner(owner: HTMLElement) {
+		// Only one branch open per level: close sibling owners before opening this one.
+		const parent = owner.parentElement;
+		if (parent) {
+			Array.from(parent.children).forEach((sibling) => {
+				if (sibling !== owner && (sibling.classList.contains('flyout-row') || sibling.classList.contains('has-dropdown'))) {
+					closeBranch(sibling);
+				}
+			});
+		}
+		owner.classList.add('is-open');
+		const panel = ownerPanel(owner);
+		panel?.classList.add('is-open');
+		if (panel && isDesktopFlyout()) positionPanel(panel);
+		ownerTrigger(owner)?.setAttribute('aria-expanded', 'true');
+	}
+
+	const hoverTimers = new WeakMap<Element, { open?: number; close?: number }>();
+
+	function clearHoverTimers(owner: Element) {
+		const t = hoverTimers.get(owner);
+		if (!t) return;
+		if (t.open) window.clearTimeout(t.open);
+		if (t.close) window.clearTimeout(t.close);
+		hoverTimers.delete(owner);
+	}
+
+	function scheduleOpen(owner: HTMLElement) {
+		const t = hoverTimers.get(owner) ?? {};
+		if (t.close) {
+			window.clearTimeout(t.close);
+			t.close = undefined;
+		}
+		if (owner.classList.contains('is-open') || t.open) {
+			hoverTimers.set(owner, t);
+			return;
+		}
+		t.open = window.setTimeout(() => {
+			openOwner(owner);
+			const current = hoverTimers.get(owner);
+			if (current) current.open = undefined;
+		}, HOVER_DELAY);
+		hoverTimers.set(owner, t);
+	}
+
+	function scheduleClose(owner: HTMLElement) {
+		const t = hoverTimers.get(owner) ?? {};
+		if (t.open) {
+			window.clearTimeout(t.open);
+			t.open = undefined;
+		}
+		if (t.close) {
+			hoverTimers.set(owner, t);
+			return;
+		}
+		t.close = window.setTimeout(() => {
+			closeBranch(owner);
+			const current = hoverTimers.get(owner);
+			if (current) current.close = undefined;
+		}, HOVER_DELAY);
+		hoverTimers.set(owner, t);
+	}
+
+	const flyoutOwners = document.querySelectorAll<HTMLElement>('.has-dropdown, .flyout-row.has-children');
+
+	flyoutOwners.forEach((owner) => {
+		owner.addEventListener('pointerenter', (event) => {
+			if (!(event instanceof PointerEvent) || event.pointerType !== 'mouse' || !isDesktopFlyout()) return;
+			scheduleOpen(owner);
+		});
+		owner.addEventListener('pointerleave', (event) => {
+			if (!(event instanceof PointerEvent) || event.pointerType !== 'mouse' || !isDesktopFlyout()) return;
+			scheduleClose(owner);
+		});
+		owner.addEventListener('focusout', (event) => {
+			const next = event.relatedTarget;
+			if (next instanceof Node && owner.contains(next)) return;
+			clearHoverTimers(owner);
+			closeBranch(owner);
+		});
+	});
+
+	// Top-level toggle: click/tap opens & closes the whole menu — this is
+	// what drives the mobile accordion (no hover there), and on desktop it
+	// also works as an immediate (no-delay) alternative to hovering.
+	document.querySelectorAll<HTMLElement>('.dropdown-toggle').forEach((toggle) => {
+		const owner = toggle.closest<HTMLElement>('.has-dropdown');
+		if (!owner) return;
 
 		toggle.addEventListener('click', () => {
-			const isOpen = parent.classList.toggle('is-open');
-			toggle.setAttribute('aria-expanded', String(isOpen));
+			clearHoverTimers(owner);
+			if (owner.classList.contains('is-open')) {
+				closeBranch(owner);
+			} else {
+				openOwner(owner);
+			}
 		});
 	});
 
 	document.addEventListener('click', (event) => {
-		document.querySelectorAll('.has-dropdown.is-open').forEach((el) => {
-			if (el.contains(event.target)) return;
-			el.classList.remove('is-open');
-			el.querySelector('.dropdown-toggle')?.setAttribute('aria-expanded', 'false');
+		document.querySelectorAll<HTMLElement>('.has-dropdown.is-open').forEach((owner) => {
+			if (event.target instanceof Node && owner.contains(event.target)) return;
+			clearHoverTimers(owner);
+			closeBranch(owner);
 		});
 	});
 
 	document.addEventListener('keydown', (event) => {
-		if (event.key !== 'Escape') return;
-		document.querySelectorAll('.has-dropdown.is-open').forEach((el) => {
-			el.classList.remove('is-open');
-			const toggle = el.querySelector('.dropdown-toggle');
-			if (toggle instanceof HTMLElement) {
-				toggle.setAttribute('aria-expanded', 'false');
-				toggle.focus();
+		const target = event.target;
+		if (!(target instanceof HTMLElement)) return;
+
+		// Escape: close everything and return focus to the top-level trigger.
+		if (event.key === 'Escape') {
+			document.querySelectorAll<HTMLElement>('.has-dropdown.is-open').forEach((owner) => {
+				clearHoverTimers(owner);
+				closeBranch(owner);
+				ownerTrigger(owner)?.focus();
+			});
+			return;
+		}
+
+		// Opening the top-level trigger with the keyboard.
+		if (target.classList.contains('dropdown-toggle')) {
+			if (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowDown') {
+				const owner = target.closest<HTMLElement>('.has-dropdown');
+				if (!owner) return;
+				event.preventDefault();
+				openOwner(owner);
+				focusFirstLink(owner);
 			}
-		});
+			return;
+		}
+
+		// Arrow-key navigation within an open flyout panel, matching the
+		// WAI-ARIA menu pattern basics: Up/Down move between sibling rows,
+		// Right opens a child flyout (if any), Left closes the current one.
+		if (!target.classList.contains('flyout-link')) return;
+
+		const row = target.closest<HTMLElement>('.flyout-row');
+		const panel = target.closest<HTMLElement>('.flyout-panel');
+		if (!row || !panel) return;
+
+		const siblingLinks = Array.from(panel.querySelectorAll<HTMLElement>(':scope > ul > .flyout-row > .flyout-link'));
+		const index = siblingLinks.indexOf(target);
+
+		if (event.key === 'ArrowDown') {
+			event.preventDefault();
+			siblingLinks[(index + 1) % siblingLinks.length]?.focus();
+		} else if (event.key === 'ArrowUp') {
+			event.preventDefault();
+			siblingLinks[(index - 1 + siblingLinks.length) % siblingLinks.length]?.focus();
+		} else if (event.key === 'ArrowRight' || event.key === 'Enter' || event.key === ' ') {
+			if (!row.classList.contains('has-children')) return;
+			event.preventDefault();
+			openOwner(row);
+			focusFirstLink(row);
+		} else if (event.key === 'ArrowLeft') {
+			const parentOwner = panel.parentElement;
+			if (!parentOwner || !(parentOwner.classList.contains('flyout-row') || parentOwner.classList.contains('has-dropdown'))) return;
+			event.preventDefault();
+			clearHoverTimers(parentOwner);
+			closeBranch(parentOwner);
+			ownerTrigger(parentOwner)?.focus();
+		}
 	});
 
-	// Card shine — single shared utility for every [data-shine] card
-	// site-wide (service/product/pillar/IoT/customize/case-study cards all
-	// carry it alongside .tech-card). Tracks the cursor position within the
-	// card as a 0–100% coordinate and writes it to --shine-x/--shine-y; the
-	// CSS above (registered via @property) handles rendering the gradient
-	// and smoothly transitioning --shine-opacity on its own — this only
-	// ever sets target values, never animates anything itself.
-	const ACTIVE_SHINE_OPACITY = '0.15';
-
-	function updateShinePosition(card: HTMLElement, event: PointerEvent) {
-		const rect = card.getBoundingClientRect();
-		const x = Math.min(100, Math.max(0, ((event.clientX - rect.left) / rect.width) * 100));
-		const y = Math.min(100, Math.max(0, ((event.clientY - rect.top) / rect.height) * 100));
-		card.style.setProperty('--shine-x', `${x}%`);
-		card.style.setProperty('--shine-y', `${y}%`);
-	}
-
-	if (!prefersReducedMotion) {
-		document.querySelectorAll<HTMLElement>('[data-shine]').forEach((card) => {
-			card.addEventListener('pointermove', (event) => updateShinePosition(card, event), { passive: true });
-
-			card.addEventListener(
-				'pointerenter',
-				(event) => {
-					updateShinePosition(card, event);
-					card.style.setProperty('--shine-opacity', ACTIVE_SHINE_OPACITY);
-				},
-				{ passive: true }
-			);
-
-			card.addEventListener(
-				'pointerleave',
-				() => {
-					card.style.setProperty('--shine-opacity', '0');
-				},
-				{ passive: true }
-			);
-		});
-	}
-	// If motion is reduced, [data-shine] elements never get these listeners
-	// — the CSS reduced-motion rule instead shows a fixed, faint, centered
-	// glow (see [data-shine] in the global styles), never one that tracks
-	// the pointer.
+	// Card shine setup now lives inside initPageContentEffects() above (it
+	// targets [data-shine] cards inside <main>, which get replaced on every
+	// navigation, so it has to re-run with the rest of that function rather
+	// than once here at the top level).
 </script>
 
 <style is:global>
@@ -426,53 +793,95 @@ const socialLinks = [
 	 * corner brackets). Page-specific layout lives in each page's
 	 * own scoped <style> block.
 	 */
+	/* Theme system: :root holds the dark palette (this site's default —
+	   matches [data-theme="dark"] and, for old/no-JS clients, the
+	   prefers-color-scheme fallback below). [data-theme="light"] further
+	   down overrides the same custom properties with light equivalents.
+	   Every page consumes only the generic --color-bg/-text/-border-style
+	   names (or their underlying --color-indigo and --color-ink sources),
+	   never a raw hex, so flipping these here re-themes the whole site.
+	   The one deliberate exception is --color-shadow-rgb: shadows stay
+	   dark-tinted in both themes (a light UI still uses dark, low-opacity
+	   shadows for elevation — only backgrounds/text/borders invert). */
 	:root {
-		/* Base — premium black theme. "Indigo" names are kept so every
-		   existing var(--color-indigo*) reference (page-header gradients,
-		   button text, badge tints, …) repaints automatically; only the
-		   values changed, from navy to near-black. */
-		--color-indigo: #0a0a0c;
-		--color-indigo-rgb: 10, 10, 12;
-		--color-indigo-dark: #000000;
-		--color-surface: #16161a;
+		/* Base — soft dark theme. "Indigo" names are kept so every existing
+		   var(--color-indigo*) reference (page-header gradients, button
+		   text, badge tints, …) repaints automatically; only the values
+		   changed. Originally a near-black theme (#0a0a0c/#16161a) — lifted
+		   to a lighter charcoal/slate so the site reads as dark mode rather
+		   than near-black, with muted text bumped up to match. */
+		--color-indigo: #1a1d24;
+		--color-indigo-rgb: 26, 29, 36;
+		--color-indigo-dark: #121419;
+		--color-surface: #24272f;
 		/* Gradient's lighter stop reuses the elevated-surface tone, so
 		   page-header/hero banners fade toward the same tone their cards
 		   and panels sit on. */
 		--color-indigo-light: var(--color-surface);
 		/* Hairline border for dark surfaces — tick-marks, dividers, card
 		   borders — used instead of translucent-white/black tricks so
-		   separation reads crisp against pure black. */
-		--color-border-dark: #26262c;
+		   separation reads crisp against the charcoal base. */
+		--color-border-dark: #363a45;
 
-		/* Accents (unchanged) */
+		/* Accents — identical in both themes (brand teal/amber don't
+		   invert), EXCEPT the "-dark" text/icon variants below, which are
+		   specifically calibrated per theme (see the light block). */
 		--color-teal: #00c2d1;
 		--color-teal-rgb: 0, 194, 209;
 		--color-amber: #f2a950;
-		--color-amber-dark: #d98f36;
 		--color-amber-rgb: 242, 169, 80;
 
-		/* Text on dark/black surfaces */
+		/* Text on dark surfaces */
 		--color-ink: #f2f3f5;
-		--color-ink-muted: #8a8f98;
+		--color-ink-rgb: 242, 243, 245;
+		--color-ink-muted: #a0a5af;
 
-		/* Surfaces & text — the whole site is dark now, so these generic
-		   names (still used by every page's card/section CSS) are repointed
-		   at the black-theme tokens instead of holding their own light
-		   values: --color-bg-alt (was #f7f8fa, the "page" tone) now IS the
-		   base black, --color-bg (was #ffffff, the "card" tone) now IS the
-		   elevated surface, and text/border follow the same logic. Nothing
-		   in the site ever again resolves to an actual light color. */
+		/* Dedicated shadow tint — deliberately NOT overridden in the light
+		   block. rgba(var(--color-indigo-rgb), …) used to double as "the
+		   shadow color" only because dark mode's page background happened
+		   to be near-black; once --color-indigo-rgb flips to a light value
+		   in light mode, reusing it for box-shadow would produce a nearly
+		   invisible white shadow instead of depth. This stays a constant
+		   near-black in both themes, the way shadows normally work. */
+		--color-shadow-rgb: 10, 10, 12;
+
+		/* Guaranteed-dark text/icon color for use ON TOP OF the bright teal/
+		   amber accent fills (buttons, hover states, ::selection) — these
+		   fills don't change between themes, so the text sitting on them
+		   shouldn't either. Also deliberately NOT overridden in the light
+		   block, same reasoning as --color-shadow-rgb above: these call
+		   sites used to read var(--color-indigo) for this purely because
+		   dark mode's page background happened to already be dark; now that
+		   --color-indigo flips to near-white in light mode, that reuse would
+		   put near-white text on a teal button. */
+		--color-on-accent: #1a1d24;
+
+		/* var(--color-teal-dark, #018b96) / var(--color-amber-dark) are used
+		   as `color:` (text/icon) values ~12x across the pages, never as a
+		   fill — kept distinct from the base --color-teal/--color-amber
+		   because the base accents don't clear text-contrast minimums (see
+		   the light block, where they're the ones that actually change). In
+		   dark mode the base accents already contrast fine as text, so
+		   these just alias straight to them. */
+		--color-teal-dark: var(--color-teal);
+		--color-amber-dark: #d98f36;
+
+		/* Surfaces & text — every page's card/section CSS reads only these
+		   generic names (never --color-indigo/--color-surface/--color-ink
+		   directly), so re-pointing them here is what actually re-themes
+		   the site: --color-bg-alt is the page tone, --color-bg is the
+		   elevated/card tone, text/border follow the same split. */
 		--color-bg: var(--color-surface);
 		--color-bg-alt: var(--color-indigo);
 		--color-text: var(--color-ink);
 		--color-text-muted: var(--color-ink-muted);
 		--color-border: var(--color-border-dark);
 
-		/* var(--color-teal-dark, #018b96) is used ~9 times across the pages
-		   as a muted-teal accent tuned for light backgrounds; defining it
-		   here (rather than editing every call site) makes all of them
-		   resolve to the brighter base teal, which is what reads on black. */
-		--color-teal-dark: var(--color-teal);
+		/* Newer, spec-named aliases for the same tokens above — additive
+		   only, existing var(--color-bg/-text/…) call sites are untouched. */
+		--color-bg-elevated: var(--color-surface);
+		--color-accent-teal: var(--color-teal);
+		--color-accent-amber: var(--color-amber);
 
 		/* Back-compat aliases so every existing var(--color-navy/--color-accent, …)
 		   reference across the site picks up the new palette automatically. */
@@ -489,11 +898,83 @@ const socialLinks = [
 		--header-height: 76px;
 	}
 
+	/* No-JS / pre-hydration fallback only — the inline head script normally
+	   sets [data-theme] before first paint, so this rarely applies in
+	   practice. Mirrors the same three-state logic: OS-preferred light
+	   wins unless a "dark" choice was already made explicit. */
+	@media (prefers-color-scheme: light) {
+		:root:not([data-theme='dark']) {
+			--color-indigo: #fafaf9;
+			--color-indigo-rgb: 250, 250, 249;
+			--color-indigo-dark: #eeeff2;
+			--color-surface: #ffffff;
+			--color-border-dark: #e2e4e8;
+			--color-ink: #1a1d24;
+			--color-ink-rgb: 26, 29, 36;
+			--color-ink-muted: #5b606b;
+			--color-teal-dark: #017885;
+			--color-amber-dark: #8f5a1c;
+		}
+	}
+
+	/* Explicit light theme — set by the toggle (see the script at the
+	   bottom of this file) or by the head script reading a stored
+	   "theme-preference". Wins regardless of OS preference. */
+	:root[data-theme='light'] {
+		--color-indigo: #fafaf9;
+		--color-indigo-rgb: 250, 250, 249;
+		/* Gradient's dark stop: a hair cooler/deeper than the base page
+		   tone, so page-header banners still show a subtle diagonal fade
+		   rather than flattening to a single flat color. */
+		--color-indigo-dark: #eeeff2;
+		--color-surface: #ffffff;
+		--color-border-dark: #e2e4e8;
+		--color-ink: #1a1d24;
+		--color-ink-rgb: 26, 29, 36;
+		--color-ink-muted: #5b606b;
+		/* Base --color-teal/--color-amber are NOT overridden here — kept
+		   pixel-identical across both themes per spec, since as fills/
+		   borders/glows (not text) they don't need it. As TEXT/icon color
+		   they measure 2.18:1 and 1.99:1 against white — badly under the
+		   3:1 floor — so the "-dark" text-safe variants get real, darker
+		   values here instead of aliasing straight to the base accent:
+		   #017885 (teal) → 5.22:1 / #8F5A1C (amber) → 5.76:1 against
+		   white, both comfortably clearing 4.5:1. */
+		--color-teal-dark: #017885;
+		--color-amber-dark: #8f5a1c;
+	}
+
 	html,
 	body {
 		margin: 0;
 		width: 100%;
 		height: 100%;
+		/* Defensive: matches body's own background below. The stylesheet is
+		   render-blocking so this rarely matters (nothing paints before it's
+		   parsed anyway), but it removes any chance of a browser-default
+		   white frame showing through on the sliver of navigations that
+		   still fall back to a hard reload (JS disabled, prefetch failed,
+		   a hard refresh, …) instead of a ClientRouter-handled transition. */
+		background: var(--color-bg-alt);
+	}
+
+	html {
+		/* Closed/off-screen nested flyout panels (NavFlyout.astro) sit at
+		   `left: 100%` relative to their trigger row so they can slide in
+		   from the right — deliberately NOT display:none or width:0 while
+		   closed (see that file's comment on why the hidden state has to
+		   stay a plain opacity/visibility flip, not a layout-removing one,
+		   for the keyboard-focus timing this menu depends on). That leaves
+		   them occupying real layout position off past the right edge even
+		   while invisible, which used to push document.documentElement's
+		   scrollWidth past the viewport on every page. Harmless in
+		   practice (nothing made it reachable — no visible scrollbar, no
+		   pannable content), but cutting it off here is simpler than
+		   changing how the menu itself is hidden. Scoped to `html`, not
+		   inherited by nested scroll containers with their own overflow-x
+		   (e.g. ComparisonTable.astro's horizontal-scroll wrapper on
+		   mobile), which stay unaffected. */
+		overflow-x: hidden;
 	}
 
 	body {
@@ -531,7 +1012,7 @@ const socialLinks = [
 
 	::selection {
 		background: rgba(var(--color-teal-rgb), 0.25);
-		color: var(--color-indigo);
+		color: var(--color-on-accent);
 	}
 
 	/* ---------------------------------------------------------------- */
@@ -708,7 +1189,7 @@ const socialLinks = [
 	.tech-card:focus-within {
 		transform: translateY(-4px);
 		box-shadow:
-			0 20px 40px rgba(var(--color-indigo-rgb), 0.14),
+			0 20px 40px rgba(var(--color-shadow-rgb), 0.14),
 			0 0 0 1px rgba(var(--color-teal-rgb), 0.3),
 			0 0 28px rgba(var(--color-teal-rgb), 0.2);
 		border-color: transparent;
@@ -747,6 +1228,72 @@ const socialLinks = [
 </style>
 
 <style>
+	/* Upgrade-notice reminder bar — see the script below for the
+	   sessionStorage check that reveals it. */
+	.upgrade-reminder-bar {
+		display: none;
+		background: rgba(var(--color-teal-rgb), 0.1);
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.upgrade-reminder-bar.is-visible {
+		display: block;
+	}
+
+	.upgrade-reminder-bar-inner {
+		max-width: var(--max-width);
+		margin: 0 auto;
+		padding: 0.55rem 1.5rem;
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.upgrade-reminder-bar-text {
+		grid-column: 2;
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		letter-spacing: 0.02em;
+		color: var(--color-text);
+		text-align: center;
+	}
+
+	.upgrade-reminder-bar-close {
+		grid-column: 3;
+		justify-self: end;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 22px;
+		height: 22px;
+		border-radius: 50%;
+		border: none;
+		background: transparent;
+		color: var(--color-text-muted);
+		cursor: pointer;
+		flex-shrink: 0;
+		transition: color 0.15s ease, background 0.15s ease;
+	}
+
+	.upgrade-reminder-bar-close:hover,
+	.upgrade-reminder-bar-close:focus-visible {
+		color: var(--color-teal);
+		background: rgba(var(--color-teal-rgb), 0.15);
+	}
+
+	@media (max-width: 600px) {
+		.upgrade-reminder-bar-inner {
+			padding: 0.55rem 1rem;
+			gap: 0.35rem;
+		}
+
+		.upgrade-reminder-bar-text {
+			font-size: 0.68rem;
+			line-height: 1.4;
+		}
+	}
+
 	/* Header */
 	.site-header {
 		position: sticky;
@@ -754,7 +1301,7 @@ const socialLinks = [
 		z-index: 100;
 		background: var(--color-bg);
 		border-bottom: 1px solid var(--color-border);
-		box-shadow: 0 1px 3px rgba(var(--color-indigo-rgb), 0.06);
+		box-shadow: 0 1px 3px rgba(var(--color-shadow-rgb), 0.06);
 	}
 
 	.header-inner {
@@ -767,20 +1314,86 @@ const socialLinks = [
 		padding: 0 1.5rem;
 	}
 
+	/* Groups the logo + theme toggle at the header's left edge as a single
+	   flex item, so header-inner's justify-content: space-between still
+	   only ever splits two things (this group vs. the nav) regardless of
+	   viewport — adding the toggle as a third direct header-inner child
+	   would otherwise get pushed to visual center instead of sitting next
+	   to the logo. */
+	.header-left {
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+		flex-shrink: 0;
+	}
+
 	.logo {
 		display: flex;
 		align-items: center;
 		flex-shrink: 0;
 	}
 
-	.logo img {
+	/* The real Cavotec wordmark is brand blue (~#3860B0). Measured against
+	   this dark header surface it's only ~2.5:1 — well under the 3:1 floor
+	   — so in dark mode this gets a light backing chip (see below) instead
+	   of forcing the logo to white; the header/footer are the only two
+	   places this pattern is needed since both sit on --color-surface. In
+	   light mode the header is already light, so no chip is added and the
+	   logo renders directly in its native brand color. */
+	.logo-chip {
+		display: flex;
+		align-items: center;
+		border-radius: 8px;
+		transition: background 0.2s ease, padding 0.2s ease;
+	}
+
+	:root:not([data-theme='light']) .logo-chip {
+		background: rgba(242, 243, 245, 0.94);
+		padding: 7px 12px;
+	}
+
+	.logo-img {
 		display: block;
-		height: 34px;
+		height: 36px;
 		width: auto;
-		/* The header is now a dark surface like the footer, so the logo
-		   gets the same brightness(0) invert(1) treatment already used on
-		   .footer-brand img to render it in solid white. */
-		filter: brightness(0) invert(1);
+	}
+
+	/* Sun/moon theme toggle — sized and styled to match the circular
+	   .footer-social icon buttons elsewhere on the site. Both icons are
+	   always in the DOM; which one shows is purely a CSS swap keyed off
+	   [data-theme], so there's nothing for JS to redraw on toggle. */
+	.theme-toggle {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 34px;
+		height: 34px;
+		border-radius: 50%;
+		border: 1px solid var(--color-border);
+		background: transparent;
+		color: var(--color-ink-muted);
+		cursor: pointer;
+		flex-shrink: 0;
+		transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+	}
+
+	.theme-toggle:hover,
+	.theme-toggle:focus-visible {
+		background: var(--color-teal);
+		border-color: var(--color-teal);
+		color: var(--color-on-accent);
+	}
+
+	.theme-icon-moon {
+		display: none;
+	}
+
+	:root[data-theme='light'] .theme-icon-sun {
+		display: none;
+	}
+
+	:root[data-theme='light'] .theme-icon-moon {
+		display: block;
 	}
 
 	.site-nav ul {
@@ -850,168 +1463,19 @@ const socialLinks = [
 		color: var(--color-teal);
 	}
 
-	/* Our Business mega menu */
+	/* Our Business nav trigger — the cascading flyout panels themselves
+	   (root + every nested level) are styled in NavFlyout.astro, since
+	   that's the component that renders them; this file only owns the
+	   trigger button's own hover/open state. */
 	.has-dropdown {
 		position: relative;
 	}
 
-	.dropdown-panel ul {
-		display: flex;
-		flex-direction: column;
-		/* Override .site-nav ul's align-items: center (meant for the
-		   horizontal top-level nav row) — it leaks into every nested <ul>
-		   here via descendant selector and was shrink-wrapping/centering
-		   each item instead of letting it stretch full-width and left-align. */
-		align-items: stretch;
-	}
-
-	.mega-menu-columns {
-		display: flex;
-	}
-
-	.mega-menu-column {
-		flex: 1;
-		min-width: 0;
-		padding-right: 1rem;
-	}
-
-	.mega-menu-column:not(:first-child) {
-		border-left: 1px solid var(--color-border);
-		padding-left: 1rem;
-	}
-
-	.mega-menu-column-title {
-		display: block;
-		font-family: var(--font-display);
-		font-size: 0.82rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-ink);
-		padding-bottom: 0.5rem;
-		margin-bottom: 0.5rem;
-		border-bottom: 1px solid var(--color-border);
-		transition: color 0.15s ease;
-	}
-
-	.mega-menu-column-title:hover,
-	.mega-menu-column-title:focus-visible {
-		color: var(--color-teal);
-	}
-
-	/* Normal spacing between the main category items within a column */
-	.mega-menu-column > ul {
-		gap: 4px;
-	}
-
-	.mega-menu-column > ul > li > a {
-		display: flex;
-		align-items: center;
-		justify-content: flex-start;
-		text-align: left;
-		padding: 8px 12px;
-		border-radius: 6px;
-		font-family: var(--font-display);
-		font-size: 0.92rem;
-		font-weight: 600;
-		color: var(--color-ink);
-		white-space: normal;
-		transition: background 0.15s ease, color 0.15s ease;
-	}
-
-	/* An item with nested sub-items (e.g. "Customize Solution Provider",
-	   "Internet of Things (IoT)") sits directly above its group, so its own
-	   bottom padding is trimmed — the tight gap below is what visually groups
-	   it with its sub-items, versus the normal 16-20px gap elsewhere. */
-	.has-subitems > a {
-		padding-bottom: 3px;
-	}
-
-	.mega-menu-column > ul > li > a:hover,
-	.mega-menu-column > ul > li > a:focus-visible {
-		background: rgba(var(--color-teal-rgb), 0.1);
-		color: var(--color-teal);
-	}
-
-	.dropdown-subitems {
-		margin-top: 1px;
-		margin-bottom: 6px;
-		margin-left: 0.75rem;
-		padding-left: 0.5rem;
-		border-left: 2px solid var(--color-border);
-	}
-
-	.dropdown-subitems > li > a {
-		display: flex;
-		align-items: center;
-		justify-content: flex-start;
-		text-align: left;
-		padding: 4px 10px;
-		border-radius: 6px;
-		font-size: 0.8rem;
-		font-weight: 500;
-		color: var(--color-text-muted);
-		white-space: normal;
-		transition: background 0.15s ease, color 0.15s ease;
-	}
-
-	.dropdown-subitems > li > a:hover,
-	.dropdown-subitems > li > a:focus-visible {
-		background: rgba(var(--color-teal-rgb), 0.08);
-		color: var(--color-teal);
-	}
-
-	/* Desktop: floating panel, opens on hover, focus, or click/tap toggle.
-	   An elevated dark surface — same as every other card/panel on the
-	   site now, so its title/link/border colors need no per-context
-	   override; the base rules above already resolve to ink-on-dark. */
 	@media (min-width: 981px) {
-		.dropdown-panel {
-			position: absolute;
-			top: 100%;
-			left: 0;
-			width: 280px;
-			background: var(--color-surface);
-			border: 1px solid var(--color-border-dark);
-			border-radius: 10px;
-			box-shadow: 0 20px 40px rgba(var(--color-indigo-rgb), 0.3);
-			padding: 0.75rem;
-			opacity: 0;
-			visibility: hidden;
-			pointer-events: none;
-			transform: translateY(8px) scale(0.97);
-			transform-origin: top left;
-			transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-			z-index: 200;
-		}
-
-		.mega-menu-panel {
-			width: 520px;
-			max-width: 90vw;
-		}
-
-		.has-dropdown:hover .dropdown-panel,
-		.has-dropdown:focus-within .dropdown-panel,
-		.has-dropdown.is-open .dropdown-panel {
-			opacity: 1;
-			visibility: visible;
-			pointer-events: auto;
-			transform: translateY(0) scale(1);
-		}
-
 		.has-dropdown:hover .chevron-icon,
 		.has-dropdown:focus-within .chevron-icon,
 		.has-dropdown.is-open .chevron-icon {
 			transform: rotate(180deg);
-		}
-
-		/* Reduced motion: keep the open/close a simple opacity fade — drop
-		   the slide + scale from the transition (the transform values still
-		   change, they just snap instantly instead of animating). */
-		@media (prefers-reduced-motion: reduce) {
-			.dropdown-panel {
-				transition: opacity 0.15s ease, visibility 0.15s;
-			}
 		}
 	}
 
@@ -1053,11 +1517,19 @@ const socialLinks = [
 		padding: 3.5rem 1.5rem 2.5rem;
 	}
 
+	.footer-logo-chip {
+		margin-bottom: 1rem;
+	}
+
+	/* Slightly tighter than the header chip (28px logo vs. 36px) so the
+	   padding stays proportional. */
+	:root:not([data-theme='light']) .footer-logo-chip {
+		padding: 5px 10px;
+	}
+
 	.footer-brand img {
 		height: 28px;
 		width: auto;
-		filter: brightness(0) invert(1);
-		margin-bottom: 1rem;
 	}
 
 	.footer-brand p {
@@ -1169,7 +1641,12 @@ const socialLinks = [
 		width: 38px;
 		height: 38px;
 		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.08);
+		/* Was a hardcoded rgba(255,255,255,0.08) — a subtle light tint that
+		   only worked because the footer was always dark. Token-based so it
+		   stays a subtle *contrasting* tint in both themes: a light haze on
+		   the dark-mode footer, a soft dark haze on the light-mode one,
+		   instead of nearly-invisible white-on-white in light mode. */
+		background: rgba(var(--color-ink-rgb), 0.08);
 		color: var(--color-ink-muted);
 		transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 	}
@@ -1177,7 +1654,7 @@ const socialLinks = [
 	.footer-social a:hover,
 	.footer-social a:focus-visible {
 		background: var(--color-teal);
-		color: var(--color-indigo);
+		color: var(--color-on-accent);
 		transform: translateY(-2px);
 		box-shadow: 0 0 18px rgba(var(--color-teal-rgb), 0.5);
 	}
@@ -1203,6 +1680,31 @@ const socialLinks = [
 			padding: 0 1.25rem;
 		}
 
+		/* Slightly smaller in the collapsed mobile header bar so it doesn't
+		   crowd the hamburger toggle next to it. */
+		.logo-img {
+			height: 28px;
+		}
+
+		.header-left {
+			gap: 0.6rem;
+		}
+
+		:root:not([data-theme='light']) .logo-chip {
+			padding: 5px 9px;
+		}
+
+		.theme-toggle {
+			width: 30px;
+			height: 30px;
+		}
+
+		.theme-icon-sun,
+		.theme-icon-moon {
+			width: 16px;
+			height: 16px;
+		}
+
 		.nav-toggle-label {
 			display: flex;
 		}
@@ -1214,7 +1716,7 @@ const socialLinks = [
 			right: 0;
 			background: var(--color-bg);
 			border-bottom: 1px solid var(--color-border);
-			box-shadow: 0 8px 16px rgba(var(--color-indigo-rgb), 0.08);
+			box-shadow: 0 8px 16px rgba(var(--color-shadow-rgb), 0.08);
 			max-height: 0;
 			overflow: hidden;
 			transition: max-height 0.25s ease;
@@ -1249,44 +1751,12 @@ const socialLinks = [
 			overflow-y: auto;
 		}
 
-		/* Mobile: "Our Business" becomes an inline expandable accordion section,
-		   with its two columns stacked as two grouped blocks */
-		.dropdown-panel {
-			position: static;
-			max-height: 0;
-			overflow: hidden;
-			opacity: 1;
-			visibility: visible;
-			background: transparent;
-			border: none;
-			box-shadow: none;
-			padding: 0;
-			transition: max-height 0.25s ease;
-		}
-
-		.has-dropdown.is-open .dropdown-panel {
-			max-height: 1200px;
-			padding-bottom: 0.5rem;
-		}
-
+		/* Mobile: "Our Business" becomes an inline expandable accordion —
+		   the nested flyout tree itself (all levels, statically shown) is
+		   styled by NavFlyout.astro's own mobile media query; this file
+		   only needs the top-level open/close accordion + chevron. */
 		.has-dropdown.is-open .chevron-icon {
 			transform: rotate(180deg);
-		}
-
-		.mega-menu-columns {
-			flex-direction: column;
-		}
-
-		.mega-menu-column {
-			padding-right: 0;
-		}
-
-		.mega-menu-column:not(:first-child) {
-			border-left: none;
-			border-top: 1px solid var(--color-border);
-			padding-left: 0;
-			padding-top: 1rem;
-			margin-top: 1rem;
 		}
 
 		.nav-toggle:checked ~ .nav-toggle-label span:nth-child(1) {

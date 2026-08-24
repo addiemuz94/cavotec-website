@@ -1,0 +1,513 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import HowItWorksFlow from '../../../components/product/HowItWorksFlow.astro';
+import FaqAccordion from '../../../components/product/FaqAccordion.astro';
+import ComparisonTable from '../../../components/product/ComparisonTable.astro';
+
+// PLACEHOLDER CONTENT — this whole page follows the reference structure
+// built for src/pages/product/iot/smart-key-management-system.astro. This
+// page was repurposed from a generic "Calibration and Test Measurement"
+// category overview into a dedicated product page for the ATE System —
+// its previous content moved to src/pages/product/calibration/ instead
+// (see that file). Copy below is generic, plausible placeholder text for
+// an Automated Test Equipment (ATE) system, pending real product details
+// from Cavotec Malaysia.
+
+const features = [
+	'Automated functional and parametric testing',
+	'Configurable test programs for different components and assemblies',
+	'Consistent, repeatable test conditions across every unit',
+	'Automatic results capture and logging',
+	'Designed to reduce manual testing time and effort',
+];
+
+const howItWorksSteps = [
+	{
+		label: 'Test Program Setup',
+		description: 'A test program is configured for your specific component or assembly',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1" /><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3" /></svg>',
+	},
+	{
+		label: 'Unit Loading',
+		description: 'The unit under test is loaded into the system',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2" /><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" /></svg>',
+	},
+	{
+		label: 'Automated Test Execution',
+		description: 'The system runs the configured test sequence automatically',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M12 3v3M12 18v3M4.2 7.8l2.1 1.2M17.7 15l2.1 1.2M4.2 16.2l2.1-1.2M17.7 9l2.1-1.2M3 12h3M18 12h3" /></svg>',
+	},
+	{
+		label: 'Results & Reporting',
+		description: 'Test results are captured, logged, and available for review',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="3" /><path d="M5 6v12c0 1.66 3.13 3 7 3s7-1.34 7-3V6" /><path d="M5 12c0 1.66 3.13 3 7 3s7-1.34 7-3" /></svg>',
+	},
+];
+
+// PLACEHOLDER CONTENT — generic, plausible Q&As for an ATE system, pending
+// real product details.
+const faqs = [
+	{
+		question: 'What types of components can the ATE System test?',
+		answer:
+			'The system supports functional and parametric testing across a range of electronic components and assemblies — contact us to confirm compatibility with your specific product.',
+	},
+	{
+		question: 'Can test programs be customized for our product?',
+		answer: 'Yes — test programs are configured to match your specific component or assembly and test requirements.',
+	},
+	{
+		question: 'How much faster is automated testing compared to manual testing?',
+		answer:
+			'Testing speed depends on the test program and component, but automated testing is generally faster and more consistent than manual test setups.',
+	},
+	{
+		question: 'Are test results logged automatically?',
+		answer: 'Yes — results are captured and logged automatically for every unit tested.',
+	},
+	{
+		question: 'Can the system integrate into our existing production line?',
+		answer: 'In many cases, yes — our team can assess your production workflow and advise on integration.',
+	},
+];
+
+// PLACEHOLDER CONTENT — illustrative comparison rows pending confirmed
+// product data.
+const comparisonRows = [
+	{ capability: 'Test Speed', baseline: 'Slower, operator-dependent', cavotec: 'Faster, automated execution' },
+	{ capability: 'Consistency', baseline: 'Varies by operator', cavotec: 'Consistent test conditions every time' },
+	{ capability: 'Results Logging', baseline: 'Manual recording', cavotec: 'Automatic capture and logging' },
+	{ capability: 'Test Coverage', baseline: 'Limited by operator time', cavotec: 'Consistent coverage across high volumes' },
+	{ capability: 'Human Error Risk', baseline: 'Higher', cavotec: 'Reduced through automation' },
+];
+---
+
+<Layout
+	title="ATE System — Cavotec Malaysia Sdn Bhd"
+	description="The ATE System from Cavotec Malaysia automates functional and parametric testing for electronic components and assemblies — faster, more consistent, and less dependent on manual operators."
+>
+	<section class="page-header">
+		<div class="page-header-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="page-header-inner" data-reveal>
+			<span class="eyebrow">Products</span>
+			<h1>ATE System</h1>
+			<p class="product-tagline">
+				The ATE System (Automated Test Equipment System) automates functional and parametric
+				testing for electronic components and assemblies — faster, more consistent, and less
+				dependent on manual operators.
+			</p>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="product-overview">
+		<div class="product-overview-inner">
+			<div class="product-image-placeholder" data-reveal>
+				<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<rect x="3" y="4" width="18" height="16" rx="2" />
+					<circle cx="8.5" cy="9.5" r="1.5" />
+					<path d="M21 16l-5.5-5.5a1.5 1.5 0 0 0-2.1 0L4 19" />
+				</svg>
+				<strong>ATE System</strong>
+				<span>Product image — coming soon</span>
+			</div>
+
+			<div class="product-description" data-reveal style="--reveal-i: 1;">
+				<h2>About the ATE System</h2>
+				<p>
+					The ATE System — short for Automated Test Equipment System — automates the functional
+					and parametric testing of electronic components and assemblies. In place of manual,
+					operator-driven test setups, the system runs a configured test program against each
+					unit, applying the same test conditions consistently from one unit to the next.
+				</p>
+				<p>
+					Test programs can be configured for different components and assemblies, so the system
+					adapts to a range of products rather than a single fixed test case. Results are captured
+					and logged automatically as each unit is tested, reducing the manual effort required to
+					record and track outcomes.
+				</p>
+				<p>
+					Designed to fit into production and quality-assurance workflows, the ATE System helps
+					reduce the time and effort spent on manual testing while supporting consistent,
+					repeatable results across high volumes of units.
+				</p>
+
+				<h3>Key Features</h3>
+				<ul class="product-features">
+					{features.map((feature) => (
+						<li>
+							<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<circle cx="12" cy="12" r="9" />
+								<path d="M8 12.5l2.5 2.5L16 9" />
+							</svg>
+							<span>{feature}</span>
+						</li>
+					))}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the 4 steps below are illustrative — adjust
+	     wording once real service workflow details are confirmed. -->
+	<section class="product-how-it-works">
+		<div class="product-how-it-works-inner">
+			<h2 data-reveal>How It Works</h2>
+			<HowItWorksFlow steps={howItWorksSteps} />
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the 5 Q&As below are generic, plausible copy
+	     pending real service specs — replace once confirmed. -->
+	<section class="product-faq">
+		<div class="product-faq-inner">
+			<h2 data-reveal>Frequently Asked Questions</h2>
+			<FaqAccordion faqs={faqs} />
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the comparison rows below are illustrative,
+	     pending confirmed service data. -->
+	<section class="product-comparison">
+		<div class="product-comparison-inner">
+			<h2 data-reveal>ATE System vs. Manual Testing</h2>
+			<ComparisonTable baselineLabel="Manual Testing" cavotecLabel="ATE System" rows={comparisonRows} />
+		</div>
+	</section>
+
+	<section class="closing-cta">
+		<div class="closing-cta-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="closing-cta-inner" data-reveal>
+			<h2>See the ATE System in Action</h2>
+			<p>Book a demo and our team will follow up with next steps.</p>
+			<div class="product-cta-group">
+				<a href="/contact?subject=ATE%20System" class="btn btn-accent">Book a Demo</a>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	/* Page header — same recipe used on every other page; each page keeps
+	   its own copy since this <style> block is scoped to this file. */
+	.page-header {
+		position: relative;
+		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem 3.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.page-header-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image:
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px),
+			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: radial-gradient(ellipse at center, black 15%, transparent 75%);
+	}
+
+	.page-header-inner {
+		max-width: 760px;
+		margin: 0 auto;
+		position: relative;
+	}
+
+	.eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-amber);
+		margin-bottom: 0.75rem;
+	}
+
+	.page-header h1 {
+		font-size: clamp(2rem, 4.5vw, 2.75rem);
+		font-weight: 700;
+		margin: 0 0 0.85rem;
+	}
+
+	.product-tagline {
+		font-size: 1.05rem;
+		line-height: 1.6;
+		color: var(--color-ink-muted);
+		max-width: 56ch;
+		margin: 0 auto;
+	}
+
+	/* Overview */
+	.product-overview {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-overview-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+		display: grid;
+		grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+		gap: 3rem;
+		align-items: start;
+	}
+
+	.product-image-placeholder {
+		aspect-ratio: 4 / 3;
+		/* No explicit width — a grid item stretches to fill its column by
+		   default. Declaring width: 100% here (content-box, the default)
+		   would add the padding below ON TOP of that 100%, overflowing the
+		   column — the exact bug already hit (and fixed) twice on this
+		   project; see the equivalent comment on the SKMS page. */
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.6rem;
+		text-align: center;
+		padding: 1.5rem;
+		color: var(--color-text-muted);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		background: repeating-linear-gradient(
+			135deg,
+			var(--color-indigo),
+			var(--color-indigo) 10px,
+			var(--color-surface) 10px,
+			var(--color-surface) 20px
+		);
+		position: sticky;
+		top: calc(var(--header-height) + 1.5rem);
+	}
+
+	.product-image-placeholder strong {
+		font-size: 1rem;
+		color: var(--color-text);
+	}
+
+	.product-image-placeholder span {
+		font-size: 0.8rem;
+	}
+
+	.product-description h2 {
+		font-size: 1.4rem;
+		color: var(--color-text);
+		margin: 0 0 1.25rem;
+	}
+
+	.product-description h3 {
+		font-size: 1.05rem;
+		color: var(--color-text);
+		margin: 2rem 0 1rem;
+	}
+
+	.product-description p {
+		font-size: 0.98rem;
+		line-height: 1.75;
+		color: var(--color-text-muted);
+		margin: 0 0 1.25rem;
+	}
+
+	.product-features {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.product-features li {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.65rem;
+		font-size: 0.92rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
+	}
+
+	.product-features svg {
+		flex-shrink: 0;
+		margin-top: 0.1rem;
+		color: var(--color-teal);
+	}
+
+	.product-cta-group {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 1rem;
+	}
+
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.85rem 2rem;
+		border-radius: 4px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: 0.01em;
+		border: none;
+		cursor: pointer;
+		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+	}
+
+	.btn-accent {
+		background: var(--color-teal);
+		color: var(--color-on-accent);
+		box-shadow: 0 6px 20px rgba(var(--color-teal-rgb), 0.35);
+	}
+
+	.btn-accent:hover,
+	.btn-accent:focus-visible {
+		background: #00d9eb;
+		transform: translateY(-2px);
+		box-shadow: 0 10px 26px rgba(var(--color-teal-rgb), 0.45);
+	}
+
+	@media (max-width: 860px) {
+		.product-overview-inner {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+
+		.product-image-placeholder {
+			position: static;
+			max-width: 380px;
+			margin: 0 auto;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.product-overview {
+			padding: 3.5rem 1.25rem;
+		}
+
+		.product-cta-group {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.btn {
+			justify-content: center;
+		}
+	}
+
+	/* How It Works */
+	.product-how-it-works {
+		background: var(--color-bg-alt);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-how-it-works-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+	}
+
+	.product-how-it-works h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	/* FAQ */
+	.product-faq {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-faq-inner {
+		max-width: 760px;
+		margin: 0 auto;
+	}
+
+	.product-faq h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	/* Comparison */
+	.product-comparison {
+		background: var(--color-bg-alt);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-comparison-inner {
+		max-width: 900px;
+		margin: 0 auto;
+	}
+
+	.product-comparison h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	@media (max-width: 600px) {
+		.product-how-it-works,
+		.product-faq,
+		.product-comparison {
+			padding: 3.5rem 1.25rem;
+		}
+	}
+
+	/* Closing CTA */
+	.closing-cta {
+		position: relative;
+		background: var(--color-indigo);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.closing-cta-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image: repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: linear-gradient(to bottom, black, transparent);
+	}
+
+	.closing-cta-inner {
+		max-width: 640px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.closing-cta h2 {
+		font-size: clamp(1.5rem, 3vw, 2rem);
+		margin: 0;
+	}
+
+	.closing-cta p {
+		font-size: 1rem;
+		color: var(--color-ink-muted);
+		margin: -0.75rem 0 0;
+	}
+</style>

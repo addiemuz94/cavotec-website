@@ -1,0 +1,100 @@
+---
+// Shared feature-comparison table for product/category pages — extracted
+// from the pattern built for
+// src/pages/product/iot/smart-key-management-system.astro (that page's own
+// inline copy is left untouched). Horizontal scroll on narrow viewports
+// rather than a bespoke stacked-card transform, matching the same
+// "overflow-x: auto" pattern services.astro's .page-subnav already uses
+// for its mobile scroll strip.
+export interface ComparisonRow {
+	capability: string;
+	baseline: string;
+	cavotec: string;
+}
+
+interface Props {
+	baselineLabel: string;
+	cavotecLabel: string;
+	rows: ComparisonRow[];
+}
+
+const { baselineLabel, cavotecLabel, rows } = Astro.props;
+---
+
+<div class="spec-comparison-wrapper" data-reveal style="--reveal-i: 1;">
+	<table class="spec-comparison-table">
+		<thead>
+			<tr>
+				<th scope="col">Capability</th>
+				<th scope="col">{baselineLabel}</th>
+				<th scope="col" class="spec-comparison-highlight">{cavotecLabel}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{
+				rows.map((row) => (
+					<tr>
+						<th scope="row">{row.capability}</th>
+						<td>{row.baseline}</td>
+						<td class="spec-comparison-highlight">{row.cavotec}</td>
+					</tr>
+				))
+			}
+		</tbody>
+	</table>
+</div>
+
+<style is:global>
+	.spec-comparison-wrapper {
+		background: var(--color-bg-elevated);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.spec-comparison-table {
+		width: 100%;
+		min-width: 560px;
+		border-collapse: collapse;
+	}
+
+	.spec-comparison-table th,
+	.spec-comparison-table td {
+		padding: 0.95rem 1.25rem;
+		text-align: left;
+		font-size: 0.88rem;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.spec-comparison-table thead th {
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+	}
+
+	.spec-comparison-table tbody th {
+		font-family: var(--font-display);
+		font-weight: 600;
+		color: var(--color-text);
+		white-space: nowrap;
+	}
+
+	.spec-comparison-table tbody td {
+		color: var(--color-text-muted);
+	}
+
+	.spec-comparison-table tbody tr:last-child th,
+	.spec-comparison-table tbody tr:last-child td {
+		border-bottom: none;
+	}
+
+	.spec-comparison-table .spec-comparison-highlight {
+		background: rgba(var(--color-teal-rgb), 0.08);
+		color: var(--color-text);
+		font-weight: 500;
+	}
+</style>

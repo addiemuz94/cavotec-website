@@ -1,0 +1,640 @@
+---
+// 3D "coverflow" showcase carousel — homepage only, sits between the hero
+// and the services grid (the space left by the removed "By the Numbers"
+// stats strip). Cards are arranged along a shallow arc using CSS 3D
+// transforms (perspective + rotateY + translateZ): the active card sits
+// centered and full-size, side cards recede in scale/depth/opacity as they
+// get further from center. All positioning math is driven by a single
+// `--delta`/`--abs-delta` custom property per card, set from JS — CSS owns
+// the actual visual tuning (spacing/depth/angle), JS only ever decides
+// "which card is how far from active".
+export interface ShowcaseItem {
+	href: string;
+	title: string;
+	tagline: string;
+	// Raw inner SVG markup (viewBox 0 0 24 24), same convention as
+	// HowItWorksFlow's iconSvg prop — rendered via set:html.
+	iconSvg: string;
+}
+
+interface Props {
+	items: ShowcaseItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="showcase">
+	<div class="showcase-inner">
+		<h2 data-reveal>Explore Our Products &amp; Services</h2>
+
+		<div class="showcase-carousel" data-carousel>
+			<button type="button" class="showcase-arrow showcase-arrow-prev" data-carousel-prev aria-label="Show previous item">
+				<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M15 18l-6-6 6-6" />
+				</svg>
+			</button>
+
+			<div class="showcase-stage" data-carousel-stage role="region" aria-roledescription="carousel" aria-label="Products and services">
+				<div class="showcase-track" data-carousel-track>
+					{
+						items.map((item, index) => (
+							<a
+								href={item.href}
+								class="showcase-card tech-card"
+								data-shine
+								data-carousel-card
+								data-index={index}
+								role="group"
+								aria-roledescription="slide"
+								aria-label={`${index + 1} of ${items.length}: ${item.title}`}
+								draggable="false"
+							>
+								<span class="showcase-card-icon" aria-hidden="true" set:html={item.iconSvg} />
+								<h3>{item.title}</h3>
+								<p>{item.tagline}</p>
+							</a>
+						))
+					}
+				</div>
+			</div>
+
+			<button type="button" class="showcase-arrow showcase-arrow-next" data-carousel-next aria-label="Show next item">
+				<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M9 18l6-6-6-6" />
+				</svg>
+			</button>
+		</div>
+
+		<div class="showcase-dots" data-carousel-dots role="tablist" aria-label="Choose an item">
+			{
+				items.map((item, index) => (
+					<button
+						type="button"
+						class="showcase-dot"
+						data-carousel-dot
+						data-index={index}
+						role="tab"
+						aria-label={`Go to ${item.title}`}
+					/>
+				))
+			}
+		</div>
+	</div>
+</section>
+
+<script>
+	// Wrapped in a function and re-run via astro:page-load (fires on the
+	// true initial load and again after every subsequent ClientRouter
+	// transition) — this carousel lives inside <main>, which gets replaced
+	// on every navigation, so a fresh page-load needs a fresh init, same
+	// pattern used for every other homepage-only effect in index.astro.
+	// Each run gets its own AbortController so timers/listeners from a
+	// previous visit to "/" are torn down on astro:before-swap instead of
+	// accumulating (a stray setInterval left running against detached
+	// cards would keep firing forever otherwise).
+	let carouselController: AbortController | null = null;
+
+	function initShowcaseCarousel() {
+		carouselController?.abort();
+		carouselController = new AbortController();
+		const { signal } = carouselController;
+
+		const root = document.querySelector<HTMLElement>('[data-carousel]');
+		if (!root) return; // Not on the homepage this navigation — no-op.
+
+		const stage = root.querySelector<HTMLElement>('[data-carousel-stage]');
+		const cards = Array.from(root.querySelectorAll<HTMLAnchorElement>('[data-carousel-card]'));
+		// The dot strip is a SIBLING of [data-carousel] (see the markup above
+		// — .showcase-dots sits outside .showcase-carousel so it can center
+		// under the whole section, not just the stage), not a descendant of
+		// `root` — query it separately rather than via root.querySelectorAll,
+		// which would silently find zero dots.
+		const dotsContainer = document.querySelector<HTMLElement>('[data-carousel-dots]');
+		const dots = Array.from(dotsContainer?.querySelectorAll<HTMLButtonElement>('[data-carousel-dot]') ?? []);
+		const prevBtn = root.querySelector<HTMLButtonElement>('[data-carousel-prev]');
+		const nextBtn = root.querySelector<HTMLButtonElement>('[data-carousel-next]');
+		if (!stage || cards.length === 0) return;
+
+		const count = cards.length;
+		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+		let activeIndex = 0;
+		let dragPreview = 0; // fractional card-steps offset while dragging
+		let autoTimer: number | null = null;
+		let idleResumeTimer: number | null = null;
+
+		// Shortest signed wrap-distance from `active` to `index`, e.g. for 9
+		// cards, card 8 is -1 away from card 0 (not +8) — this is what keeps
+		// the arc symmetric instead of always spreading everything to one side.
+		function wrapDelta(index: number, active: number): number {
+			let delta = index - active;
+			const half = count / 2;
+			while (delta > half) delta -= count;
+			while (delta < -half) delta += count;
+			return delta;
+		}
+
+		function render(previewOffset = 0) {
+			const effectiveActive = activeIndex + previewOffset;
+			// Wrapped into [0, count) — Math.round(effectiveActive) can land
+			// negative or >= count while dragging past either end, and JS's
+			// `%` doesn't wrap negatives on its own (-1 % 9 === -1, not 8).
+			const roundedActiveIndex = (((Math.round(effectiveActive) % count) + count) % count);
+			const settled = Math.abs(previewOffset) < 0.001;
+			cards.forEach((card, index) => {
+				const delta = wrapDelta(index, effectiveActive);
+				const absDelta = Math.abs(delta);
+				card.style.setProperty('--delta', String(delta));
+				card.style.setProperty('--abs-delta', String(absDelta));
+				const isActive = settled && index === roundedActiveIndex;
+				card.classList.toggle('is-active', isActive);
+				// Far-side cards (beyond the visible arc) stop being reachable —
+				// prevents an almost-invisible card from still eating a click/tab
+				// stop. With `count` cards the max |delta| is floor(count/2), so
+				// this only ever engages once there are enough cards for some to
+				// meaningfully recede past the fade-out point.
+				const reachable = absDelta <= 3.5;
+				card.style.pointerEvents = reachable ? '' : 'none';
+				card.tabIndex = isActive ? 0 : -1;
+				card.setAttribute('aria-hidden', reachable ? 'false' : 'true');
+			});
+			dots.forEach((dot, index) => {
+				const isActive = index === roundedActiveIndex;
+				dot.classList.toggle('is-active', isActive);
+				dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
+			});
+		}
+
+		function goTo(index: number, { userInitiated = true } = {}) {
+			activeIndex = ((index % count) + count) % count;
+			render();
+			if (userInitiated) scheduleIdleResume();
+		}
+
+		function step(direction: 1 | -1, opts?: { userInitiated?: boolean }) {
+			goTo(activeIndex + direction, opts);
+		}
+
+		// --- Auto-rotate -------------------------------------------------
+		function startAuto() {
+			if (prefersReducedMotion || autoTimer !== null || count < 2) return;
+			autoTimer = window.setInterval(() => step(1, { userInitiated: false }), 3500);
+		}
+
+		function stopAuto() {
+			if (autoTimer === null) return;
+			window.clearInterval(autoTimer);
+			autoTimer = null;
+		}
+
+		function scheduleIdleResume() {
+			stopAuto();
+			if (idleResumeTimer !== null) window.clearTimeout(idleResumeTimer);
+			if (prefersReducedMotion) return;
+			idleResumeTimer = window.setTimeout(() => {
+				idleResumeTimer = null;
+				startAuto();
+			}, 4500);
+		}
+
+		// --- Arrows + dots -------------------------------------------------
+		prevBtn?.addEventListener('click', () => step(-1), { signal });
+		nextBtn?.addEventListener('click', () => step(1), { signal });
+		dots.forEach((dot) => {
+			dot.addEventListener('click', () => goTo(Number(dot.dataset.index)), { signal });
+		});
+
+		// --- Keyboard (roving tabindex: only the active card is a tab stop,
+		// arrow keys move between cards from wherever focus currently is
+		// within the carousel) ----------------------------------------------
+		root.addEventListener(
+			'keydown',
+			(event) => {
+				if (event.key === 'ArrowLeft') {
+					event.preventDefault();
+					step(-1);
+					cards[activeIndex]?.focus();
+				} else if (event.key === 'ArrowRight') {
+					event.preventDefault();
+					step(1);
+					cards[activeIndex]?.focus();
+				}
+			},
+			{ signal }
+		);
+
+		// --- Click-to-center vs click-through ------------------------------
+		// The active card is a real link and navigates normally. Any other
+		// card intercepts its own click, brings itself to center instead of
+		// navigating away immediately, and does NOT count as a drag (see
+		// drag handling below, which sets wasDragging for genuine drags).
+		cards.forEach((card, index) => {
+			card.addEventListener(
+				'click',
+				(event) => {
+					if (wasDragging) {
+						event.preventDefault();
+						return;
+					}
+					if (index !== activeIndex) {
+						event.preventDefault();
+						goTo(index);
+					}
+					// index === activeIndex: let the <a> navigate normally.
+				},
+				{ signal }
+			);
+		});
+
+		// --- Drag (mouse) / swipe (touch) -----------------------------------
+		// Live 1:1 tracking while dragging (no CSS transition, so the whole
+		// arc follows the pointer immediately), then snaps to the nearest
+		// whole card on release. A small movement threshold distinguishes a
+		// genuine drag from a click so cards stay clickable.
+		//
+		// Deliberately NOT using setPointerCapture to keep tracking a drag
+		// that leaves the stage's bounds — capturing on pointerdown reroutes
+		// the browser's synthesized `click` event to whatever element holds
+		// the capture (the stage), not whatever the pointer is actually
+		// over, which silently broke every card click (confirmed via a raw
+		// event trace: pointerup/click both landed on the stage, never the
+		// card, for an ordinary click with no movement at all). It also
+		// appears to suppress further pointermove delivery for
+		// CDP-synthesized pointer events in at least this environment
+		// (confirmed the same way: move events simply stopped arriving
+		// right after capture was requested). The standard, capture-free
+		// alternative below sidesteps both: pointermove/pointerup listen on
+		// `window` for the duration of a drag (added on pointerdown, removed
+		// on pointerup/cancel) instead of relying on element capture, so
+		// movement keeps tracking correctly wherever the pointer goes, and a
+		// plain click's own pointerup/click still targets the card exactly
+		// as if none of this drag code existed.
+		const STEP_PX = 130;
+		const CLICK_THRESHOLD_PX = 6;
+		let activePointerId: number | null = null;
+		let dragging = false;
+		let dragStartX = 0;
+		let wasDragging = false;
+
+		function onWindowPointerMove(event: PointerEvent) {
+			if (activePointerId === null || event.pointerId !== activePointerId) return;
+			const dx = event.clientX - dragStartX;
+			if (!dragging) {
+				if (Math.abs(dx) <= CLICK_THRESHOLD_PX) return;
+				dragging = true;
+				wasDragging = true;
+				stage!.classList.add('is-dragging');
+				stopAuto();
+				if (idleResumeTimer !== null) {
+					window.clearTimeout(idleResumeTimer);
+					idleResumeTimer = null;
+				}
+			}
+			// Dragging left (negative dx) reveals the NEXT card, dragging
+			// right reveals the PREVIOUS one — matches natural swipe intent.
+			dragPreview = -dx / STEP_PX;
+			render(prefersReducedMotion ? Math.round(dragPreview) : dragPreview);
+		}
+
+		function onWindowPointerUp(event: PointerEvent) {
+			if (activePointerId === null || event.pointerId !== activePointerId) return;
+			activePointerId = null;
+			window.removeEventListener('pointermove', onWindowPointerMove);
+			window.removeEventListener('pointerup', onWindowPointerUp);
+			window.removeEventListener('pointercancel', onWindowPointerUp);
+			if (!dragging) return; // Plain click/tap — nothing to snap, let `click` fire on the card normally.
+			dragging = false;
+			stage!.classList.remove('is-dragging');
+			const stepsMoved = Math.round(dragPreview);
+			dragPreview = 0;
+			if (stepsMoved !== 0) {
+				goTo(activeIndex + stepsMoved);
+			} else {
+				render();
+				scheduleIdleResume();
+			}
+			// Clear the drag flag after this tick — a genuine drag's click
+			// (if the browser fires one at all after a real drag) still
+			// shouldn't count as navigation/centering.
+			window.setTimeout(() => {
+				wasDragging = false;
+			}, 0);
+		}
+
+		function onStagePointerDown(event: PointerEvent) {
+			if (event.button !== undefined && event.button !== 0) return;
+			activePointerId = event.pointerId;
+			dragStartX = event.clientX;
+			dragPreview = 0;
+			window.addEventListener('pointermove', onWindowPointerMove, { signal });
+			window.addEventListener('pointerup', onWindowPointerUp, { signal });
+			window.addEventListener('pointercancel', onWindowPointerUp, { signal });
+		}
+
+		stage.addEventListener('pointerdown', onStagePointerDown, { signal });
+
+		// --- Pause on hover / keyboard focus --------------------------------
+		// Covers both `root` (arrows + stage/cards) and the separate dots
+		// container (a sibling of `root`, not a descendant of it — see the
+		// dots query above) so hovering or tabbing through either pauses
+		// auto-rotate the same way.
+		const pauseRegions = [root, dotsContainer].filter((el): el is HTMLElement => el !== null);
+		const withinAnyPauseRegion = (node: Node) => pauseRegions.some((el) => el.contains(node));
+
+		pauseRegions.forEach((el) => {
+			el.addEventListener('pointerenter', stopAuto, { signal });
+			el.addEventListener(
+				'pointerleave',
+				() => {
+					if (!dragging) scheduleIdleResume();
+				},
+				{ signal }
+			);
+			el.addEventListener('focusin', stopAuto, { signal });
+			el.addEventListener(
+				'focusout',
+				(event) => {
+					if (event.relatedTarget instanceof Node && withinAnyPauseRegion(event.relatedTarget)) return;
+					if (!dragging) scheduleIdleResume();
+				},
+				{ signal }
+			);
+		});
+
+		// Auto-rotate's setInterval, and the drag's live-follow loop, both
+		// keep running against these exact card elements — explicitly stop
+		// everything on the next transition rather than relying on the
+		// interval callback's own no-op-on-detached-elements safety (it
+		// wouldn't crash, but it would keep firing uselessly forever).
+		signal.addEventListener('abort', () => {
+			stopAuto();
+			if (idleResumeTimer !== null) window.clearTimeout(idleResumeTimer);
+		});
+
+		render();
+		startAuto();
+	}
+
+	document.addEventListener('astro:page-load', initShowcaseCarousel);
+</script>
+
+<style>
+	.showcase {
+		background: var(--color-bg-alt);
+		padding: 4.5rem 1.5rem 5rem;
+		overflow: hidden;
+	}
+
+	.showcase-inner {
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+
+	.showcase h2 {
+		text-align: center;
+		font-size: clamp(1.6rem, 3vw, 2.2rem);
+		color: var(--color-text);
+		margin: 0 0 3rem;
+		position: relative;
+	}
+
+	.showcase h2::after {
+		content: '';
+		display: block;
+		width: 64px;
+		height: 3px;
+		background: var(--color-teal);
+		margin: 0.9rem auto 0;
+		border-radius: 2px;
+	}
+
+	.showcase-carousel {
+		--card-w: 240px;
+		--card-h: 270px;
+		--step-x: 180px;
+		--step-z: 100px;
+		--step-angle: 34deg;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+	}
+
+	.showcase-stage {
+		position: relative;
+		width: 100%;
+		max-width: 720px;
+		height: calc(var(--card-h) + 2rem);
+		perspective: 1400px;
+		/* No touch-action: pan-y here — the carousel owns horizontal drag
+		   itself via pointer events, and this stops the browser's own
+		   swipe-to-scroll from fighting the drag gesture on touch devices. */
+		touch-action: pan-y;
+	}
+
+	.showcase-track {
+		position: absolute;
+		inset: 0;
+	}
+
+	.showcase-card {
+		/* background-color, not the shorthand — [data-shine]'s own
+		   background-image (see Layout.astro) needs that slot left alone. */
+		background-color: var(--color-bg-elevated);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		width: var(--card-w);
+		height: var(--card-h);
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		gap: 0.85rem;
+		padding: 1.5rem 1.25rem;
+		--delta: 0;
+		--abs-delta: 0;
+		transform: translate(-50%, -50%) translateX(calc(var(--delta) * var(--step-x))) translateZ(calc(var(--abs-delta) * var(--step-z) * -1))
+			rotateY(calc(var(--delta) * var(--step-angle) * -1)) scale(calc(1 - var(--abs-delta) * 0.14));
+		opacity: calc(1 - var(--abs-delta) * 0.32);
+		z-index: calc(100 - (var(--abs-delta) * 10));
+		transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+		cursor: pointer;
+		/* These are <a> elements, which browsers make draggable by default —
+		   without this, a pointer-drag gesture starting on a card gets
+		   hijacked partway through by the browser's native link-drag (drag
+		   the link to a bookmark/new tab), which stops delivering pointermove
+		   events to this component's own drag handling entirely (confirmed
+		   via a raw event trace: movement just stops a few pixels in, no
+		   further pointermove ever arrives). draggable="false" on the
+		   element (see the markup above) is the primary fix; user-select and
+		   -webkit-user-drag reinforce it against text/image drag-selection
+		   starting the same native gesture from a slightly different path. */
+		-webkit-user-drag: none;
+		user-select: none;
+		-webkit-user-select: none;
+	}
+
+	.showcase-stage.is-dragging .showcase-card {
+		transition: opacity 0.6s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+	}
+
+	.showcase-card.is-active {
+		border-color: rgba(var(--color-teal-rgb), 0.5);
+		box-shadow: 0 20px 45px rgba(var(--color-shadow-rgb), 0.35), 0 0 0 1px rgba(var(--color-teal-rgb), 0.15);
+		cursor: pointer;
+	}
+
+	.showcase-card-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 54px;
+		height: 54px;
+		border-radius: 50%;
+		background: rgba(var(--color-teal-rgb), 0.12);
+		color: var(--color-teal);
+		flex-shrink: 0;
+		transition: background 0.25s ease, color 0.25s ease;
+	}
+
+	.showcase-card.is-active .showcase-card-icon {
+		background: var(--color-teal);
+		color: var(--color-on-accent);
+	}
+
+	.showcase-card h3 {
+		font-family: var(--font-display);
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--color-text);
+		margin: 0;
+		line-height: 1.35;
+	}
+
+	.showcase-card p {
+		font-size: 0.85rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
+		margin: 0;
+	}
+
+	/* Arrows */
+	.showcase-arrow {
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		border: 1px solid var(--color-border);
+		background: var(--color-bg-elevated);
+		color: var(--color-text);
+		cursor: pointer;
+		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+	}
+
+	.showcase-arrow:hover,
+	.showcase-arrow:focus-visible {
+		background: var(--color-teal);
+		color: var(--color-on-accent);
+		border-color: var(--color-teal);
+		transform: translateY(-2px);
+	}
+
+	/* Dots */
+	.showcase-dots {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		gap: 0.55rem;
+		margin-top: 2rem;
+	}
+
+	.showcase-dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		border: none;
+		padding: 0;
+		background: var(--color-border);
+		cursor: pointer;
+		transition: background 0.2s ease, transform 0.2s ease;
+	}
+
+	.showcase-dot:hover,
+	.showcase-dot:focus-visible {
+		background: var(--color-teal-dark);
+	}
+
+	.showcase-dot.is-active {
+		background: var(--color-teal);
+		transform: scale(1.35);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.showcase-card {
+			transition: none;
+		}
+	}
+
+	@media (max-width: 860px) {
+		.showcase-arrow {
+			width: 38px;
+			height: 38px;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.showcase {
+			padding: 3.5rem 1.25rem 4rem;
+		}
+
+		.showcase-carousel {
+			--card-w: 168px;
+			--card-h: 220px;
+			--step-x: 92px;
+			--step-z: 55px;
+			--step-angle: 28deg;
+			gap: 0.25rem;
+		}
+
+		.showcase-card {
+			padding: 1.1rem 0.9rem;
+			gap: 0.6rem;
+		}
+
+		.showcase-card-icon {
+			width: 44px;
+			height: 44px;
+		}
+
+		.showcase-card h3 {
+			font-size: 0.88rem;
+		}
+
+		.showcase-card p {
+			font-size: 0.76rem;
+		}
+	}
+
+	@media (max-width: 420px) {
+		.showcase-arrow {
+			width: 32px;
+			height: 32px;
+		}
+
+		.showcase-carousel {
+			--card-w: 140px;
+			--card-h: 200px;
+			--step-x: 70px;
+			--step-z: 40px;
+		}
+	}
+</style>

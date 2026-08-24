@@ -1,0 +1,260 @@
+---
+// Recursive cascading flyout menu, used for the header "Our Business" nav
+// item. Each MenuItem with `children` renders its own nested <NavFlyout>
+// (via Astro.self) inside its own row — so a child panel is always a DOM
+// descendant of the row that opens it. That's what lets the interaction
+// script in Layout.astro treat "pointer is within the trigger row OR its
+// open panel" as a single element (pointerenter/leave on the row only fire
+// when the pointer truly leaves that whole DOM subtree), and it's also what
+// makes the child panel "top-aligned to its row" for free: the panel is
+// `position: absolute; top: 0; left: 100%` relative to the row itself, not
+// the parent panel.
+//
+// Depth is unbounded — Products > IoT > Smart Key Management System sits at
+// level 3 today, but a 4th level would render identically with no template
+// changes.
+export interface MenuItem {
+	href: string;
+	label: string;
+	external?: boolean;
+	children?: MenuItem[];
+}
+
+interface Props {
+	items: MenuItem[];
+	level?: number;
+	id?: string;
+}
+
+const { items, level = 1, id } = Astro.props;
+---
+
+<div class="flyout-panel" data-level={level} id={id} role="menu">
+	<ul>
+		{
+			items.map((item) => (
+				<li class={`flyout-row${item.children ? ' has-children' : ''}`} role="none">
+					<a
+						href={item.href}
+						class="flyout-link"
+						role="menuitem"
+						target={item.external ? '_blank' : undefined}
+						rel={item.external ? 'noopener noreferrer' : undefined}
+						aria-haspopup={item.children ? 'true' : undefined}
+						aria-expanded={item.children ? 'false' : undefined}
+						aria-label={item.external ? `${item.label} (opens in a new tab)` : undefined}
+					>
+						<span class="flyout-label">{item.label}</span>
+						{item.external && (
+							<svg class="external-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<path d="M7 17L17 7" />
+								<path d="M8 7h9v9" />
+							</svg>
+						)}
+						{item.children && (
+							<svg class="flyout-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<path d="M9 6l6 6-6 6" />
+							</svg>
+						)}
+					</a>
+					{item.children && <Astro.self items={item.children} level={level + 1} />}
+				</li>
+			))
+		}
+	</ul>
+</div>
+
+<style is:global>
+	/* ---------------------------------------------------------------- */
+	/* Cascading flyout menu — shared across every level (the component  */
+	/* renders itself recursively, so one set of rules styles all of     */
+	/* them). `is:global` is required here: Astro scopes a component's   */
+	/* styles with a per-file attribute, and JS toggles `.is-open` on    */
+	/* elements that live in Layout.astro's ".has-dropdown" as well as   */
+	/* this file's own rows/panels, so the rules need to reach across    */
+	/* that component boundary.                                          */
+	/* ---------------------------------------------------------------- */
+	.flyout-row {
+		position: relative;
+	}
+
+	.flyout-row:not(:last-child) {
+		border-bottom: 1px solid var(--color-border-dark);
+	}
+
+	.flyout-link {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.6rem;
+		min-height: 44px;
+		padding: 12px 18px;
+		font-family: var(--font-body);
+		font-size: 0.92rem;
+		font-weight: 500;
+		color: var(--color-ink);
+		white-space: normal;
+		transition: background 0.12s ease, color 0.12s ease;
+	}
+
+	.flyout-panel[data-level="1"] .flyout-row > .flyout-link {
+		font-weight: 600;
+	}
+
+	.flyout-chevron,
+	.external-icon {
+		flex-shrink: 0;
+	}
+
+	.external-icon {
+		opacity: 0.7;
+		margin-left: -0.2rem;
+	}
+
+	.flyout-panel {
+		background: var(--color-surface);
+		border: 1px solid var(--color-border-dark);
+		border-radius: 10px;
+		box-shadow: 0 8px 24px rgba(var(--color-shadow-rgb), 0.4);
+		width: 260px;
+		padding: 6px 0;
+		z-index: 20;
+	}
+
+	/* Desktop: hover/keyboard-driven flyouts, positioned + shown/hidden by
+	   JS toggling `.is-open` (see Layout.astro's script) rather than pure
+	   CSS :hover — that's what makes the ~150ms open/close delay and the
+	   arrow-key navigation possible. */
+	@media (min-width: 981px) {
+		.flyout-panel {
+			position: absolute;
+			opacity: 0;
+			visibility: hidden;
+			pointer-events: none;
+			/* `visibility` is deliberately NOT in this list. Transitioning it
+			   makes the hidden→visible flip depend on the transition actually
+			   starting, which happens on the next style/animation flush, not
+			   synchronously — so `focusFirstLink()`'s `.focus()` call in
+			   Layout.astro's keyboard handler (which runs immediately after
+			   `.is-open` is added, same tick) would silently no-op: the
+			   browser still evaluates the panel as `visibility: hidden` at
+			   that instant. Left as a plain, non-animated property, the flip
+			   is instant, so opening via keyboard reliably moves focus. */
+			transition: opacity 0.12s ease, transform 0.12s ease;
+		}
+
+		.flyout-panel[data-level="1"] {
+			top: 100%;
+			left: 0;
+			margin-top: 10px;
+			transform: translateY(6px);
+		}
+
+		.flyout-panel:not([data-level="1"]) {
+			top: -7px;
+			left: 100%;
+			transform: translateX(4px);
+		}
+
+		.flyout-panel.is-open {
+			opacity: 1;
+			visibility: visible;
+			pointer-events: auto;
+			transform: translate(0, 0);
+		}
+
+		/* Edge-collision fallback (JS-applied, see Layout.astro): a panel
+		   that would run off the right side of the viewport opens toward
+		   the left instead. */
+		.flyout-panel[data-level="1"].flyout-panel--flip {
+			left: auto;
+			right: 0;
+		}
+
+		.flyout-panel:not([data-level="1"]).flyout-panel--flip {
+			left: auto;
+			right: 100%;
+			transform: translateX(-4px);
+		}
+
+		.flyout-link:hover,
+		.flyout-link:focus-visible,
+		.flyout-row.is-open > .flyout-link {
+			background: var(--color-teal);
+			color: var(--color-on-accent);
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.flyout-panel {
+				transition: opacity 0.15s ease;
+			}
+		}
+	}
+
+	/* Mobile/touch: no hover flyouts — the whole tree renders inline as a
+	   plain accordion, expanding under the "Our Business" toggle exactly
+	   like it did before this menu became a cascading flyout on desktop. */
+	@media (max-width: 980px) {
+		.flyout-panel {
+			position: static;
+			opacity: 1;
+			visibility: visible;
+			pointer-events: auto;
+			transform: none;
+			width: auto;
+			background: transparent;
+			border: none;
+			border-radius: 0;
+			box-shadow: none;
+			padding: 0;
+			z-index: auto;
+		}
+
+		.flyout-panel[data-level="1"] {
+			max-height: 0;
+			overflow: hidden;
+			transition: max-height 0.25s ease;
+		}
+
+		.has-dropdown.is-open > .flyout-panel[data-level="1"] {
+			max-height: 2400px;
+			padding-bottom: 0.5rem;
+		}
+
+		.flyout-panel[data-level="1"] > ul > .flyout-row {
+			border-bottom: 1px solid var(--color-border-dark);
+		}
+
+		.flyout-panel[data-level="1"] > ul > .flyout-row:last-child {
+			border-bottom: none;
+		}
+
+		.flyout-row:not(:last-child) {
+			border-bottom: none;
+		}
+
+		.flyout-panel:not([data-level="1"]) {
+			margin: 2px 0 6px 0.75rem;
+			padding-left: 0.5rem;
+			border-left: 2px solid var(--color-border-dark);
+		}
+
+		.flyout-panel[data-level="1"] > ul > .flyout-row > .flyout-link {
+			padding: 10px 8px;
+		}
+
+		.flyout-panel:not([data-level="1"]) .flyout-link {
+			min-height: auto;
+			padding: 6px 8px;
+			font-size: 0.85rem;
+			font-weight: 500;
+			color: var(--color-text-muted);
+		}
+
+		.flyout-link:hover,
+		.flyout-link:focus-visible {
+			background: rgba(var(--color-teal-rgb), 0.08);
+			color: var(--color-teal);
+		}
+	}
+</style>

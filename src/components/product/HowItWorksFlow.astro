@@ -1,0 +1,143 @@
+---
+// Shared "How It Works" flow diagram for product/category pages — extracted
+// from the pattern originally built inline for products.astro's IoT cards
+// (.iot-flow / .iot-flow-step / …) and then extended (with a description
+// line per step) for src/pages/product/iot/smart-key-management-system.astro.
+// That page's own inline copy is left untouched; this component exists so
+// the newer category pages don't duplicate the same ~150 lines of CSS/
+// markup four more times. Same visual language either way: icon circle →
+// label → description → connecting arrow, wraps to a vertical stack with
+// rotated arrows on narrow viewports.
+//
+// Each step supplies its own icon as a raw inline SVG string (via
+// `iconSvg`, rendered with set:html) rather than a fixed icon-name enum —
+// keeps this component page-agnostic without needing to grow a shared
+// icon switch every time a new page needs an icon the others don't use.
+export interface HowItWorksStep {
+	label: string;
+	description: string;
+	iconSvg: string;
+}
+
+interface Props {
+	steps: HowItWorksStep[];
+}
+
+const { steps } = Astro.props;
+---
+
+<div class="how-it-works-flow tech-card" data-shine data-reveal style="--reveal-i: 1;">
+	<ol class="how-it-works-steps">
+		{
+			steps.map((step, index) => (
+				<>
+					<li class="how-it-works-step">
+						<span class="how-it-works-icon" aria-hidden="true" set:html={step.iconSvg} />
+						<span class="how-it-works-label spec-mono">{step.label}</span>
+						<span class="how-it-works-description">{step.description}</span>
+					</li>
+					{index < steps.length - 1 && (
+						<li class="how-it-works-arrow" aria-hidden="true">
+							<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M5 12h14M13 6l6 6-6 6" />
+							</svg>
+						</li>
+					)}
+				</>
+			))
+		}
+	</ol>
+</div>
+
+<style is:global>
+	/* `is:global` (rather than this component's own scoped CSS) so a single
+	   copy of these rules applies no matter which page includes the
+	   component — matches how NavFlyout.astro already does this for the
+	   same reason (JS/markup crossing a component boundary otherwise loses
+	   Astro's per-file scoping attribute). */
+	.how-it-works-flow {
+		background-color: var(--color-bg);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		padding: 2rem 1.75rem;
+	}
+
+	.how-it-works-steps {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		align-items: flex-start;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 1.5rem 0.75rem;
+	}
+
+	.how-it-works-step {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 0.6rem;
+		width: 190px;
+		flex-shrink: 0;
+	}
+
+	.how-it-works-icon {
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: rgba(var(--color-teal-rgb), 0.12);
+		color: var(--color-teal-dark, #018b96);
+	}
+
+	.how-it-works-label {
+		font-size: 0.78rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--color-text);
+	}
+
+	.how-it-works-description {
+		font-size: 0.82rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
+	}
+
+	.how-it-works-arrow {
+		display: flex;
+		align-items: center;
+		flex-shrink: 0;
+		color: var(--color-teal);
+		margin-top: 22px;
+	}
+
+	@media (max-width: 760px) {
+		.how-it-works-steps {
+			flex-direction: column;
+			align-items: center;
+			gap: 1.25rem;
+		}
+
+		.how-it-works-step {
+			width: auto;
+			max-width: 320px;
+		}
+
+		.how-it-works-arrow {
+			margin-top: 0;
+			transform: rotate(90deg);
+		}
+	}
+
+	@media (max-width: 600px) {
+		.how-it-works-flow {
+			padding: 1.75rem 1.25rem;
+		}
+	}
+</style>

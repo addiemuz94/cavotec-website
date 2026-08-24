@@ -39,9 +39,8 @@ const iotItems = [
 	{
 		id: 'smart-key-management-system-ekms',
 		title: 'Smart Key Management System (eKMS)',
-		description: 'Secure, connected key control and tracking. Visit kms-cvt.com for full details.',
-		href: 'https://kms-cvt.com',
-		external: true,
+		description: 'IoT-based electronic key management and access control — secure key storage, real-time tracking, and a full audit trail.',
+		href: '/product/iot/smart-key-management-system',
 		icon: 'key',
 		flow: [
 			{ label: 'Device / Key', icon: 'key' },
@@ -144,14 +143,21 @@ const iotItems = [
 			</p>
 			<div class="iot-grid">
 				{iotItems.map((item, index) => {
-					const Tag = item.external ? 'a' : 'div';
+					// Tag is <a> whenever there's somewhere to go — either an
+					// internal page (plain link) or an external one (target
+					// _blank + rel + the external-link icon below). Items with
+					// neither href stay a plain, non-clickable <div> with the
+					// "Coming soon" tag.
+					const Tag = item.href ? 'a' : 'div';
 					return (
 						<div class="iot-item tech-card" data-shine data-reveal style={`--reveal-i: ${index + 2};`}>
 							<Tag
 								class="iot-card anchor"
 								id={item.id}
-								{...(item.external
-									? { href: item.href, target: '_blank', rel: 'noopener noreferrer', 'aria-label': `${item.title} (opens in a new tab)` }
+								{...(item.href
+									? item.external
+										? { href: item.href, target: '_blank', rel: 'noopener noreferrer', 'aria-label': `${item.title} (opens in a new tab)` }
+										: { href: item.href }
 									: {})}
 							>
 								<span class="iot-card-icon" aria-hidden="true">
@@ -178,7 +184,7 @@ const iotItems = [
 									)}
 								</span>
 								<div class="iot-card-body">
-									{!item.external && <span class="placeholder-tag">Coming soon</span>}
+									{!item.href && <span class="placeholder-tag">Coming soon</span>}
 									<h3>
 										{item.title}
 										{item.external && (
@@ -287,10 +293,6 @@ const iotItems = [
 </Layout>
 
 <style>
-	section {
-		width: 100%;
-	}
-
 	/* Page header */
 	.page-header {
 		position: relative;
@@ -538,7 +540,7 @@ const iotItems = [
 	.btn-details:focus-visible {
 		background: var(--color-teal);
 		border-color: var(--color-teal);
-		color: var(--color-indigo);
+		color: var(--color-on-accent);
 		transform: translateY(-2px);
 		box-shadow: 0 8px 20px rgba(var(--color-teal-rgb), 0.35);
 	}

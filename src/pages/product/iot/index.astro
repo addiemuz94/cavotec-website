@@ -1,0 +1,628 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import HowItWorksFlow from '../../../components/product/HowItWorksFlow.astro';
+import FaqAccordion from '../../../components/product/FaqAccordion.astro';
+import ComparisonTable from '../../../components/product/ComparisonTable.astro';
+
+// PLACEHOLDER CONTENT — this whole page follows the reference structure
+// built for src/pages/product/iot/smart-key-management-system.astro (that
+// sub-page itself is untouched — this is the new category landing page one
+// level up, at /product/iot/). Copy below is generic, plausible placeholder
+// text for Cavotec's IoT capability generally, pending real details.
+
+const features = [
+	'Custom IoT hardware and sensor integration',
+	'Cloud-connected dashboards for real-time visibility',
+	'Scalable from a single device to multi-site deployments',
+	'Secure, connected access control and monitoring solutions',
+	'Ongoing support and maintenance for deployed IoT systems',
+];
+
+const howItWorksSteps = [
+	{
+		label: 'Assessment',
+		description: 'Evaluate facility needs and connectivity requirements',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.35-4.35" /></svg>',
+	},
+	{
+		label: 'Design & Integration',
+		description: 'Design a custom IoT solution and integrate sensors and devices',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1" /><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3" /></svg>',
+	},
+	{
+		label: 'Deployment',
+		description: 'Install and configure connected devices on-site',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="8" height="16" rx="1" /><rect x="13" y="10" width="6" height="10" rx="1" /><path d="M8 8h1M11 8h1M8 12h1M11 12h1" /></svg>',
+	},
+	{
+		label: 'Monitoring & Support',
+		description: 'Ongoing monitoring, maintenance, and support from a central dashboard',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M8 20h8M12 16v4" /></svg>',
+	},
+];
+
+// PLACEHOLDER CONTENT — generic, plausible Q&As for Cavotec's IoT
+// capability generally, pending real details.
+const faqs = [
+	{
+		question: 'What kinds of IoT solutions does Cavotec Malaysia develop?',
+		answer:
+			'Our IoT portfolio includes connected access control, alarm monitoring, and building management systems, with custom hardware and sensor integration available for other applications.',
+	},
+	{
+		question: 'Can you build a custom IoT solution for our facility?',
+		answer:
+			'Yes — our team can assess your requirements and design a connected solution tailored to your facility, from a single device to a multi-site deployment.',
+	},
+	{
+		question: 'Do your IoT products require special networking infrastructure?',
+		answer:
+			"Requirements vary by solution. Our team will review your site's existing infrastructure and advise what's needed during the assessment stage.",
+	},
+	{
+		question: 'Is remote monitoring available for IoT deployments?',
+		answer: 'Yes — our connected solutions are designed with remote, dashboard-based monitoring in mind.',
+	},
+	{
+		question: 'What ongoing support is available after deployment?',
+		answer: 'We provide ongoing monitoring, maintenance, and support for deployed IoT systems to help keep them running reliably.',
+	},
+];
+
+// PLACEHOLDER CONTENT — illustrative comparison rows pending confirmed
+// product data.
+const comparisonRows = [
+	{ capability: 'Visibility', baseline: 'Manual checks only', cavotec: 'Real-time dashboard visibility' },
+	{ capability: 'Data Trail', baseline: 'Little to no historical data', cavotec: 'Continuous logged data history' },
+	{ capability: 'Response Time', baseline: 'Delayed, reactive', cavotec: 'Real-time alerts and notifications' },
+	{ capability: 'Scalability', baseline: 'Difficult to expand', cavotec: 'Scales across multiple sites' },
+	{ capability: 'Maintenance', baseline: 'Reactive, after failure', cavotec: 'Proactive, monitored maintenance' },
+];
+---
+
+<Layout
+	title="Internet of Things (IoT) — Cavotec Malaysia Sdn Bhd"
+	description="Connected, IoT-enabled hardware and development from Cavotec Malaysia — bringing test and measurement expertise into connected, data-driven solutions."
+>
+	<section class="page-header">
+		<div class="page-header-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="page-header-inner" data-reveal>
+			<span class="eyebrow">Products</span>
+			<h1>Internet of Things (IoT)</h1>
+			<p class="product-tagline">
+				Connected hardware and IoT development — bringing Cavotec Malaysia's test and measurement
+				expertise into the connected world.
+			</p>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="product-overview">
+		<div class="product-overview-inner">
+			<div class="product-image-placeholder" data-reveal>
+				<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<rect x="3" y="4" width="18" height="16" rx="2" />
+					<circle cx="8.5" cy="9.5" r="1.5" />
+					<path d="M21 16l-5.5-5.5a1.5 1.5 0 0 0-2.1 0L4 19" />
+				</svg>
+				<strong>Internet of Things (IoT)</strong>
+				<span>Product image — coming soon</span>
+			</div>
+
+			<div class="product-description" data-reveal style="--reveal-i: 1;">
+				<h2>About Our IoT Capability</h2>
+				<p>
+					Cavotec Malaysia's Internet of Things (IoT) capability brings connected, remotely
+					managed hardware to the same test and measurement expertise the company is known for.
+					From secure access control to building monitoring, our growing IoT portfolio is designed
+					to help customers modernize their operations with connected, data-driven solutions.
+				</p>
+				<p>
+					Our IoT development spans electronic and electrical design, sensor integration, and
+					cloud-connected dashboards, giving customers real-time visibility into the systems that
+					matter most to their operations. Solutions are built to scale from a single connected
+					device to multi-site deployments.
+				</p>
+				<p>
+					Explore our current IoT product line below, including the Smart Key Management System —
+					our flagship connected access control solution — with more connected products in
+					development.
+				</p>
+
+				<h3>Key Features</h3>
+				<ul class="product-features">
+					{features.map((feature) => (
+						<li>
+							<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<circle cx="12" cy="12" r="9" />
+								<path d="M8 12.5l2.5 2.5L16 9" />
+							</svg>
+							<span>{feature}</span>
+						</li>
+					))}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- Featured product: links to the existing, fully-built Smart Key
+	     Management System sub-page rather than duplicating its content. -->
+	<section class="featured-product">
+		<div class="featured-product-inner">
+			<span class="eyebrow-mono">Featured Product</span>
+			<a href="/product/iot/smart-key-management-system" class="featured-product-card tech-card" data-shine data-reveal>
+				<span class="featured-product-icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+						<circle cx="8" cy="8" r="4" />
+						<path d="M11 11l9 9" />
+						<path d="M17 17l2-2" />
+						<path d="M15 19l2-2" />
+					</svg>
+				</span>
+				<span class="featured-product-body">
+					<span class="featured-product-title">Smart Key Management System (eKMS)</span>
+					<span class="featured-product-description">
+						Secure, connected key control and tracking with a full digital audit trail.
+					</span>
+				</span>
+				<svg class="featured-product-arrow" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M5 12h14M13 6l6 6-6 6" />
+				</svg>
+			</a>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the 4 steps below are illustrative — adjust
+	     wording once real deployment workflow details are confirmed. -->
+	<section class="product-how-it-works">
+		<div class="product-how-it-works-inner">
+			<h2 data-reveal>How It Works</h2>
+			<HowItWorksFlow steps={howItWorksSteps} />
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the 5 Q&As below are generic, plausible copy
+	     pending real details — replace once confirmed. -->
+	<section class="product-faq">
+		<div class="product-faq-inner">
+			<h2 data-reveal>Frequently Asked Questions</h2>
+			<FaqAccordion faqs={faqs} />
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- PLACEHOLDER CONTENT: the comparison rows below are illustrative,
+	     pending confirmed product data. -->
+	<section class="product-comparison">
+		<div class="product-comparison-inner">
+			<h2 data-reveal>Connected/IoT-Enabled vs. Traditional Manual Systems</h2>
+			<ComparisonTable baselineLabel="Traditional Manual Systems" cavotecLabel="Connected / IoT-Enabled" rows={comparisonRows} />
+		</div>
+	</section>
+
+	<section class="closing-cta">
+		<div class="closing-cta-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="closing-cta-inner" data-reveal>
+			<h2>Modernize Your Operations with IoT</h2>
+			<p>Book a demo with our team to see what a connected solution could look like for you.</p>
+			<div class="product-cta-group">
+				<a href="/contact?subject=IoT%20Solutions" class="btn btn-accent">Book a Demo</a>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	/* Page header — same recipe used on every other page; each page keeps
+	   its own copy since this <style> block is scoped to this file. */
+	.page-header {
+		position: relative;
+		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem 3.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.page-header-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image:
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px),
+			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: radial-gradient(ellipse at center, black 15%, transparent 75%);
+	}
+
+	.page-header-inner {
+		max-width: 760px;
+		margin: 0 auto;
+		position: relative;
+	}
+
+	.eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-amber);
+		margin-bottom: 0.75rem;
+	}
+
+	.page-header h1 {
+		font-size: clamp(2rem, 4.5vw, 2.75rem);
+		font-weight: 700;
+		margin: 0 0 0.85rem;
+	}
+
+	.product-tagline {
+		font-size: 1.05rem;
+		line-height: 1.6;
+		color: var(--color-ink-muted);
+		max-width: 56ch;
+		margin: 0 auto;
+	}
+
+	/* Overview */
+	.product-overview {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-overview-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+		display: grid;
+		grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+		gap: 3rem;
+		align-items: start;
+	}
+
+	.product-image-placeholder {
+		aspect-ratio: 4 / 3;
+		/* No explicit width — a grid item stretches to fill its column by
+		   default; see the equivalent comment on the SKMS page for why. */
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.6rem;
+		text-align: center;
+		padding: 1.5rem;
+		color: var(--color-text-muted);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		background: repeating-linear-gradient(
+			135deg,
+			var(--color-indigo),
+			var(--color-indigo) 10px,
+			var(--color-surface) 10px,
+			var(--color-surface) 20px
+		);
+		position: sticky;
+		top: calc(var(--header-height) + 1.5rem);
+	}
+
+	.product-image-placeholder strong {
+		font-size: 1rem;
+		color: var(--color-text);
+	}
+
+	.product-image-placeholder span {
+		font-size: 0.8rem;
+	}
+
+	.product-description h2 {
+		font-size: 1.4rem;
+		color: var(--color-text);
+		margin: 0 0 1.25rem;
+	}
+
+	.product-description h3 {
+		font-size: 1.05rem;
+		color: var(--color-text);
+		margin: 2rem 0 1rem;
+	}
+
+	.product-description p {
+		font-size: 0.98rem;
+		line-height: 1.75;
+		color: var(--color-text-muted);
+		margin: 0 0 1.25rem;
+	}
+
+	.product-features {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.product-features li {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.65rem;
+		font-size: 0.92rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
+	}
+
+	.product-features svg {
+		flex-shrink: 0;
+		margin-top: 0.1rem;
+		color: var(--color-teal);
+	}
+
+	.product-cta-group {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 1rem;
+	}
+
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.85rem 2rem;
+		border-radius: 4px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: 0.01em;
+		border: none;
+		cursor: pointer;
+		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+	}
+
+	.btn-accent {
+		background: var(--color-teal);
+		color: var(--color-on-accent);
+		box-shadow: 0 6px 20px rgba(var(--color-teal-rgb), 0.35);
+	}
+
+	.btn-accent:hover,
+	.btn-accent:focus-visible {
+		background: #00d9eb;
+		transform: translateY(-2px);
+		box-shadow: 0 10px 26px rgba(var(--color-teal-rgb), 0.45);
+	}
+
+	@media (max-width: 860px) {
+		.product-overview-inner {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+
+		.product-image-placeholder {
+			position: static;
+			max-width: 380px;
+			margin: 0 auto;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.product-overview {
+			padding: 3.5rem 1.25rem;
+		}
+
+		.product-cta-group {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		.btn {
+			justify-content: center;
+		}
+	}
+
+	/* Featured product */
+	.featured-product {
+		background: var(--color-bg-alt);
+		padding: 3.5rem 1.5rem;
+	}
+
+	.featured-product-inner {
+		max-width: 780px;
+		margin: 0 auto;
+	}
+
+	.eyebrow-mono {
+		display: block;
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		font-weight: 500;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+		margin-bottom: 0.85rem;
+	}
+
+	.featured-product-card {
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+		background-color: var(--color-bg);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		padding: 1.5rem 1.75rem;
+		color: inherit;
+	}
+
+	.featured-product-icon {
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 52px;
+		height: 52px;
+		border-radius: 50%;
+		background: rgba(var(--color-teal-rgb), 0.12);
+		color: var(--color-teal);
+	}
+
+	.featured-product-body {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+	}
+
+	.featured-product-title {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 1.02rem;
+		color: var(--color-text);
+	}
+
+	.featured-product-description {
+		font-size: 0.88rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
+	}
+
+	.featured-product-arrow {
+		flex-shrink: 0;
+		color: var(--color-teal);
+		transition: transform 0.2s ease;
+	}
+
+	.featured-product-card:hover .featured-product-arrow,
+	.featured-product-card:focus-visible .featured-product-arrow {
+		transform: translateX(4px);
+	}
+
+	@media (max-width: 600px) {
+		.featured-product {
+			padding: 3rem 1.25rem;
+		}
+
+		.featured-product-card {
+			flex-wrap: wrap;
+			padding: 1.5rem;
+		}
+
+		.featured-product-arrow {
+			display: none;
+		}
+	}
+
+	/* How It Works */
+	.product-how-it-works {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-how-it-works-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+	}
+
+	.product-how-it-works h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	/* FAQ */
+	.product-faq {
+		background: var(--color-bg-alt);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-faq-inner {
+		max-width: 760px;
+		margin: 0 auto;
+	}
+
+	.product-faq h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	/* Comparison */
+	.product-comparison {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-comparison-inner {
+		max-width: 900px;
+		margin: 0 auto;
+	}
+
+	.product-comparison h2 {
+		text-align: center;
+		font-size: 1.6rem;
+		color: var(--color-text);
+		margin: 0 0 2.5rem;
+	}
+
+	@media (max-width: 600px) {
+		.product-how-it-works,
+		.product-faq,
+		.product-comparison {
+			padding: 3.5rem 1.25rem;
+		}
+	}
+
+	/* Closing CTA */
+	.closing-cta {
+		position: relative;
+		background: var(--color-indigo);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.closing-cta-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image: repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: linear-gradient(to bottom, black, transparent);
+	}
+
+	.closing-cta-inner {
+		max-width: 640px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.closing-cta h2 {
+		font-size: clamp(1.5rem, 3vw, 2rem);
+		margin: 0;
+	}
+
+	.closing-cta p {
+		font-size: 1rem;
+		color: var(--color-ink-muted);
+		margin: -0.75rem 0 0;
+	}
+</style>
