@@ -1,18 +1,47 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ShowcaseCarousel, { type ShowcaseItem } from '../components/ShowcaseCarousel.astro';
+import HoloPreviewPanel from '../components/HoloPreviewPanel.astro';
+import CustomerLogoGrid from '../components/CustomerLogoGrid.astro';
+import { productCategories } from '../data/productCategories';
+import { customers } from '../data/customers';
+
+// ATE System's and Test Equipment and Measurement Instrument's carousel
+// summaries below are both pulled from productCategories (also used by
+// /our-business's Products section) rather than a second hand-copied
+// string, so the pages can't drift apart on this text.
+const ateSystemCategory = productCategories.find((category) => category.id === 'ate-system')!;
+const testEquipmentCategory = productCategories.find((category) => category.id === 'test-equipment-measurement')!;
 
 // PLACEHOLDER CONTENT — working set for the homepage showcase carousel,
 // pulled from the actual product/service pages already built. One card per
 // item rather than expanding "Customize Solution Provider" into its 3
 // sub-services (electronic design / 3D design / R&D) — keeps the carousel
-// at a manageable 9 cards; its own page links out to those sub-services.
-// Final product/service list, taglines, and icons to be confirmed later.
+// at a manageable 10 cards; its own page links out to those sub-services.
+// Order groups Products first (Test Equipment and Measurement Instrument,
+// ATE System, then IoT's 3 sub-items — matching ourBusinessMenu's current
+// Products order in Layout.astro), then Services. Final product/service
+// list, taglines, and icons to be confirmed later.
+//
+// `image` is intentionally omitted on every item below — there are no real
+// product/service photos in the repo yet (only the hero background set).
+// HoloPreviewPanel renders its wireframe-glyph fallback for any item without
+// an `image`, so right now every card shows that fallback; drop in a real
+// photo path here per item as photos become available and the panel picks
+// it up automatically, no other changes needed.
 const showcaseItems: ShowcaseItem[] = [
+	{
+		href: testEquipmentCategory.href,
+		title: testEquipmentCategory.title,
+		tagline: 'Curated test equipment and measurement brands',
+		summary: testEquipmentCategory.description,
+		iconSvg: testEquipmentCategory.iconSvg,
+	},
 	{
 		href: '/product/calibration-test-measurement/',
 		title: 'ATE System',
 		tagline: 'Automated functional and parametric testing',
+		summary: ateSystemCategory.description,
 		iconSvg:
 			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6" rx="1" /><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3" /></svg>',
 	},
@@ -20,6 +49,8 @@ const showcaseItems: ShowcaseItem[] = [
 		href: '/product/iot/smart-key-management-system',
 		title: 'Smart Key Management System',
 		tagline: 'Secure, trackable key access control',
+		summary:
+			'A secure, trackable system for managing physical key access across facilities and fleets. Every checkout and return is logged automatically, removing the guesswork over who holds what and when, and it integrates with existing access-control and IoT monitoring setups.',
 		iconSvg:
 			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" /></svg>',
 	},
@@ -27,6 +58,8 @@ const showcaseItems: ShowcaseItem[] = [
 		href: '/product/iot/integrated-alarm-system',
 		title: 'Integrated Alarm System',
 		tagline: 'Centralized monitoring and instant alerts',
+		summary:
+			'Centralized monitoring that pulls alerts from across a site into a single, actionable view. Instant notifications flag issues the moment they are detected, cutting response time, and the system scales from a single building to a full multi-site deployment.',
 		iconSvg:
 			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>',
 	},
@@ -34,70 +67,55 @@ const showcaseItems: ShowcaseItem[] = [
 		href: '/product/iot/bms',
 		title: 'Smart Building Management System',
 		tagline: 'Monitor and manage your building systems',
+		summary:
+			'Monitor and manage HVAC, power, lighting, and security from one connected dashboard. Real-time data surfaces inefficiencies before they become costly problems, and the system fits both new builds and retrofits of existing infrastructure.',
 		iconSvg:
 			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1" /><path d="M9 21v-4h6v4" /><path d="M8 7h2M14 7h2M8 11h2M14 11h2" /></svg>',
 	},
 	{
-		href: '/product/calibration/',
+		href: '/services/calibration-test-measurement/',
 		title: 'Calibration and Test Measurement',
 		tagline: 'Precision calibration for test equipment',
+		summary:
+			'Precision calibration services that keep test and measurement equipment within spec and traceable to recognized standards. Coverage spans a broad range of instruments, from RF and microwave gear to general electronic test equipment, so drift gets caught before it gets costly.',
 		iconSvg:
 			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 0-9-9" /><path d="M12 21a9 9 0 0 0 9-9" /><path d="M12 12L16 8" /><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" /></svg>',
 	},
 	{
-		href: '/product/repair-work-service/',
+		href: '/services/repair-work/',
 		title: 'Repair Work',
 		tagline: 'Expert repair for test and measurement gear',
+		summary:
+			'Expert repair services for test and measurement equipment, from routine maintenance to complex fault diagnosis. Experienced technicians restore instruments to full manufacturer specification, with turnaround built around minimizing downtime for critical gear.',
 		iconSvg:
 			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 4.6L4 16.2V20h3.8l5.3-5.3a4 4 0 0 0 4.6-5.4l-2.6 2.6-2-2 2.6-2.6z" /></svg>',
 	},
 	{
-		href: '/product/equipment-rental/',
+		href: '/services/equipment-rental/',
 		title: 'Equipment Rental',
 		tagline: 'Calibrated equipment, ready when you need it',
+		summary:
+			'Calibrated test equipment available on flexible rental terms, ready to deploy the moment a project needs it. Avoid the capital cost of specialized gear that is only needed occasionally — every unit ships calibrated and verified before it reaches you.',
 		iconSvg:
 			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" /></svg>',
 	},
 	{
-		href: '/product/training/',
+		href: '/services/training/',
 		title: 'Training',
 		tagline: 'Hands-on training for your technical team',
+		summary:
+			'Hands-on training programs built to bring technical teams up to speed on test and measurement equipment and practices. Sessions combine practical exercises with real-world troubleshooting scenarios, tailored to the equipment and skill level of each team.',
 		iconSvg:
 			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L2 8l10 5 10-5-10-5z" /><path d="M6 10.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-5.5" /><path d="M22 8v6" /></svg>',
 	},
 	{
-		href: '/product/customize-solution-provider/',
+		href: '/services/customize-solution-provider/',
 		title: 'Customize Solution Provider',
 		tagline: 'Tailored electronic and 3D design services',
+		summary:
+			'Tailored electronic and 3D design services for teams that need a solution built around their exact requirements. Coverage spans schematic and PCB design through mechanical enclosures and prototyping, backed by an in-house R&D and innovation process.',
 		iconSvg:
 			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M4 12h16M4 18h7" /><circle cx="17" cy="6" r="2" /><circle cx="9" cy="12" r="2" /><circle cx="14" cy="18" r="2" /></svg>',
-	},
-];
-
-const services = [
-	{
-		title: 'Calibration and Training',
-		icon: 'award',
-	},
-	{
-		title: 'Test Equipment Repair',
-		icon: 'wrench',
-	},
-	{
-		title: 'Test and Measurement Solutions',
-		icon: 'gauge',
-	},
-	{
-		title: 'Test Equipment Rental',
-		icon: 'clock',
-	},
-	{
-		title: 'RF, Microwave & Radio Accessories',
-		icon: 'signal',
-	},
-	{
-		title: 'Telecommunication Equipment',
-		icon: 'tower',
 	},
 ];
 
@@ -140,7 +158,7 @@ const heroBackgrounds = [
 				<p class="hero-subheading" data-reveal style="--reveal-i: 1;">
 					Home for repair and services of your favorite test and measurement equipment
 				</p>
-				<a href="/services" class="btn btn-accent" data-reveal style="--reveal-i: 2;">Learn More</a>
+				<a href="/our-business" class="btn btn-accent" data-reveal style="--reveal-i: 2;">Learn More</a>
 			</div>
 		</div>
 	</section>
@@ -151,61 +169,7 @@ const heroBackgrounds = [
 
 	<div class="tick-divider" aria-hidden="true"></div>
 
-	<section class="services">
-		<div class="services-inner">
-			<h2 data-reveal>List of Services Offered</h2>
-			<div class="services-grid">
-				{services.map((service, index) => (
-					<div class="service-card tech-card" data-shine data-reveal style={`--reveal-i: ${index};`}>
-						<span class="service-icon" aria-hidden="true">
-							{service.icon === 'gauge' && (
-								<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M12 21a9 9 0 1 0-9-9" />
-									<path d="M12 21a9 9 0 0 0 9-9" />
-									<path d="M12 12L16 8" />
-									<circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
-								</svg>
-							)}
-							{service.icon === 'tower' && (
-								<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M12 2l7 20M12 2L5 22" />
-									<path d="M8.5 12h7M6.5 17h11" />
-									<path d="M12 2v4" />
-								</svg>
-							)}
-							{service.icon === 'signal' && (
-								<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M4 12a8 8 0 0 1 16 0" />
-									<path d="M7.5 12a4.5 4.5 0 0 1 9 0" />
-									<circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none" />
-									<path d="M12 13.3V19" />
-								</svg>
-							)}
-							{service.icon === 'wrench' && (
-								<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<path d="M14.7 6.3a4 4 0 0 0-5.4 4.6L4 16.2V20h3.8l5.3-5.3a4 4 0 0 0 4.6-5.4l-2.6 2.6-2-2 2.6-2.6z" />
-								</svg>
-							)}
-							{service.icon === 'award' && (
-								<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<circle cx="12" cy="9" r="6" />
-									<path d="M9 14.5L7 22l5-3 5 3-2-7.5" />
-									<path d="M9.5 9l1.8 1.8L14.5 7.5" />
-								</svg>
-							)}
-							{service.icon === 'clock' && (
-								<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-									<circle cx="12" cy="12" r="9" />
-									<path d="M12 7v5l3.5 2" />
-								</svg>
-							)}
-						</span>
-						<h3>{service.title}</h3>
-					</div>
-				))}
-			</div>
-		</div>
-	</section>
+	<HoloPreviewPanel items={showcaseItems} />
 
 	<div class="tick-divider" aria-hidden="true"></div>
 
@@ -214,6 +178,21 @@ const heroBackgrounds = [
 		<div class="closing-cta-inner" data-reveal>
 			<h2>Need High Quality Services? Call Us!</h2>
 			<a href="/contact" class="btn btn-warm">Get in Touch</a>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- "Our Customers" — see data/customers.ts for the placeholder-content
+	     note (real logos + display permission both still pending from Adi).
+	     Heading/intro copy below is placeholder wording, not final. -->
+	<section class="customers-section">
+		<div class="customers-section-inner">
+			<h2 data-reveal>Our Customers</h2>
+			<p class="customers-intro" data-reveal>
+				Trusted by organizations across telecommunications, defense, and manufacturing.
+			</p>
+			<CustomerLogoGrid customers={customers} />
 		</div>
 	</section>
 
@@ -818,83 +797,6 @@ const heroBackgrounds = [
 		background: rgba(var(--color-indigo-rgb), 0.85);
 	}
 
-	/* Services */
-	.services {
-		background: var(--color-bg);
-		padding: 5rem 1.5rem;
-	}
-
-	.services-inner {
-		max-width: 1200px;
-		margin: 0 auto;
-	}
-
-	.services h2 {
-		text-align: center;
-		font-size: clamp(1.6rem, 3vw, 2.2rem);
-		color: var(--color-ink);
-		margin: 0 0 3rem;
-		position: relative;
-	}
-
-	.services h2::after {
-		content: '';
-		display: block;
-		width: 64px;
-		height: 3px;
-		background: var(--color-teal);
-		margin: 0.9rem auto 0;
-		border-radius: 2px;
-	}
-
-	.services-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-		gap: 1.75rem;
-	}
-
-	.service-card {
-		/* background-color, not the background shorthand — the shine's
-		   background-image (see [data-shine] in Layout.astro) needs the
-		   image slot left alone, or this shorthand would reset it to none. */
-		background-color: var(--color-bg);
-		border: 1px solid var(--color-border);
-		border-radius: 10px;
-		padding: 2.25rem 1.5rem;
-		text-align: center;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 1rem;
-		transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-	}
-
-	.service-icon {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 60px;
-		height: 60px;
-		border-radius: 50%;
-		background: rgba(var(--color-teal-rgb), 0.12);
-		color: var(--color-teal);
-		transition: background 0.25s ease, color 0.25s ease;
-	}
-
-	.service-card:hover .service-icon {
-		background: var(--color-teal);
-		color: var(--color-on-accent);
-	}
-
-	.service-card h3 {
-		font-family: var(--font-display);
-		font-size: 1.05rem;
-		font-weight: 600;
-		color: var(--color-text);
-		margin: 0;
-		line-height: 1.4;
-	}
-
 	/* Closing CTA */
 	.closing-cta {
 		position: relative;
@@ -928,18 +830,43 @@ const heroBackgrounds = [
 		margin: 0;
 	}
 
+	/* Our Customers — logo wall placeholder section */
+	.customers-section {
+		background: var(--color-bg);
+		padding: 5.5rem 1.5rem;
+	}
+
+	.customers-section-inner {
+		max-width: 1000px;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.customers-section h2 {
+		font-size: clamp(1.6rem, 3vw, 2.2rem);
+		color: var(--color-text);
+		margin: 0 0 0.75rem;
+		position: relative;
+	}
+
+	.customers-intro {
+		font-size: 0.98rem;
+		color: var(--color-text-muted);
+		max-width: 56ch;
+		margin: 0 auto 2.75rem;
+	}
+
 	@media (max-width: 600px) {
 		.hero {
 			padding: 4.5rem 1.25rem;
 		}
 
-		.services,
 		.closing-cta {
 			padding: 3.5rem 1.25rem;
 		}
 
-		.service-card {
-			padding: 1.75rem 1.25rem;
+		.customers-section {
+			padding: 3.5rem 1.25rem;
 		}
 	}
 </style>

@@ -1,0 +1,525 @@
+---
+// Homepage-only "hologram display" that mirrors whichever ShowcaseCarousel
+// card the visitor last explicitly selected (see the `holopreview:select`
+// CustomEvent dispatched from ShowcaseCarousel.astro's goTo()). Renders as a
+// self-contained dark "screen" embedded in the page — its background/text
+// colors are explicit hex, not the site's --color-bg/--color-text theme
+// tokens, so it looks identical (and intentional) in both light and dark
+// site themes rather than inheriting whichever mode is active. --color-teal
+// IS used throughout, deliberately: it's a fixed brand constant, never
+// overridden per-theme (see Layout.astro), so it's safe for a
+// theme-independent surface.
+import type { ShowcaseItem } from './ShowcaseCarousel.astro';
+
+interface Props {
+	items: ShowcaseItem[];
+}
+
+const { items } = Astro.props;
+const initial = items[0];
+---
+
+<section class="holo-panel" data-holo-panel aria-label="Product and service preview">
+	<div class="holo-panel-inner">
+		<div class="holo-stage-frame">
+			<div class="holo-stage">
+				<div class="holo-particles" aria-hidden="true">
+					<span class="holo-particle" style="--x: 18%; --delay: 0s; --dur: 5.4s;"></span>
+					<span class="holo-particle" style="--x: 32%; --delay: 1.1s; --dur: 4.6s;"></span>
+					<span class="holo-particle" style="--x: 48%; --delay: 2.3s; --dur: 6.1s;"></span>
+					<span class="holo-particle" style="--x: 61%; --delay: 0.6s; --dur: 5s;"></span>
+					<span class="holo-particle" style="--x: 72%; --delay: 3.1s; --dur: 4.9s;"></span>
+					<span class="holo-particle" style="--x: 84%; --delay: 1.8s; --dur: 5.8s;"></span>
+					<span class="holo-particle" style="--x: 40%; --delay: 4s; --dur: 5.2s;"></span>
+				</div>
+
+				<div class="holo-light-column" aria-hidden="true"></div>
+
+				<div class="holo-image-wrap">
+					<div class="holo-visual-bob" data-holo-visual-bob>
+						{initial.image ? (
+							<img src={initial.image} alt="" class="holo-image" data-holo-image />
+						) : (
+							/* Wireframe glyph fallback — see the matching comment on the
+							   <template> below for what this treatment means and why it
+							   must not be deleted once real photos start arriving. */
+							<div class="holo-visual-spin">
+								<svg class="holo-wireframe" viewBox="0 0 200 200" aria-hidden="true">
+									<polygon points="100,10 175,55 175,145 100,190 25,145 25,55" />
+									<polygon points="100,55 145,80 145,130 100,155 55,130 55,80" />
+									<line x1="100" y1="10" x2="100" y2="55" />
+									<line x1="175" y1="55" x2="145" y2="80" />
+									<line x1="175" y1="145" x2="145" y2="130" />
+									<line x1="100" y1="190" x2="100" y2="155" />
+									<line x1="25" y1="145" x2="55" y2="130" />
+									<line x1="25" y1="55" x2="55" y2="80" />
+								</svg>
+							</div>
+						)}
+					</div>
+				</div>
+
+				<div class="holo-platform" aria-hidden="true">
+					<div class="holo-platform-ring-outer"></div>
+					<div class="holo-platform-ring-mid"></div>
+					<div class="holo-platform-ring-inner"></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="holo-content">
+			<span class="holo-eyebrow">Live Preview</span>
+			<h3 class="holo-title" data-holo-title>{initial.title}</h3>
+			<p class="holo-summary" data-holo-summary>{initial.summary}</p>
+			<a class="holo-cta" data-holo-cta href={initial.href}>
+				View details
+				<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M5 12h14M13 6l6 6-6 6" />
+				</svg>
+			</a>
+		</div>
+	</div>
+
+	<!-- Wireframe glyph template, cloned by JS whenever a selected item has no
+	     real photo. IMPORTANT: this is an intentional "concept / coming soon"
+	     display treatment, not a temporary stand-in to delete once real
+	     product images exist site-wide. Only stop rendering it for a given
+	     product once THAT product has a confirmed real photo — do not remove
+	     the fallback mechanism itself in a future cleanup pass. -->
+	<template data-holo-wireframe-template>
+		<div class="holo-visual-spin">
+			<svg class="holo-wireframe" viewBox="0 0 200 200" aria-hidden="true">
+				<polygon points="100,10 175,55 175,145 100,190 25,145 25,55" />
+				<polygon points="100,55 145,80 145,130 100,155 55,130 55,80" />
+				<line x1="100" y1="10" x2="100" y2="55" />
+				<line x1="175" y1="55" x2="145" y2="80" />
+				<line x1="175" y1="145" x2="145" y2="130" />
+				<line x1="100" y1="190" x2="100" y2="155" />
+				<line x1="25" y1="145" x2="55" y2="130" />
+				<line x1="25" y1="55" x2="55" y2="80" />
+			</svg>
+		</div>
+	</template>
+</section>
+
+<script>
+	// Same astro:page-load / astro:before-swap pattern as ShowcaseCarousel and
+	// every other homepage-only interactive bit in index.astro — this panel
+	// lives inside <main>, which is replaced on every ClientRouter
+	// navigation, so listeners need a fresh init (and a clean teardown of the
+	// previous one) on every visit to "/".
+	let holoController: AbortController | null = null;
+
+	interface HoloSelectDetail {
+		id: string;
+		href: string;
+		title: string;
+		summary: string;
+		image: string | null;
+	}
+
+	function initHoloPreviewPanel() {
+		holoController?.abort();
+		holoController = new AbortController();
+		const { signal } = holoController;
+
+		const panel = document.querySelector<HTMLElement>('[data-holo-panel]');
+		if (!panel) return; // Not on the homepage this navigation — no-op.
+
+		const visualSlot = panel.querySelector<HTMLElement>('[data-holo-visual-bob]');
+		const titleEl = panel.querySelector<HTMLElement>('[data-holo-title]');
+		const summaryEl = panel.querySelector<HTMLElement>('[data-holo-summary]');
+		const ctaEl = panel.querySelector<HTMLAnchorElement>('[data-holo-cta]');
+		const wireframeTemplate = panel.querySelector<HTMLTemplateElement>('[data-holo-wireframe-template]');
+		const contentEl = panel.querySelector<HTMLElement>('.holo-content');
+		const stageEl = panel.querySelector<HTMLElement>('.holo-stage');
+		if (!visualSlot || !titleEl || !summaryEl || !ctaEl || !wireframeTemplate || !contentEl || !stageEl) return;
+
+		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		let currentId: string | null = null;
+
+		// Wireframe glyph fallback — see the comment above the <template> in
+		// the markup: this is a deliberate, permanent "concept / coming soon"
+		// display, not a stopgap to strip out once photos exist. Whether an
+		// item shows a real photo vs. this glyph is driven purely by whether
+		// `image` is set on it (see ShowcaseItem in ShowcaseCarousel.astro) —
+		// there's currently no separate flag distinguishing "no photo yet"
+		// from "designed to stay conceptual forever"; both render identically
+		// here today because, right now, every showcase item is in the same
+		// "no real photo yet" state.
+		function renderVisual(image: string | null, title: string) {
+			visualSlot.innerHTML = '';
+			if (image) {
+				const img = document.createElement('img');
+				img.src = image;
+				img.alt = title;
+				img.className = 'holo-image';
+				visualSlot.appendChild(img);
+			} else {
+				visualSlot.appendChild(wireframeTemplate.content.cloneNode(true));
+			}
+		}
+
+		function playEntrance() {
+			if (prefersReducedMotion) return;
+			// Restart the CSS entrance animation on repeated selections: class
+			// removal + re-addition alone wouldn't restart it (same class,
+			// same frame), so force a reflow in between.
+			contentEl!.classList.remove('is-refreshing');
+			stageEl!.classList.remove('is-refreshing');
+			void contentEl!.offsetWidth;
+			contentEl!.classList.add('is-refreshing');
+			stageEl!.classList.add('is-refreshing');
+		}
+
+		function applySelection(detail: HoloSelectDetail) {
+			if (detail.id === currentId) return; // Re-selecting the active card — nothing changed, skip the animation churn.
+			currentId = detail.id;
+			titleEl!.textContent = detail.title;
+			summaryEl!.textContent = detail.summary;
+			ctaEl!.href = detail.href;
+			renderVisual(detail.image, detail.title);
+			playEntrance();
+		}
+
+		document.addEventListener(
+			'holopreview:select',
+			(event) => {
+				const detail = (event as CustomEvent<HoloSelectDetail>).detail;
+				if (!detail) return;
+				applySelection(detail);
+			},
+			{ signal }
+		);
+	}
+
+	document.addEventListener('astro:page-load', initHoloPreviewPanel);
+</script>
+
+<style>
+	/* Fixed dark "display screen" backdrop — explicit hex, deliberately NOT
+	   var(--color-bg)/--color-surface/--color-text (those flip with the
+	   site's light/dark theme). This panel is meant to read as its own
+	   embedded hologram projector, identical in both site themes. */
+	.holo-panel {
+		background: radial-gradient(ellipse 120% 90% at 50% 20%, #0d1c2b 0%, #060b14 65%, #04070d 100%);
+		padding: 4.5rem 1.5rem 5rem;
+		overflow: hidden;
+	}
+
+	.holo-panel-inner {
+		max-width: 1200px;
+		margin: 0 auto;
+		display: grid;
+		grid-template-columns: minmax(280px, 440px) 1fr;
+		align-items: center;
+		gap: clamp(2rem, 5vw, 4rem);
+	}
+
+	/* --- Stage (platform + light column + product visual + particles) --- */
+	.holo-stage-frame {
+		/* Explicit width, not just relying on grid's default item-stretch —
+		   the mobile breakpoint below switches .holo-panel-inner to
+		   `justify-items: center`, which stops grid items stretching to
+		   their track's full width. Without this, this flex container's own
+		   width becomes shrink-to-fit-based-on-children while its child
+		   (.holo-stage) tries to size itself at 100% of THIS element — a
+		   circular percentage that browsers resolve to 0, collapsing the
+		   entire hologram to nothing on mobile (confirmed via a real
+		   375px-viewport render: .holo-stage measured 0×0 without this). */
+		width: 100%;
+		display: flex;
+		justify-content: center;
+	}
+
+	.holo-stage {
+		position: relative;
+		width: 100%;
+		max-width: 420px;
+		aspect-ratio: 1 / 1;
+		overflow: hidden;
+		perspective: 700px;
+	}
+
+	.holo-particles {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+	}
+
+	.holo-particle {
+		position: absolute;
+		left: var(--x, 50%);
+		bottom: 20%;
+		width: 4px;
+		height: 4px;
+		border-radius: 50%;
+		background: var(--color-teal);
+		filter: blur(1.5px);
+		opacity: 0;
+	}
+
+	.holo-light-column {
+		position: absolute;
+		left: 50%;
+		bottom: 16%;
+		top: 6%;
+		width: 46%;
+		transform: translateX(-50%);
+		background: linear-gradient(to top, rgba(var(--color-teal-rgb), 0.4), rgba(var(--color-teal-rgb), 0.12) 55%, transparent 100%);
+		clip-path: polygon(30% 100%, 70% 100%, 88% 0%, 12% 0%);
+		filter: blur(16px);
+	}
+
+	.holo-image-wrap {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding-bottom: 14%;
+	}
+
+	.holo-visual-bob {
+		width: 62%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.holo-image {
+		max-width: 100%;
+		max-height: 220px;
+		width: auto;
+		height: auto;
+		object-fit: contain;
+		border-radius: 8px;
+		filter: saturate(0.85) brightness(1.12) contrast(1.02);
+		outline: 1px solid rgba(var(--color-teal-rgb), 0.55);
+		outline-offset: 4px;
+		box-shadow: 0 0 30px rgba(var(--color-teal-rgb), 0.45), 0 0 70px rgba(var(--color-teal-rgb), 0.2);
+	}
+
+	.holo-visual-spin {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transform-style: preserve-3d;
+	}
+
+	.holo-wireframe {
+		width: min(60%, 200px);
+		height: auto;
+		overflow: visible;
+		filter: drop-shadow(0 0 10px rgba(var(--color-teal-rgb), 0.55));
+	}
+
+	.holo-wireframe polygon,
+	.holo-wireframe line {
+		fill: none;
+		stroke: var(--color-teal);
+		stroke-width: 1.4;
+	}
+
+	/* --- Platform: layered gradient discs faking a metal circular base --- */
+	.holo-platform {
+		position: absolute;
+		left: 50%;
+		bottom: 8%;
+		width: 74%;
+		aspect-ratio: 3 / 1;
+		transform: translateX(-50%);
+	}
+
+	.holo-platform-ring-outer,
+	.holo-platform-ring-mid,
+	.holo-platform-ring-inner {
+		position: absolute;
+		inset: 0;
+		border-radius: 50%;
+	}
+
+	.holo-platform-ring-outer {
+		background:
+			repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.09) 0deg 4deg, rgba(255, 255, 255, 0.02) 4deg 8deg),
+			radial-gradient(ellipse at center, rgba(var(--color-teal-rgb), 0.25) 0%, transparent 70%);
+		box-shadow: 0 0 40px 4px rgba(var(--color-teal-rgb), 0.2);
+	}
+
+	.holo-platform-ring-mid {
+		inset: 16% 14%;
+		background: radial-gradient(ellipse at center, #1a2836 0%, #0c141d 100%);
+		border: 1px solid rgba(var(--color-teal-rgb), 0.3);
+	}
+
+	.holo-platform-ring-inner {
+		inset: 34% 30%;
+		background: radial-gradient(ellipse at center, rgba(var(--color-teal-rgb), 0.85) 0%, rgba(var(--color-teal-rgb), 0.25) 60%, transparent 100%);
+		box-shadow: 0 0 25px 6px rgba(var(--color-teal-rgb), 0.55);
+	}
+
+	/* --- Content --- */
+	.holo-content {
+		text-align: left;
+	}
+
+	.holo-eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono, monospace);
+		font-size: 0.75rem;
+		font-weight: 500;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--color-teal);
+		margin-bottom: 0.75rem;
+	}
+
+	.holo-title {
+		font-family: var(--font-display, inherit);
+		font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+		font-weight: 600;
+		color: #f2fafb;
+		margin: 0 0 0.85rem;
+		line-height: 1.3;
+	}
+
+	.holo-summary {
+		font-size: 0.98rem;
+		line-height: 1.65;
+		color: #9db2bc;
+		margin: 0 0 1.75rem;
+		max-width: 46ch;
+	}
+
+	.holo-cta {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: var(--color-teal);
+		color: #04141a;
+		padding: 0.8rem 1.5rem;
+		border-radius: 4px;
+		font-family: var(--font-display, inherit);
+		font-weight: 600;
+		font-size: 0.92rem;
+		letter-spacing: 0.01em;
+		box-shadow: 0 6px 20px rgba(var(--color-teal-rgb), 0.35);
+		transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+	}
+
+	.holo-cta:hover,
+	.holo-cta:focus-visible {
+		background: #00d9eb;
+		transform: translateY(-2px);
+		box-shadow: 0 10px 26px rgba(var(--color-teal-rgb), 0.45);
+	}
+
+	.holo-cta svg {
+		flex-shrink: 0;
+	}
+
+	/* --- Entrance retrigger (fade/scale in on selection change) --- */
+	@media (prefers-reduced-motion: no-preference) {
+		.holo-content.is-refreshing,
+		.holo-stage.is-refreshing {
+			animation: holoEnter 0.36s ease;
+		}
+	}
+
+	@keyframes holoEnter {
+		from {
+			opacity: 0;
+			transform: scale(0.96);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+
+	/* --- Motion: bob, particle drift, wireframe spin. All gated behind
+	   prefers-reduced-motion — the static layout above is already a complete
+	   hologram on its own (platform, light column, glowing image/wireframe),
+	   so "reduced motion" here just means "the same display, holding still". */
+	@media (prefers-reduced-motion: no-preference) {
+		.holo-visual-bob {
+			animation: holoBob 3.6s ease-in-out infinite;
+		}
+
+		.holo-visual-spin {
+			animation: holoSpin 13s linear infinite;
+		}
+
+		.holo-particle {
+			animation-name: holoParticleRise;
+			animation-timing-function: ease-in;
+			animation-iteration-count: infinite;
+			animation-duration: var(--dur, 5s);
+			animation-delay: var(--delay, 0s);
+		}
+	}
+
+	@keyframes holoBob {
+		0%,
+		100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(-14px);
+		}
+	}
+
+	@keyframes holoSpin {
+		from {
+			transform: rotateY(0deg);
+		}
+		to {
+			transform: rotateY(360deg);
+		}
+	}
+
+	@keyframes holoParticleRise {
+		0% {
+			opacity: 0;
+			transform: translateY(0) scale(0.8);
+		}
+		15% {
+			opacity: 0.85;
+		}
+		80% {
+			opacity: 0.4;
+		}
+		100% {
+			opacity: 0;
+			transform: translateY(-170px) scale(1.1);
+		}
+	}
+
+	@media (max-width: 860px) {
+		.holo-panel-inner {
+			grid-template-columns: 1fr;
+			justify-items: center;
+			text-align: center;
+		}
+
+		.holo-content {
+			text-align: center;
+		}
+
+		.holo-summary {
+			margin-left: auto;
+			margin-right: auto;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.holo-panel {
+			padding: 3.5rem 1.25rem 4rem;
+		}
+
+		.holo-stage {
+			max-width: 300px;
+		}
+	}
+</style>

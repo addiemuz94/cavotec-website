@@ -2,6 +2,10 @@
 import { Image } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
 import CavotecLogo from '../assets/cavotec-logo.png';
+import LindosLogo from '../assets/brands/lindos.png';
+import AstronicsLogo from '../assets/brands/astronics.png';
+import RedwoodLogo from '../assets/brands/redwood.png';
+import DoeweLogo from '../assets/brands/doewe.png';
 import NavFlyout, { type MenuItem } from '../components/NavFlyout.astro';
 
 interface Props {
@@ -20,7 +24,7 @@ const {
 const footerCompanyLinks = [
 	{ href: '/', label: 'Home' },
 	{ href: '/our-company', label: 'Our Company' },
-	{ href: '/case-studies', label: 'Case Studies' },
+	{ href: '/news-events/', label: 'News/Event' },
 	{ href: '/contact', label: 'Contact' },
 ];
 
@@ -34,17 +38,17 @@ const ourBusinessMenu: MenuItem[] = [
 		href: '/services',
 		label: 'Services',
 		children: [
-			{ href: '/product/calibration/', label: 'Calibration and Test Measurement' },
-			{ href: '/product/repair-work-service/', label: 'Repair Work' },
-			{ href: '/product/equipment-rental/', label: 'Equipment Rental' },
-			{ href: '/product/training/', label: 'Training' },
+			{ href: '/services/calibration-test-measurement/', label: 'Calibration and Test Measurement' },
+			{ href: '/services/repair-work/', label: 'Repair Work' },
+			{ href: '/services/equipment-rental/', label: 'Equipment Rental' },
+			{ href: '/services/training/', label: 'Training' },
 			{
-				href: '/product/customize-solution-provider/',
+				href: '/services/customize-solution-provider/',
 				label: 'Customize Solution Provider',
 				children: [
-					{ href: '/product/customize-solution-provider/electronic-design-service', label: 'Electronic Design Service' },
-					{ href: '/product/customize-solution-provider/3d-design-service', label: '3D Design Service' },
-					{ href: '/product/rd-service/', label: 'New Product R&D and Innovation' },
+					{ href: '/services/customize-solution-provider/electronic-design-service', label: 'Electronic Design Service' },
+					{ href: '/services/customize-solution-provider/3d-design-service', label: '3D Design Service' },
+					{ href: '/services/rd-service/', label: 'New Product R&D and Innovation' },
 				],
 			},
 		],
@@ -53,6 +57,37 @@ const ourBusinessMenu: MenuItem[] = [
 		href: '/products',
 		label: 'Products',
 		children: [
+			{
+				href: '/product/test-equipment-measurement/',
+				label: 'Test Equipment and Measurement Instrument',
+				children: [
+					{ href: '/product/test-equipment-measurement/lindos/', label: 'LINDOS', logo: LindosLogo, logoAlt: 'LINDOS logo' },
+					// Slug is "freedom-astronics" (no slash — not URL-safe as-is);
+					// the display label keeps the brand's real "/" as given.
+					// Logo art (astronics.png) only shows "ASTRONICS" branding, not
+					// "FREEDOM" — see the flag on this in freedom-astronics.astro's
+					// own frontmatter comment; using it here regardless per
+					// instruction, pending confirmation these aren't actually two
+					// separate brands that got merged into one nav entry.
+					{
+						href: '/product/test-equipment-measurement/freedom-astronics/',
+						label: 'FREEDOM/ASTRONICS',
+						logo: AstronicsLogo,
+						logoAlt: 'ASTRONICS logo',
+					},
+					{ href: '/product/test-equipment-measurement/redwood/', label: 'REDWOOD', logo: RedwoodLogo, logoAlt: 'REDWOOD logo' },
+					// DOEWE's logo is white/light-colored art with a teal accent —
+					// needs the dark chip variant, or it disappears against the
+					// default light chip (see BrandLogoChip.astro).
+					{
+						href: '/product/test-equipment-measurement/doewe/',
+						label: 'DOEWE',
+						logo: DoeweLogo,
+						logoAlt: 'DOEWE logo',
+						logoChipVariant: 'dark',
+					},
+				],
+			},
 			{
 				href: '/product/calibration-test-measurement/',
 				label: 'ATE System',
@@ -77,13 +112,16 @@ const headerNavLinks = [
 	{ href: '/', label: 'Home' },
 	{ href: '/our-company', label: 'Our Company' },
 	{ label: 'Our Business', megaMenu: ourBusinessMenu },
-	{ href: '/case-studies', label: 'Case Studies' },
+	{ href: '/news-events/', label: 'News/Event' },
 	{ href: '/contact', label: 'Contact' },
 ];
 
 // Only Facebook and YouTube are confirmed accounts for now. YouTube's href
 // is a placeholder ("#") until the real channel URL is provided — do not
-// point it at a guessed URL.
+// point it at a guessed URL. src/pages/news-events.astro has the same open
+// item for its own YouTube section (a real embed, currently placeholder) —
+// update BOTH this link and that page's embed together once the channel
+// URL/handle is confirmed, not just one of them.
 const socialLinks = [
 	{ label: 'Facebook', href: 'https://www.facebook.com/cavotecmalaysia', icon: 'facebook' },
 	{ label: 'YouTube', href: '#', icon: 'youtube' },
@@ -133,6 +171,21 @@ const socialLinks = [
 			// visible flash — same guarantee as the first-paint call above,
 			// just repeated on every subsequent transition.
 			document.addEventListener('astro:after-swap', applyStoredTheme);
+
+			// Back/forward-cache restore: if the browser serves a page back out
+			// of bfcache (e.g. the user hard-navigated away and then hit Back)
+			// instead of re-parsing it, the DOM is repainted exactly as it was
+			// frozen — neither astro:after-swap nor astro:page-load fires, since
+			// no real navigation/swap actually happens. If the stored theme
+			// preference changed while that page was frozen (toggled in another
+			// tab, or via a hard navigation elsewhere in between), the restored
+			// page would keep showing its stale, frozen [data-theme] until a
+			// real reload. `pageshow` with event.persisted === true is the
+			// standard signal for exactly this case (see MDN's bfcache
+			// guidance) — re-run the same resolution here to close that gap.
+			window.addEventListener('pageshow', function (event) {
+				if (event.persisted) applyStoredTheme();
+			});
 		</script>
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />

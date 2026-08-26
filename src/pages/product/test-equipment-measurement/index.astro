@@ -1,0 +1,397 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+// PLACEHOLDER CONTENT — this category landing page mirrors the structure of
+// /product/iot/ (src/pages/product/iot/index.astro): hero + short overview
+// + a grid linking out to each nested brand page, no How It Works/FAQ/
+// comparison-table sections. Those sections fit IoT (one coherent
+// technology with a real deployment workflow to walk through) but don't
+// obviously fit "a category grouping 4 distinct instrument brands" — kept
+// deliberately minimal instead of forcing content that doesn't apply. Add
+// them later if there turns out to be a real cross-brand story to tell.
+//
+// Brand names below are the 4 confirmed brands; taglines/descriptions are
+// generic, plausible placeholder copy pending real input from Cavotec.
+const brands = [
+	{
+		href: '/product/test-equipment-measurement/lindos/',
+		name: 'LINDOS',
+		tagline: 'Precision audio and broadcast test instruments.',
+	},
+	{
+		href: '/product/test-equipment-measurement/freedom-astronics/',
+		name: 'FREEDOM/ASTRONICS',
+		tagline: 'Rugged test and measurement solutions for demanding environments.',
+	},
+	{
+		href: '/product/test-equipment-measurement/redwood/',
+		name: 'REDWOOD',
+		tagline: 'General-purpose test and measurement instrumentation.',
+	},
+	{
+		href: '/product/test-equipment-measurement/doewe/',
+		name: 'DOEWE',
+		tagline: 'Specialist broadcast and RF measurement systems.',
+	},
+];
+---
+
+<Layout
+	title="Test Equipment and Measurement Instrument — Cavotec Malaysia Sdn Bhd"
+	description="Cavotec Malaysia's test equipment and measurement instrument brands, including LINDOS, FREEDOM/ASTRONICS, REDWOOD, and DOEWE."
+>
+	<section class="page-header">
+		<div class="page-header-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="page-header-inner" data-reveal>
+			<span class="eyebrow">Products</span>
+			<h1>Test Equipment and Measurement Instrument</h1>
+			<p class="product-tagline">
+				A curated line of test equipment and measurement instrument brands, brought in by Cavotec
+				Malaysia to support precise, reliable measurement across your operations.
+			</p>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="product-overview">
+		<div class="product-overview-inner">
+			<div class="product-image-placeholder" data-reveal>
+				<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<rect x="3" y="4" width="18" height="16" rx="2" />
+					<circle cx="8.5" cy="9.5" r="1.5" />
+					<path d="M21 16l-5.5-5.5a1.5 1.5 0 0 0-2.1 0L4 19" />
+				</svg>
+				<strong>Test Equipment and Measurement Instrument</strong>
+				<span>Product image — coming soon</span>
+			</div>
+
+			<div class="product-description" data-reveal style="--reveal-i: 1;">
+				<h2>About This Category</h2>
+				<p>
+					Cavotec Malaysia brings together test equipment and measurement instrument brands
+					selected for reliability across audio, broadcast, RF, and general-purpose measurement
+					work. Each brand below has its own dedicated page, with individual products to be added
+					as details are confirmed.
+				</p>
+				<p>
+					Browse the brands below to see what's available today, or get in touch with our team to
+					discuss which instruments best fit your application.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="brand-grid-section">
+		<div class="brand-grid-inner">
+			<h2 data-reveal>Our Brands</h2>
+			<div class="brand-grid">
+				{
+					brands.map((brand, index) => (
+						<a href={brand.href} class="brand-card tech-card" data-shine data-reveal style={`--reveal-i: ${index};`}>
+							<span class="brand-card-name">{brand.name}</span>
+							<span class="brand-card-tagline">{brand.tagline}</span>
+							<svg class="brand-card-arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<path d="M5 12h14M13 6l6 6-6 6" />
+							</svg>
+						</a>
+					))
+				}
+			</div>
+		</div>
+	</section>
+
+	<section class="closing-cta">
+		<div class="closing-cta-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="closing-cta-inner" data-reveal>
+			<h2>Looking for a Specific Instrument?</h2>
+			<p>Get in touch and our team will help you find the right test equipment for your needs.</p>
+			<div class="product-cta-group">
+				<a href="/contact?subject=Test%20Equipment%20and%20Measurement%20Instrument" class="btn btn-accent">Enquire Now</a>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	/* Page header — same recipe used on every other page; each page keeps
+	   its own copy since this <style> block is scoped to this file. */
+	.page-header {
+		position: relative;
+		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem 3.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.page-header-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image:
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px),
+			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: radial-gradient(ellipse at center, black 15%, transparent 75%);
+	}
+
+	.page-header-inner {
+		max-width: 760px;
+		margin: 0 auto;
+		position: relative;
+	}
+
+	.eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-amber);
+		margin-bottom: 0.75rem;
+	}
+
+	.page-header h1 {
+		font-size: clamp(2rem, 4.5vw, 2.75rem);
+		font-weight: 700;
+		margin: 0 0 0.85rem;
+	}
+
+	.product-tagline {
+		font-size: 1.05rem;
+		line-height: 1.6;
+		color: var(--color-ink-muted);
+		max-width: 56ch;
+		margin: 0 auto;
+	}
+
+	/* Overview */
+	.product-overview {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.product-overview-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+		display: grid;
+		grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+		gap: 3rem;
+		align-items: start;
+	}
+
+	.product-image-placeholder {
+		aspect-ratio: 4 / 3;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.6rem;
+		text-align: center;
+		padding: 1.5rem;
+		color: var(--color-text-muted);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		background: repeating-linear-gradient(
+			135deg,
+			var(--color-indigo),
+			var(--color-indigo) 10px,
+			var(--color-surface) 10px,
+			var(--color-surface) 20px
+		);
+		position: sticky;
+		top: calc(var(--header-height) + 1.5rem);
+	}
+
+	.product-image-placeholder strong {
+		font-size: 1rem;
+		color: var(--color-text);
+	}
+
+	.product-image-placeholder span {
+		font-size: 0.8rem;
+	}
+
+	.product-description h2 {
+		font-size: 1.4rem;
+		color: var(--color-text);
+		margin: 0 0 1.25rem;
+	}
+
+	.product-description p {
+		font-size: 0.98rem;
+		line-height: 1.75;
+		color: var(--color-text-muted);
+		margin: 0 0 1.25rem;
+	}
+
+	@media (max-width: 860px) {
+		.product-overview-inner {
+			grid-template-columns: 1fr;
+			gap: 2rem;
+		}
+
+		.product-image-placeholder {
+			position: static;
+			max-width: 380px;
+			margin: 0 auto;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.product-overview {
+			padding: 3.5rem 1.25rem;
+		}
+	}
+
+	/* Brands grid */
+	.brand-grid-section {
+		background: var(--color-bg-alt);
+		padding: 5rem 1.5rem;
+	}
+
+	.brand-grid-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+	}
+
+	.brand-grid-section h2 {
+		text-align: center;
+		font-size: clamp(1.6rem, 3vw, 2.2rem);
+		color: var(--color-ink);
+		margin: 0 0 3rem;
+		position: relative;
+	}
+
+	.brand-grid-section h2::after {
+		content: '';
+		display: block;
+		width: 64px;
+		height: 3px;
+		background: var(--color-teal);
+		margin: 0.9rem auto 0;
+		border-radius: 2px;
+	}
+
+	.brand-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: 1.75rem;
+	}
+
+	.brand-card {
+		/* background-color, not the background shorthand — see the matching
+		   comment on other tech-cards in this codebase for why. */
+		background-color: var(--color-bg);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		padding: 2rem 1.75rem;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.6rem;
+		color: inherit;
+	}
+
+	.brand-card-name {
+		font-family: var(--font-display);
+		font-size: 1.2rem;
+		font-weight: 700;
+		color: var(--color-text);
+		letter-spacing: 0.02em;
+	}
+
+	.brand-card-tagline {
+		font-size: 0.9rem;
+		line-height: 1.55;
+		color: var(--color-text-muted);
+	}
+
+	.brand-card-arrow {
+		margin-top: 0.5rem;
+		color: var(--color-teal);
+		transition: transform 0.2s ease;
+	}
+
+	.brand-card:hover .brand-card-arrow,
+	.brand-card:focus-visible .brand-card-arrow {
+		transform: translateX(4px);
+	}
+
+	@media (max-width: 600px) {
+		.brand-grid-section {
+			padding: 3.5rem 1.25rem;
+		}
+	}
+
+	/* Closing CTA */
+	.closing-cta {
+		position: relative;
+		background: var(--color-indigo);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.closing-cta-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image: repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: linear-gradient(to bottom, black, transparent);
+	}
+
+	.closing-cta-inner {
+		max-width: 640px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.closing-cta h2 {
+		font-size: clamp(1.5rem, 3vw, 2rem);
+		margin: 0;
+	}
+
+	.closing-cta p {
+		font-size: 1rem;
+		color: var(--color-ink-muted);
+		margin: -0.75rem 0 0;
+	}
+
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.85rem 2rem;
+		border-radius: 4px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: 0.01em;
+		border: none;
+		cursor: pointer;
+		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+	}
+
+	.btn-accent {
+		background: var(--color-teal);
+		color: var(--color-on-accent);
+		box-shadow: 0 6px 20px rgba(var(--color-teal-rgb), 0.35);
+	}
+
+	.btn-accent:hover,
+	.btn-accent:focus-visible {
+		background: #00d9eb;
+		transform: translateY(-2px);
+		box-shadow: 0 10px 26px rgba(var(--color-teal-rgb), 0.45);
+	}
+</style>

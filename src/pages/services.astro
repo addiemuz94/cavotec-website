@@ -1,15 +1,19 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { services } from '../data/services';
 
 // Mirrors the "Our Business" mega-menu structure in Layout.astro — keep the
-// anchors and hierarchy here in sync with `ourBusinessMenu` there.
-const tocLinks = [
-	{ href: '#calibration', label: 'Calibration' },
-	{ href: '#repair-work', label: 'Repair Work' },
-	{ href: '#equipment-rental', label: 'Equipment Rental' },
-	{ href: '#training', label: 'Training' },
-	{ href: '#customize-solution-provider', label: 'Customize Solution Provider' },
-];
+// anchors and hierarchy here in sync with `ourBusinessMenu` there. Derived
+// from `services` (id/title) rather than hand-listed, so this can't drift
+// from the section headings actually rendered below.
+const tocLinks = services.map((service) => ({ href: `#${service.id}`, label: service.title }));
+
+// The first 4 services render as plain full-width blocks below; Customize
+// Solution Provider (services[4]) gets its own richer section further down
+// (intro paragraph + nested sub-service cards) since it isn't a single flat
+// description the way the other 4 are.
+const simpleServices = services.slice(0, 4);
+const customizeService = services[4];
 
 const customizeSubServices = [
 	{
@@ -58,108 +62,30 @@ const customizeSubServices = [
 
 	<div class="tick-divider" aria-hidden="true"></div>
 
-	<section class="service-block anchor" id="calibration">
-		<div class="service-block-inner">
-			<span class="service-block-icon" aria-hidden="true">
-				<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-					<circle cx="12" cy="9" r="6" />
-					<path d="M9 14.5L7 22l5-3 5 3-2-7.5" />
-					<path d="M9.5 9l1.8 1.8L14.5 7.5" />
-				</svg>
-			</span>
-			<div class="service-block-body" data-reveal>
-				<h2>Calibration</h2>
-				<p>
-					Cavotec Malaysia has calibrated equipment from over 2,400 manufacturers. All
-					laboratories, including the Mobile Calibration Laboratory, are NATA accredited and ISO
-					certified, with calibration provided to manufacturers' specifications and NATA
-					reporting available.
-				</p>
-			</div>
-		</div>
-	</section>
+	{
+		simpleServices.map((service, index) => (
+			<>
+				<section class:list={['service-block', 'anchor', { alt: index % 2 === 1 }]} id={service.id}>
+					<div class="service-block-inner">
+						<span class="service-block-icon" aria-hidden="true" set:html={service.iconSvg} />
+						<div class="service-block-body" data-reveal>
+							{service.comingSoon && <span class="placeholder-tag">Coming soon</span>}
+							<h2>{service.title}</h2>
+							<p>{service.description}</p>
+						</div>
+					</div>
+				</section>
+				<div class="tick-divider" aria-hidden="true" />
+			</>
+		))
+	}
 
-	<div class="tick-divider" aria-hidden="true"></div>
-
-	<section class="service-block alt anchor" id="repair-work">
-		<div class="service-block-inner">
-			<span class="service-block-icon" aria-hidden="true">
-				<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M14.7 6.3a4 4 0 0 0-5.4 4.6L4 16.2V20h3.8l5.3-5.3a4 4 0 0 0 4.6-5.4l-2.6 2.6-2-2 2.6-2.6z" />
-				</svg>
-			</span>
-			<div class="service-block-body" data-reveal>
-				<h2>Repair Work</h2>
-				<p>
-					Cavotec Malaysia has been providing repair and service solutions since 2006, covering
-					defense, manufacturing, and other high-tech sectors, with deep experience in Tektronix
-					and Fluke equipment.
-				</p>
-			</div>
-		</div>
-	</section>
-
-	<div class="tick-divider" aria-hidden="true"></div>
-
-	<section class="service-block anchor" id="equipment-rental">
-		<div class="service-block-inner">
-			<span class="service-block-icon" aria-hidden="true">
-				<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-					<rect x="3" y="5" width="18" height="16" rx="2" />
-					<path d="M3 10h18M8 3v4M16 3v4" />
-					<path d="M12 14v3l2 1" />
-				</svg>
-			</span>
-			<div class="service-block-body" data-reveal>
-				<span class="placeholder-tag">Coming soon</span>
-				<h2>Equipment Rental</h2>
-				<p>
-					Short-term and long-term rental of calibrated test and measurement equipment, so teams
-					can scale up capacity without a capital purchase — full rental terms and available
-					inventory will be published here soon.
-				</p>
-			</div>
-		</div>
-	</section>
-
-	<div class="tick-divider" aria-hidden="true"></div>
-
-	<section class="service-block alt anchor" id="training">
-		<div class="service-block-inner">
-			<span class="service-block-icon" aria-hidden="true">
-				<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M2 9l10-5 10 5-10 5-10-5z" />
-					<path d="M6 11v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5" />
-					<path d="M22 9v6" />
-				</svg>
-			</span>
-			<div class="service-block-body" data-reveal>
-				<span class="placeholder-tag">Coming soon</span>
-				<h2>Training</h2>
-				<p>
-					Hands-on and classroom training on test equipment operation, calibration procedures,
-					and best practices for in-house maintenance teams — a detailed course catalog and
-					schedule will be published here soon.
-				</p>
-			</div>
-		</div>
-	</section>
-
-	<div class="tick-divider" aria-hidden="true"></div>
-
-	<section class="customize-section anchor" id="customize-solution-provider">
+	<section class="customize-section anchor" id={customizeService.id}>
 		<div class="customize-inner">
-			<span class="service-block-icon customize-icon" aria-hidden="true">
-				<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-					<circle cx="12" cy="12" r="3" />
-					<path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z" />
-				</svg>
-			</span>
-			<h2 class="section-heading" data-reveal>Customize Solution Provider</h2>
+			<span class="service-block-icon customize-icon" aria-hidden="true" set:html={customizeService.iconSvg} />
+			<h2 class="section-heading" data-reveal>{customizeService.title}</h2>
 			<p class="customize-intro" data-reveal style="--reveal-i: 1;">
-				For requirements that off-the-shelf equipment can't meet, our engineering team designs
-				and builds custom solutions end-to-end — from electronics, through mechanical design, to
-				new product development.
+				{customizeService.description}
 			</p>
 			<div class="customize-grid">
 				{customizeSubServices.map((service, index) => (

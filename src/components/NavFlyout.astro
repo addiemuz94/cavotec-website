@@ -1,4 +1,6 @@
 ---
+import BrandLogoChip from './product/BrandLogoChip.astro';
+
 // Recursive cascading flyout menu, used for the header "Our Business" nav
 // item. Each MenuItem with `children` renders its own nested <NavFlyout>
 // (via Astro.self) inside its own row — so a child panel is always a DOM
@@ -13,10 +15,28 @@
 // Depth is unbounded — Products > IoT > Smart Key Management System sits at
 // level 3 today, but a 4th level would render identically with no template
 // changes.
+//
+// `logo` is optional and currently only set on the 4 Test Equipment and
+// Measurement Instrument brand entries (see ourBusinessMenu in
+// Layout.astro) — a small BrandLogoChip renders next to the label when
+// present. It's additive, not a replacement: `label` still renders
+// regardless, so removing/missing a logo never leaves a row without its
+// text.
+//
+// `logoChipVariant` picks which fixed chip backdrop that logo needs
+// ('light', the default, or 'dark' — see BrandLogoChip.astro) based on the
+// brand's own logo colors, not the site's current theme. Per-item, not
+// global: most brands' logos read fine on the default light chip; a brand
+// with light/white art in its own logo (e.g. DOEWE) needs the dark variant
+// instead, and any brand added later just sets whichever its own logo
+// needs.
 export interface MenuItem {
 	href: string;
 	label: string;
 	external?: boolean;
+	logo?: ImageMetadata;
+	logoAlt?: string;
+	logoChipVariant?: 'light' | 'dark';
 	children?: MenuItem[];
 }
 
@@ -44,7 +64,12 @@ const { items, level = 1, id } = Astro.props;
 						aria-expanded={item.children ? 'false' : undefined}
 						aria-label={item.external ? `${item.label} (opens in a new tab)` : undefined}
 					>
-						<span class="flyout-label">{item.label}</span>
+						<span class="flyout-label-group">
+							{item.logo && (
+								<BrandLogoChip src={item.logo} alt={item.logoAlt ?? `${item.label} logo`} size="nav" variant={item.logoChipVariant} />
+							)}
+							<span class="flyout-label">{item.label}</span>
+						</span>
 						{item.external && (
 							<svg class="external-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 								<path d="M7 17L17 7" />
@@ -99,6 +124,20 @@ const { items, level = 1, id } = Astro.props;
 
 	.flyout-panel[data-level="1"] .flyout-row > .flyout-link {
 		font-weight: 600;
+	}
+
+	/* Wraps logo chip + label as one flex child so a row with a logo
+	   (currently just the 4 Test Equipment brand entries) still has exactly
+	   the same two-item shape (this group, then chevron/external-icon/
+	   nothing) the surrounding .flyout-link's `justify-content: space-between`
+	   already assumes — without this, a logo-only leaf row (no chevron to
+	   balance against) would have the chip and label pushed to opposite
+	   ends of the row instead of sitting together. */
+	.flyout-label-group {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-width: 0;
 	}
 
 	.flyout-chevron,

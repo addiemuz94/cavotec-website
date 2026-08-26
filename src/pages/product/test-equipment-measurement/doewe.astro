@@ -1,0 +1,313 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import BrandProductGrid, { type BrandProduct } from '../../../components/product/BrandProductGrid.astro';
+import BrandLogoChip from '../../../components/product/BrandLogoChip.astro';
+import DoeweLogo from '../../../assets/brands/doewe.png';
+
+// PLACEHOLDER CONTENT — brand name, positioning statement, and description
+// below are generic, plausible placeholder copy pending real input from
+// Cavotec/DOEWE. This page deliberately uses a different template than the
+// single-product pages (e.g. smart-key-management-system.astro): a brand
+// page describes the brand and lists MULTIPLE products under it over time,
+// so there's no single-product hero/features pairing, and no How It Works/
+// FAQ/comparison-table sections — those assume one product with one
+// workflow to walk through, which doesn't fit a brand listing. Add such
+// sections per-product later if a given product ends up needing them.
+const brandName = 'DOEWE';
+const positioningStatement = 'Specialist broadcast and RF measurement systems.';
+
+// PLACEHOLDER CONTENT — supplier-attribution wording pending real/confirmed
+// phrasing. This states a supply relationship (Cavotec brings in/supplies
+// this third-party brand), not a certification/accreditation claim — keep
+// it framed that way if this text changes later.
+const supplierLine = `Cavotec Malaysia supplies ${brandName} test and measurement products.`;
+
+// PLACEHOLDER CONTENT — single stand-in product card until real DOEWE
+// products are confirmed and added. BrandProductGrid renders one card per
+// entry, so adding real products later is just adding entries here.
+const brandProducts: BrandProduct[] = [
+	{
+		name: 'DOEWE Product — Coming Soon',
+		description: 'A DOEWE product will be listed here once details are confirmed.',
+	},
+];
+---
+
+<Layout
+	title={`${brandName} — Test Equipment and Measurement Instrument — Cavotec Malaysia Sdn Bhd`}
+	description={`${brandName} test and measurement instruments, available through Cavotec Malaysia Sdn Bhd.`}
+>
+	<section class="page-header">
+		<div class="page-header-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="page-header-inner" data-reveal>
+			<span class="eyebrow">Products / Test Equipment and Measurement Instrument</span>
+			<!-- Logo chip is the visual hero treatment now; the heading stays in
+			     the DOM (visually hidden) so the brand name is still a real
+			     <h1> for accessibility/SEO rather than only existing as image
+			     alt text. -->
+			<h1 class="visually-hidden">{brandName}</h1>
+			<div class="brand-hero-logo">
+				{/* DOEWE's logo is white/light-colored art with a teal accent —
+				    needs the dark chip variant (variant="dark"), or it
+				    disappears against the default light chip regardless of
+				    site theme (see BrandLogoChip.astro). Keep this in sync with
+				    the matching logoChipVariant: 'dark' on this brand's nav
+				    entry in Layout.astro. */}
+				<BrandLogoChip src={DoeweLogo} alt={`${brandName} logo`} size="hero" variant="dark" />
+			</div>
+			<p class="brand-supplier-line">{supplierLine}</p>
+			<p class="product-tagline">{positioningStatement}</p>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="brand-about">
+		<div class="brand-about-inner" data-reveal>
+			<h2>About {brandName}</h2>
+			<p>
+				{brandName} is one of the test equipment and measurement instrument brands Cavotec Malaysia
+				brings to customers who need dependable, precise measurement tools. Full brand background
+				and product line details are being finalized and will be added here.
+			</p>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<section class="brand-products">
+		<div class="brand-products-inner">
+			<h2 data-reveal>Products</h2>
+			<BrandProductGrid products={brandProducts} />
+		</div>
+	</section>
+
+	<section class="closing-cta">
+		<div class="closing-cta-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="closing-cta-inner" data-reveal>
+			<h2>Interested in {brandName}?</h2>
+			<p>Get in touch and our team will help you find the right instrument for your needs.</p>
+			<div class="product-cta-group">
+				<a href={`/contact?subject=${encodeURIComponent(brandName)}%20Enquiry`} class="btn btn-accent">Enquire Now</a>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	/* Page header — same recipe used on every other page; each page keeps
+	   its own copy since this <style> block is scoped to this file. */
+	.page-header {
+		position: relative;
+		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem 3.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.page-header-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image:
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px),
+			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: radial-gradient(ellipse at center, black 15%, transparent 75%);
+	}
+
+	.page-header-inner {
+		max-width: 760px;
+		margin: 0 auto;
+		position: relative;
+	}
+
+	.eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-amber);
+		margin-bottom: 0.75rem;
+	}
+
+	.page-header h1 {
+		font-size: clamp(2rem, 4.5vw, 2.75rem);
+		font-weight: 700;
+		margin: 0 0 0.85rem;
+	}
+
+	.product-tagline {
+		font-size: 1.05rem;
+		line-height: 1.6;
+		color: var(--color-ink-muted);
+		max-width: 56ch;
+		margin: 0 auto;
+	}
+
+	/* Standard sr-only pattern — keeps the brand name a real, focusable-order
+	   <h1> in the DOM for accessibility/SEO without it competing visually
+	   with the logo chip, which is the actual hero visual now. */
+	.visually-hidden {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.brand-hero-logo {
+		display: flex;
+		justify-content: center;
+		margin: 0 0 1.25rem;
+	}
+
+	.brand-supplier-line {
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.02em;
+		color: var(--color-teal);
+		margin: 0 0 1rem;
+	}
+
+	/* Brand description */
+	.brand-about {
+		background: var(--color-bg);
+		padding: 4.5rem 1.5rem;
+	}
+
+	.brand-about-inner {
+		max-width: 760px;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.brand-about h2 {
+		font-size: 1.4rem;
+		color: var(--color-text);
+		margin: 0 0 1.25rem;
+	}
+
+	.brand-about p {
+		font-size: 0.98rem;
+		line-height: 1.75;
+		color: var(--color-text-muted);
+		margin: 0;
+	}
+
+	@media (max-width: 600px) {
+		.brand-about {
+			padding: 3.5rem 1.25rem;
+		}
+	}
+
+	/* Products */
+	.brand-products {
+		background: var(--color-bg-alt);
+		padding: 5rem 1.5rem;
+	}
+
+	.brand-products-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+	}
+
+	.brand-products h2 {
+		text-align: center;
+		font-size: clamp(1.6rem, 3vw, 2.2rem);
+		color: var(--color-ink);
+		margin: 0 0 3rem;
+		position: relative;
+	}
+
+	.brand-products h2::after {
+		content: '';
+		display: block;
+		width: 64px;
+		height: 3px;
+		background: var(--color-teal);
+		margin: 0.9rem auto 0;
+		border-radius: 2px;
+	}
+
+	@media (max-width: 600px) {
+		.brand-products {
+			padding: 3.5rem 1.25rem;
+		}
+	}
+
+	/* Closing CTA */
+	.closing-cta {
+		position: relative;
+		background: var(--color-indigo);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.closing-cta-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image: repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: linear-gradient(to bottom, black, transparent);
+	}
+
+	.closing-cta-inner {
+		max-width: 640px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.closing-cta h2 {
+		font-size: clamp(1.5rem, 3vw, 2rem);
+		margin: 0;
+	}
+
+	.closing-cta p {
+		font-size: 1rem;
+		color: var(--color-ink-muted);
+		margin: -0.75rem 0 0;
+	}
+
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.85rem 2rem;
+		border-radius: 4px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: 0.01em;
+		border: none;
+		cursor: pointer;
+		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+	}
+
+	.btn-accent {
+		background: var(--color-teal);
+		color: var(--color-on-accent);
+		box-shadow: 0 6px 20px rgba(var(--color-teal-rgb), 0.35);
+	}
+
+	.btn-accent:hover,
+	.btn-accent:focus-visible {
+		background: #00d9eb;
+		transform: translateY(-2px);
+		box-shadow: 0 10px 26px rgba(var(--color-teal-rgb), 0.45);
+	}
+</style>

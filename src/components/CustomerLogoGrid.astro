@@ -1,0 +1,120 @@
+---
+import type { Customer } from '../data/customers';
+
+// A logo-wall grid for the homepage "Our Customers" section. Deliberately a
+// separate component from product/BrandLogoChip.astro rather than reusing
+// it: BrandLogoChip is a small inline chip meant to sit next to a brand name
+// in nav/text (supplier attribution), where this renders fixed-height tiles
+// in a standalone wall (customer attribution) — different purpose, different
+// layout shape, so it gets its own file even though both end up styling a
+// small logo.
+//
+// Every entry today has no `logoSrc` (see data/customers.ts — real logos are
+// pending content + permission from customers), so every card currently
+// renders the placeholder branch below. That's a permanent fallback this
+// component keeps supporting, not dead code to remove once real logos land —
+// any future customer added without art yet (e.g. logo still pending on
+// their end) falls back to it too.
+interface Props {
+	customers: Customer[];
+}
+
+const { customers } = Astro.props;
+---
+
+<div class="customer-grid">
+	{
+		customers.map((customer, index) => {
+			const Tag = customer.href ? 'a' : 'div';
+			return (
+				<Tag
+					class="customer-tile"
+					href={customer.href}
+					data-reveal
+					style={`--reveal-i: ${index % 6};`}
+				>
+					{customer.logoSrc ? (
+						<img class="customer-logo" src={customer.logoSrc} alt={customer.name} loading="lazy" />
+					) : (
+						<span class="customer-placeholder" aria-label={customer.name}>
+							<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<rect x="3" y="4" width="18" height="16" rx="2" />
+								<circle cx="8.5" cy="9.5" r="1.5" />
+								<path d="M21 16l-5.5-5.5a1.5 1.5 0 0 0-2.1 0L4 19" />
+							</svg>
+							<span class="customer-placeholder-label">Logo</span>
+						</span>
+					)}
+				</Tag>
+			);
+		})
+	}
+</div>
+
+<style>
+	.customer-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+		gap: 1.25rem;
+	}
+
+	.customer-tile {
+		height: 96px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: var(--color-bg-alt);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		padding: 1rem;
+		color: inherit;
+		transition: border-color 0.2s ease, transform 0.15s ease;
+	}
+
+	a.customer-tile:hover,
+	a.customer-tile:focus-visible {
+		border-color: var(--color-teal);
+		transform: translateY(-2px);
+	}
+
+	.customer-logo {
+		max-width: 100%;
+		max-height: 100%;
+		object-fit: contain;
+		/* Muted-by-default, full color on hover/focus — a common, low-cost
+		   treatment for logo walls with mismatched source colors. Only takes
+		   effect once real logoSrc art exists; harmless no-op today. */
+		filter: grayscale(1) opacity(0.7);
+		transition: filter 0.2s ease;
+	}
+
+	.customer-tile:hover .customer-logo,
+	.customer-tile:focus-visible .customer-logo {
+		filter: grayscale(0) opacity(1);
+	}
+
+	/* Placeholder state — every tile today. Reads as a deliberate "logo
+	   coming soon" slot (dashed border + muted icon + caption), not a
+	   missing-content bug. */
+	.customer-placeholder {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.35rem;
+		color: var(--color-text-muted);
+		opacity: 0.6;
+	}
+
+	.customer-tile:has(.customer-placeholder) {
+		border-style: dashed;
+		background-color: transparent;
+	}
+
+	.customer-placeholder-label {
+		font-family: var(--font-mono);
+		font-size: 0.68rem;
+		font-weight: 500;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+</style>

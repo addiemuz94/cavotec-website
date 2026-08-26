@@ -1,0 +1,393 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { services } from '../data/services';
+import { productCategories } from '../data/productCategories';
+
+// Summary landing page for "Our Business" — two sections (Services,
+// Products) of short cards, each linking straight to its real page. Card
+// visual pattern is copied from /services' .customize-card (icon circle +
+// heading + paragraph, tech-card hover/shine) rather than inventing a new
+// card style — the only functional difference is that these cards are real
+// links (.customize-card itself isn't clickable, it's a static summary
+// block), which every card here needs to be so it can go straight to its
+// product/service page.
+const sections = [
+	{ id: 'services', title: 'Services', items: services, viewAllHref: '/services', viewAllLabel: 'View All Services' },
+	{ id: 'products', title: 'Products', items: productCategories, viewAllHref: '/products', viewAllLabel: 'View All Products' },
+];
+---
+
+<Layout
+	title="Our Business — Cavotec Malaysia Sdn Bhd"
+	description="An overview of Cavotec Malaysia's services and products — calibration, repair work, equipment rental, training, custom solutions, ATE systems, IoT, and test equipment brands."
+>
+	<section class="page-header">
+		<div class="page-header-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="page-header-inner" data-reveal>
+			<span class="eyebrow">Our Business</span>
+			<h1>Services &amp; Products</h1>
+			<p class="page-tagline">
+				A quick look at everything Cavotec Malaysia offers. Explore each summary below, or visit
+				a section's own page for full details.
+			</p>
+		</div>
+	</section>
+
+	<nav class="page-subnav" aria-label="Sections on this page">
+		<div class="page-subnav-inner">
+			{sections.map((section) => (
+				<a href={`#${section.id}`}>{section.title}</a>
+			))}
+		</div>
+	</nav>
+
+	{
+		sections.map((section, sectionIndex) => (
+			<>
+				<div class="tick-divider" aria-hidden="true" />
+				<section class:list={['summary-section', 'anchor', { alt: sectionIndex % 2 === 1 }]} id={section.id}>
+					<div class="summary-section-inner">
+						<h2 class="section-heading" data-reveal>{section.title}</h2>
+						<div class="summary-grid">
+							{section.items.map((item, index) => (
+								<a href={item.href} class="summary-card tech-card" data-shine data-reveal style={`--reveal-i: ${index};`}>
+									<span class="summary-card-icon" aria-hidden="true" set:html={item.iconSvg} />
+									{'comingSoon' in item && item.comingSoon && <span class="placeholder-tag">Coming soon</span>}
+									<h3>{item.title}</h3>
+									<p>{item.description}</p>
+								</a>
+							))}
+						</div>
+						<div class="summary-section-cta">
+							<a href={section.viewAllHref} class="btn btn-outline">{section.viewAllLabel}</a>
+						</div>
+					</div>
+				</section>
+			</>
+		))
+	}
+
+	<section class="closing-cta">
+		<div class="closing-cta-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="closing-cta-inner" data-reveal>
+			<h2>Need Help Choosing?</h2>
+			<p>Get in touch and our team will point you to the right service or product.</p>
+			<div class="product-cta-group">
+				<a href="/contact" class="btn btn-accent">Get in Touch</a>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	/* Page header — same recipe used on every other page; each page keeps
+	   its own copy since this <style> block is scoped to this file. */
+	.page-header {
+		position: relative;
+		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem 3.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.page-header-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image:
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px),
+			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: radial-gradient(ellipse at center, black 15%, transparent 75%);
+	}
+
+	.page-header-inner {
+		max-width: 760px;
+		margin: 0 auto;
+		position: relative;
+	}
+
+	.eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-amber);
+		margin-bottom: 0.75rem;
+	}
+
+	.page-header h1 {
+		font-size: clamp(2rem, 4.5vw, 2.75rem);
+		font-weight: 700;
+		margin: 0 0 0.85rem;
+	}
+
+	.page-tagline {
+		font-size: 1.05rem;
+		line-height: 1.6;
+		color: var(--color-ink-muted);
+		max-width: 56ch;
+		margin: 0 auto;
+	}
+
+	/* In-page table of contents — same pattern as /services' .page-subnav. */
+	.page-subnav {
+		background: var(--color-bg);
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.page-subnav-inner {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 1rem 1.5rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+		justify-content: center;
+	}
+
+	.page-subnav a {
+		font-family: var(--font-mono);
+		font-size: 0.76rem;
+		font-weight: 500;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+		background: var(--color-bg-alt);
+		border: 1px solid var(--color-border);
+		border-radius: 999px;
+		padding: 0.45rem 0.95rem;
+		transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+	}
+
+	.page-subnav a:hover,
+	.page-subnav a:focus-visible {
+		color: var(--color-teal-dark, #018b96);
+		border-color: var(--color-teal);
+		background: rgba(var(--color-teal-rgb), 0.08);
+	}
+
+	/* Anchor targets sit under a sticky header, so give scroll position
+	   some breathing room instead of tucking straight under it. */
+	.anchor {
+		scroll-margin-top: calc(var(--header-height) + 1.25rem);
+	}
+
+	.section-heading {
+		font-size: clamp(1.6rem, 3vw, 2.2rem);
+		color: var(--color-ink);
+		margin: 0 0 3rem;
+		text-align: center;
+		position: relative;
+	}
+
+	.section-heading::after {
+		content: '';
+		display: block;
+		width: 64px;
+		height: 3px;
+		background: var(--color-teal);
+		margin: 0.9rem auto 0;
+		border-radius: 2px;
+	}
+
+	.summary-section {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+	}
+
+	.summary-section.alt {
+		background: var(--color-bg-alt);
+	}
+
+	.summary-section-inner {
+		max-width: 1100px;
+		margin: 0 auto;
+	}
+
+	/* Card grid — visually copied from /services' .customize-grid/
+	   .customize-card (icon circle + heading + paragraph), not a new card
+	   style. See the frontmatter comment for why these are <a> elements
+	   instead of .customize-card's plain non-clickable <div>. */
+	.summary-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+		gap: 1.75rem;
+	}
+
+	.summary-card {
+		/* background-color, not the background shorthand — [data-shine]'s own
+		   background-image (see Layout.astro) needs that slot left alone. */
+		background-color: var(--color-bg-alt);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		padding: 2rem 1.75rem;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.15rem;
+		color: inherit;
+		/* Matches .customize-card/.service-card/.product-card/.iot-item —
+		   without its own transition this fights the scroll-reveal's
+		   lingering 0.7s transition (see [data-reveal] in Layout.astro),
+		   making the hover-lift sluggish instead of snappy. */
+		transition: transform 0.25s ease, box-shadow 0.25s ease;
+	}
+
+	.summary-section.alt .summary-card {
+		background-color: var(--color-bg);
+	}
+
+	.summary-card-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		background: rgba(var(--color-teal-rgb), 0.12);
+		color: var(--color-teal);
+		margin-bottom: 1rem;
+	}
+
+	/* The shared icon data is sized for /services' larger 64px icon circles
+	   (see the comment on ServiceItem.iconSvg) — scaled down to fit this
+	   page's smaller 48px circles instead of keeping a second, differently
+	   sized copy of the same markup. */
+	.summary-card-icon :global(svg) {
+		width: 24px;
+		height: 24px;
+	}
+
+	.summary-card h3 {
+		font-family: var(--font-display);
+		font-size: 1.05rem;
+		font-weight: 700;
+		color: var(--color-ink);
+		margin: 0 0 0.5rem;
+	}
+
+	.summary-card p {
+		font-size: 0.9rem;
+		line-height: 1.65;
+		color: var(--color-text-muted);
+		margin: 0;
+	}
+
+	.placeholder-tag {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-amber-dark);
+		background: rgba(var(--color-amber-rgb), 0.14);
+		padding: 0.3rem 0.7rem;
+		border-radius: 999px;
+		margin-bottom: 0.65rem;
+	}
+
+	.summary-section-cta {
+		text-align: center;
+		margin-top: 3rem;
+	}
+
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.85rem 2rem;
+		border-radius: 4px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: 0.01em;
+		border: none;
+		cursor: pointer;
+		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+	}
+
+	.btn-outline {
+		background: transparent;
+		color: var(--color-teal-dark, #018b96);
+		border: 1.5px solid var(--color-teal);
+	}
+
+	.btn-outline:hover,
+	.btn-outline:focus-visible {
+		background: var(--color-teal);
+		color: var(--color-on-accent);
+		transform: translateY(-2px);
+		box-shadow: 0 8px 20px rgba(var(--color-teal-rgb), 0.35);
+	}
+
+	.btn-accent {
+		background: var(--color-teal);
+		color: var(--color-on-accent);
+		box-shadow: 0 6px 20px rgba(var(--color-teal-rgb), 0.35);
+	}
+
+	.btn-accent:hover,
+	.btn-accent:focus-visible {
+		background: #00d9eb;
+		transform: translateY(-2px);
+		box-shadow: 0 10px 26px rgba(var(--color-teal-rgb), 0.45);
+	}
+
+	/* Closing CTA */
+	.closing-cta {
+		position: relative;
+		background: var(--color-indigo);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.closing-cta-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image: repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: linear-gradient(to bottom, black, transparent);
+	}
+
+	.closing-cta-inner {
+		max-width: 640px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.closing-cta h2 {
+		font-size: clamp(1.5rem, 3vw, 2rem);
+		margin: 0;
+	}
+
+	.closing-cta p {
+		font-size: 1rem;
+		color: var(--color-ink-muted);
+		margin: -0.75rem 0 0;
+	}
+
+	@media (max-width: 640px) {
+		.page-header {
+			padding: 3.5rem 1.25rem 2.75rem;
+		}
+
+		.page-subnav-inner {
+			padding: 0.85rem 1.25rem;
+		}
+
+		.summary-section {
+			padding: 3.25rem 1.25rem;
+		}
+	}
+</style>

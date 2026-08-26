@@ -1,0 +1,394 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const FACEBOOK_PAGE_URL = 'https://www.facebook.com/cavotecmalaysia';
+
+// YouTube channel URL/handle is not confirmed yet — same open item as
+// socialLinks' YouTube entry in Layout.astro (see the comment there). This
+// section renders a placeholder until it's available; update BOTH this
+// page and that footer link together once confirmed, not just one.
+const YOUTUBE_PLACEHOLDER = true;
+---
+
+<Layout
+	title="News/Event — Cavotec Malaysia Sdn Bhd"
+	description="Latest news and updates from Cavotec Malaysia — follow along on Facebook and YouTube."
+>
+	<section class="page-header">
+		<div class="page-header-grid" aria-hidden="true" data-parallax-bg></div>
+		<div class="page-header-inner" data-reveal>
+			<span class="eyebrow">Stay Connected</span>
+			<h1>News/Event</h1>
+			<p class="page-tagline">The latest updates from Cavotec Malaysia, straight from our social channels.</p>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- Facebook: wired up now via the official Page Plugin (fb-root + SDK
+	     script, initialized below). No custom API/backend/token needed —
+	     the plugin renders the page's real, live timeline directly. -->
+	<section class="social-section" id="facebook">
+		<div class="social-section-inner">
+			<h2 class="section-heading" data-reveal>Latest from Facebook</h2>
+			<!-- Fixed-dark frame — same reasoning as HoloPreviewPanel's own
+			     "self-contained display" treatment: the Facebook Page Plugin's
+			     iframe is set to its own dark color scheme below
+			     (data-color-scheme="dark") regardless of the site's light/dark
+			     toggle, since re-parsing the widget on every theme change to
+			     match isn't worth the complexity for an embed that isn't part
+			     of the site's own design system. Explicit hex, not theme
+			     tokens, so this frame doesn't flip and clash with the widget's
+			     fixed-dark iframe. -->
+			<div class="social-embed-frame" data-reveal style="--reveal-i: 1;">
+				<div
+					class="fb-page"
+					data-href={FACEBOOK_PAGE_URL}
+					data-tabs="timeline"
+					data-small-header="true"
+					data-adapt-container-width="true"
+					data-hide-cover="false"
+					data-show-facepile="false"
+					data-color-scheme="dark"
+				>
+					<blockquote cite={FACEBOOK_PAGE_URL} class="fb-xfbml-parse-ignore">
+						<a href={FACEBOOK_PAGE_URL}>Cavotec Malaysia Sdn Bhd</a>
+					</blockquote>
+				</div>
+			</div>
+			<a href={FACEBOOK_PAGE_URL} target="_blank" rel="noopener noreferrer" class="btn btn-accent">
+				Visit our Facebook
+				<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+					<path d="M15 3h6v6M10 14L21 3" />
+				</svg>
+			</a>
+		</div>
+	</section>
+
+	<div class="tick-divider" aria-hidden="true"></div>
+
+	<!-- YouTube: PLACEHOLDER — no real channel URL/handle confirmed yet (see
+	     the frontmatter comment and the matching one on socialLinks in
+	     Layout.astro). Two real embed options once the channel is known,
+	     left open rather than pre-deciding:
+	       (a) Official channel/uploads-playlist iframe embed — simplest, no
+	           API key, auto-updates as new videos post:
+	           <iframe src="https://www.youtube.com/embed/videoseries?list=UUxxxxxxxxxxxxxxxxxxxxxxxx"
+	                   title="Cavotec Malaysia YouTube uploads" allowfullscreen />
+	           (the uploads playlist ID is the channel ID with "UC" swapped
+	           for "UU").
+	       (b) YouTube Data API (search.list / playlistItems.list) — more
+	           control over layout (e.g. a custom grid of thumbnails/titles
+	           matching this site's own card style instead of YouTube's
+	           player chrome), at the cost of an API key and quota
+	           management.
+	     Whoever wires this up picks (a) or (b) based on how much layout
+	     control is actually needed then — nothing here commits to one. -->
+	<section class="social-section alt" id="youtube">
+		<div class="social-section-inner">
+			<h2 class="section-heading" data-reveal>Latest from YouTube</h2>
+			<div class="social-embed-frame youtube-placeholder" data-reveal style="--reveal-i: 1;">
+				<span class="placeholder-tag">Coming soon</span>
+				<span class="youtube-placeholder-icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+						<rect x="2" y="5" width="20" height="14" rx="3" />
+						<path d="M10 9.5v5l4.5-2.5z" fill="currentColor" stroke="none" />
+					</svg>
+				</span>
+				<p>Our YouTube channel is confirmed and on the way — video updates will show up here once it's live.</p>
+			</div>
+			<a href="#" class="btn btn-outline" aria-disabled="true" tabindex="-1">
+				Visit our YouTube channel
+				<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+					<path d="M15 3h6v6M10 14L21 3" />
+				</svg>
+			</a>
+		</div>
+	</section>
+</Layout>
+
+<script>
+	// Facebook Page Plugin — homepage-effect pattern used elsewhere in this
+	// project (astro:page-load / astro:before-swap), adapted for a
+	// third-party SDK rather than plain listeners:
+	//
+	// The FB SDK is designed to run its parse pass ONCE, on its own load —
+	// it doesn't know or care about ClientRouter navigations. <main> (and
+	// the .fb-page div inside it) gets replaced on every ClientRouter swap,
+	// so landing on this page a second time via client-side nav (not a hard
+	// refresh) leaves a fresh, unparsed .fb-page div in the DOM that the
+	// already-loaded SDK will never notice on its own (confirmed: its
+	// auto-parse only ever fires once, at initial script load). The fix is
+	// explicit: check whether `window.FB` already exists from an earlier
+	// visit in this SPA session, and if so, call FB.XFBML.parse() ourselves
+	// against the new container instead of waiting for an auto-parse that
+	// isn't coming.
+	//
+	// No AbortController here (unlike this project's other page-load
+	// inits) — there's nothing to clean up on astro:before-swap. The SDK
+	// script and window.FB are global and meant to persist for the whole
+	// SPA session regardless of which page is active; re-running this
+	// function is naturally idempotent via the getElementById checks below,
+	// so there's no listener/timer leak risk to guard against.
+	function initFacebookEmbed() {
+		const container = document.querySelector<HTMLElement>('[data-reveal] .fb-page, .fb-page');
+		if (!container) return; // Not on /news-events this navigation.
+
+		// fb-root is required exactly once in the document for the SDK to
+		// mount into. It's rendered inside <main> (see fb-root check below)
+		// which is replaced on every navigation, so re-create it if a
+		// previous visit's copy is gone.
+		if (!document.getElementById('fb-root')) {
+			const fbRoot = document.createElement('div');
+			fbRoot.id = 'fb-root';
+			document.body.prepend(fbRoot);
+		}
+
+		const win = window as typeof window & { FB?: any; fbAsyncInit?: () => void };
+
+		if (win.FB) {
+			// SDK already loaded from an earlier visit this session — its
+			// one-time auto-parse already happened against a since-discarded
+			// DOM, so parse the current .fb-page explicitly instead.
+			win.FB.XFBML.parse(container.parentElement ?? container);
+			return;
+		}
+
+		win.fbAsyncInit = function () {
+			win.FB?.init({ xfbml: true, version: 'v19.0' });
+		};
+
+		if (!document.getElementById('facebook-jssdk')) {
+			const script = document.createElement('script');
+			script.id = 'facebook-jssdk';
+			script.src = 'https://connect.facebook.net/en_US/sdk.js';
+			script.async = true;
+			script.defer = true;
+			script.crossOrigin = 'anonymous';
+			document.body.appendChild(script);
+		}
+	}
+
+	document.addEventListener('astro:page-load', initFacebookEmbed);
+</script>
+
+<style>
+	/* Page header — same recipe used on every other page; each page keeps
+	   its own copy since this <style> block is scoped to this file. */
+	.page-header {
+		position: relative;
+		background: linear-gradient(135deg, var(--color-indigo-dark) 0%, var(--color-indigo) 55%, var(--color-indigo-light) 100%);
+		color: var(--color-ink);
+		padding: 4.5rem 1.5rem 3.5rem;
+		text-align: center;
+		overflow: hidden;
+		isolation: isolate;
+	}
+
+	.page-header-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background-image:
+			repeating-linear-gradient(90deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px),
+			repeating-linear-gradient(0deg, rgba(var(--color-teal-rgb), 0.08) 0 1px, transparent 1px 48px);
+		mask-image: radial-gradient(ellipse at center, black 15%, transparent 75%);
+	}
+
+	.page-header-inner {
+		max-width: 760px;
+		margin: 0 auto;
+		position: relative;
+	}
+
+	.eyebrow {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-amber);
+		margin-bottom: 0.75rem;
+	}
+
+	.page-header h1 {
+		font-size: clamp(2rem, 4.5vw, 2.75rem);
+		font-weight: 700;
+		margin: 0 0 0.85rem;
+	}
+
+	.page-tagline {
+		font-size: 1.05rem;
+		line-height: 1.6;
+		color: var(--color-ink-muted);
+		max-width: 56ch;
+		margin: 0 auto;
+	}
+
+	.section-heading {
+		font-size: clamp(1.6rem, 3vw, 2.2rem);
+		color: var(--color-ink);
+		margin: 0 0 2.5rem;
+		text-align: center;
+		position: relative;
+	}
+
+	.section-heading::after {
+		content: '';
+		display: block;
+		width: 64px;
+		height: 3px;
+		background: var(--color-teal);
+		margin: 0.9rem auto 0;
+		border-radius: 2px;
+	}
+
+	/* Section wrapper — normal theme-aware tokens, same as every other page
+	   section on the site. Only the embed frame inside (below) is a fixed
+	   dark "screen", not this whole section. */
+	.social-section {
+		background: var(--color-bg);
+		padding: 5rem 1.5rem;
+		text-align: center;
+	}
+
+	.social-section.alt {
+		background: var(--color-bg-alt);
+	}
+
+	.social-section-inner {
+		max-width: 640px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	/* Fixed-dark embed frame — explicit hex, deliberately not
+	   var(--color-bg)/--color-surface (those flip with the site's theme).
+	   Both the live Facebook widget (its own dark color scheme) and the
+	   YouTube placeholder sit in this same fixed-dark "screen" treatment so
+	   the two sections read as one consistent pair regardless of site
+	   theme, and so Facebook's white-chrome-by-default iframe never has a
+	   moment of clashing against a light page background. */
+	.social-embed-frame {
+		width: 100%;
+		max-width: 500px;
+		min-height: 300px;
+		background: #12181f;
+		border: 1px solid #232b35;
+		border-radius: 12px;
+		padding: 1.25rem;
+		margin-bottom: 2rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+	}
+
+	/* The Facebook Page Plugin's own iframe is responsive via
+	   data-adapt-container-width, but constrain it defensively anyway so a
+	   slow-loading/failed embed can't force horizontal scroll while its
+	   real width is still being measured. */
+	.social-embed-frame :global(.fb-page),
+	.social-embed-frame :global(iframe) {
+		max-width: 100%;
+	}
+
+	.youtube-placeholder {
+		flex-direction: column;
+		gap: 0.85rem;
+		color: #7c8894;
+		text-align: center;
+		padding: 2.5rem 1.5rem;
+	}
+
+	.youtube-placeholder-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 72px;
+		height: 72px;
+		border-radius: 50%;
+		background: rgba(var(--color-teal-rgb), 0.14);
+		color: var(--color-teal);
+	}
+
+	.youtube-placeholder p {
+		margin: 0;
+		max-width: 32ch;
+		font-size: 0.92rem;
+		line-height: 1.6;
+	}
+
+	.placeholder-tag {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-amber-dark, var(--color-amber));
+		background: rgba(var(--color-amber-rgb), 0.16);
+		padding: 0.3rem 0.7rem;
+		border-radius: 999px;
+	}
+
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.85rem 2rem;
+		border-radius: 4px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 0.95rem;
+		letter-spacing: 0.01em;
+		border: none;
+		cursor: pointer;
+		transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+	}
+
+	.btn-accent {
+		background: var(--color-teal);
+		color: var(--color-on-accent);
+		box-shadow: 0 6px 20px rgba(var(--color-teal-rgb), 0.35);
+	}
+
+	.btn-accent:hover,
+	.btn-accent:focus-visible {
+		background: #00d9eb;
+		transform: translateY(-2px);
+		box-shadow: 0 10px 26px rgba(var(--color-teal-rgb), 0.45);
+	}
+
+	.btn-outline {
+		background: transparent;
+		color: var(--color-text-muted);
+		border: 1.5px solid var(--color-border);
+		cursor: not-allowed;
+	}
+
+	.btn-outline[aria-disabled='true'] {
+		pointer-events: none;
+		opacity: 0.7;
+	}
+
+	@media (max-width: 640px) {
+		.page-header {
+			padding: 3.5rem 1.25rem 2.75rem;
+		}
+
+		.social-section {
+			padding: 3.5rem 1.25rem;
+		}
+
+		.social-embed-frame {
+			padding: 1rem;
+			min-height: 260px;
+		}
+	}
+</style>

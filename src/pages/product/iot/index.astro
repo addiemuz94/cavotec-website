@@ -10,6 +10,39 @@ import ComparisonTable from '../../../components/product/ComparisonTable.astro';
 // level up, at /product/iot/). Copy below is generic, plausible placeholder
 // text for Cavotec's IoT capability generally, pending real details.
 
+// The 3 nested IoT products (mirrors ourBusinessMenu's IoT children in
+// Layout.astro — keep hrefs/labels in sync with that if either changes).
+// Descriptions are reused verbatim from copy already written elsewhere
+// rather than invented here: SKMS's is this page's own pre-existing
+// featured-product blurb, Integrated Alarm System's is its own page's hero
+// tagline (integrated-alarm-system.astro), and BMS's is the shorter
+// one-liner already used for it on products.astro (its own page's hero
+// tagline repeats the product name first, which reads redundantly in a
+// compact card).
+const iotProducts = [
+	{
+		href: '/product/iot/smart-key-management-system',
+		title: 'Smart Key Management System (eKMS)',
+		description: 'Secure, connected key control and tracking with a full digital audit trail.',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="4" /><path d="M11 11l9 9" /><path d="M17 17l2-2" /><path d="M15 19l2-2" /></svg>',
+	},
+	{
+		href: '/product/iot/integrated-alarm-system',
+		title: 'Integrated Alarm System',
+		description: 'Centralized, connected alarm monitoring and control for your facility.',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>',
+	},
+	{
+		href: '/product/iot/bms',
+		title: 'Smart Building Management and Monitoring System (BMS)',
+		description: 'Real-time building systems monitoring and management from a single connected platform.',
+		iconSvg:
+			'<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1" /><path d="M9 21v-4h6v4" /><path d="M8 7h2M14 7h2M8 11h2M14 11h2" /></svg>',
+	},
+];
+
 const features = [
 	'Custom IoT hardware and sensor integration',
 	'Cloud-connected dashboards for real-time visibility',
@@ -152,30 +185,30 @@ const comparisonRows = [
 
 	<div class="tick-divider" aria-hidden="true"></div>
 
-	<!-- Featured product: links to the existing, fully-built Smart Key
-	     Management System sub-page rather than duplicating its content. -->
+	<!-- All 3 nested IoT products — this used to be a single hardcoded card
+	     (Smart Key Management System only); fixed to render all of
+	     `iotProducts` so Integrated Alarm System and BMS actually show up
+	     too, same as every other category landing page's child-listing
+	     pattern (e.g. /product/test-equipment-measurement/'s brand grid). -->
 	<section class="featured-product">
 		<div class="featured-product-inner">
-			<span class="eyebrow-mono">Featured Product</span>
-			<a href="/product/iot/smart-key-management-system" class="featured-product-card tech-card" data-shine data-reveal>
-				<span class="featured-product-icon" aria-hidden="true">
-					<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-						<circle cx="8" cy="8" r="4" />
-						<path d="M11 11l9 9" />
-						<path d="M17 17l2-2" />
-						<path d="M15 19l2-2" />
-					</svg>
-				</span>
-				<span class="featured-product-body">
-					<span class="featured-product-title">Smart Key Management System (eKMS)</span>
-					<span class="featured-product-description">
-						Secure, connected key control and tracking with a full digital audit trail.
-					</span>
-				</span>
-				<svg class="featured-product-arrow" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M5 12h14M13 6l6 6-6 6" />
-				</svg>
-			</a>
+			<span class="eyebrow-mono">Products</span>
+			<div class="featured-product-grid">
+				{
+					iotProducts.map((product, index) => (
+						<a href={product.href} class="featured-product-card tech-card" data-shine data-reveal style={`--reveal-i: ${index};`}>
+							<span class="featured-product-icon" aria-hidden="true" set:html={product.iconSvg} />
+							<span class="featured-product-body">
+								<span class="featured-product-title">{product.title}</span>
+								<span class="featured-product-description">{product.description}</span>
+							</span>
+							<svg class="featured-product-arrow" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<path d="M5 12h14M13 6l6 6-6 6" />
+							</svg>
+						</a>
+					))
+				}
+			</div>
 		</div>
 	</section>
 
@@ -440,7 +473,9 @@ const comparisonRows = [
 	}
 
 	.featured-product-inner {
-		max-width: 780px;
+		/* Widened from the original single-card 780px — now hosts a 3-card
+		   grid, not one centered card. */
+		max-width: 1100px;
 		margin: 0 auto;
 	}
 
@@ -453,6 +488,12 @@ const comparisonRows = [
 		text-transform: uppercase;
 		color: var(--color-text-muted);
 		margin-bottom: 0.85rem;
+	}
+
+	.featured-product-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 1.5rem;
 	}
 
 	.featured-product-card {

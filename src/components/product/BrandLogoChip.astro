@@ -1,0 +1,110 @@
+---
+// Shared "supplier badge" chip for third-party instrument brand logos
+// (LINDOS, FREEDOM/ASTRONICS, REDWOOD, DOEWE) — used both in NavFlyout's
+// small nav-row treatment and each brand page's large hero treatment.
+//
+// Deliberately theme-invariant (unlike the Cavotec logo's own .logo-chip in
+// Layout.astro, which only applies in dark mode via
+// `:root:not([data-theme='light'])` — the header is light in light mode, so
+// Cavotec's own logo needs no backdrop there). These brand logos have
+// colors baked into their source art that aren't under this site's control
+// the way Cavotec's own brand color is, and a fixed chip backdrop behind
+// each, in both site themes, is the one treatment that keeps every logo
+// legible everywhere without needing separate light/dark logo art per
+// brand.
+//
+// `variant` picks WHICH fixed backdrop a given brand needs — most logos
+// (dark/colored art) read fine on the light backdrop ('light', the
+// default: navy ASTRONICS, red LINDOS/REDWOOD all pass easily), but a
+// brand with light/white art in its own logo (DOEWE: white wordmark + teal
+// accent) needs the dark backdrop ('dark') instead, or its light-on-light
+// text disappears regardless of site theme. This is a per-brand content
+// property, not a per-theme one — set it once where each brand's data is
+// defined (Layout.astro's nav entry, and again on that brand's own page),
+// not derived from [data-theme]. Additional brands added later just pick
+// whichever variant their own logo's colors need.
+import { Image } from 'astro:assets';
+
+interface Props {
+	src: ImageMetadata;
+	alt: string;
+	size?: 'nav' | 'hero';
+	variant?: 'light' | 'dark';
+}
+
+const { src, alt, size = 'hero', variant = 'light' } = Astro.props;
+---
+
+<span class={`brand-chip brand-chip-${size} brand-chip-${variant}`}>
+	<Image src={src} alt={alt} width={src.width} height={src.height} class="brand-chip-img" />
+</span>
+
+<style>
+	.brand-chip {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		/* Border/shadow are shared across both variants — --color-shadow-rgb
+		   is already a fixed constant, never overridden per theme (see
+		   Layout.astro), so it's safe here the same way the light variant's
+		   background is: neither needs to react to [data-theme]. */
+		border: 1px solid rgba(var(--color-shadow-rgb), 0.1);
+		box-shadow: 0 1px 3px rgba(var(--color-shadow-rgb), 0.14);
+	}
+
+	/* Explicit hex/rgba, not theme tokens, for both variants — each is a
+	   fixed backdrop regardless of site light/dark mode (see the
+	   frontmatter comment for why). */
+	.brand-chip-light {
+		/* Same value already used for Cavotec's own dark-mode logo chip (see
+		   Layout.astro) — reused here deliberately so both chip families
+		   read as the same visual language. */
+		background: rgba(242, 243, 245, 0.94);
+	}
+
+	.brand-chip-dark {
+		/* Same color as --color-surface-elevated's dark-mode value
+		   (--color-surface: #24272f in Layout.astro) — hardcoded rather than
+		   referencing the token itself, since that token flips to white in
+		   light mode and this chip must stay dark regardless of site theme. */
+		background: #24272f;
+	}
+
+	.brand-chip :global(.brand-chip-img) {
+		display: block;
+		width: auto;
+		max-width: 100%;
+	}
+
+	/* Nav flyout scale — sits inline next to the row's text label. */
+	.brand-chip-nav {
+		border-radius: 6px;
+		padding: 3px 7px;
+		flex-shrink: 0;
+	}
+
+	.brand-chip-nav :global(.brand-chip-img) {
+		height: 16px;
+	}
+
+	/* Brand-page hero scale — the primary visual in place of a plain text
+	   heading. */
+	.brand-chip-hero {
+		border-radius: 12px;
+		padding: 1rem 1.5rem;
+	}
+
+	.brand-chip-hero :global(.brand-chip-img) {
+		height: 56px;
+	}
+
+	@media (max-width: 480px) {
+		.brand-chip-hero {
+			padding: 0.85rem 1.25rem;
+		}
+
+		.brand-chip-hero :global(.brand-chip-img) {
+			height: 44px;
+		}
+	}
+</style>

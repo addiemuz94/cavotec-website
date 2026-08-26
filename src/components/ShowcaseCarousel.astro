@@ -15,6 +15,16 @@ export interface ShowcaseItem {
 	// Raw inner SVG markup (viewBox 0 0 24 24), same convention as
 	// HowItWorksFlow's iconSvg prop — rendered via set:html.
 	iconSvg: string;
+	// 2-3 sentence description shown by HoloPreviewPanel when this item is
+	// selected. Distinct from `tagline` (a few words, used on the card face
+	// itself) — this is the longer copy for the preview panel's body text.
+	summary: string;
+	// Real product/service photo for HoloPreviewPanel's hologram display.
+	// Omitted (or falsy) means "no real photo yet" — the panel renders a
+	// wireframe glyph in its place. See HoloPreviewPanel.astro for why that
+	// fallback is a permanent, intentional treatment rather than a temp
+	// placeholder.
+	image?: string;
 }
 
 interface Props {
@@ -39,21 +49,29 @@ const { items } = Astro.props;
 				<div class="showcase-track" data-carousel-track>
 					{
 						items.map((item, index) => (
-							<a
-								href={item.href}
+							// A <button>, not a link — cards no longer navigate anywhere
+							// themselves (see the click handler below). `item.href` is
+							// still carried as data-href purely so dispatchSelect() can
+							// pass it through to HoloPreviewPanel, whose own "View
+							// details" CTA is the only remaining way to reach the actual
+							// product page from this flow.
+							<button
+								type="button"
 								class="showcase-card tech-card"
 								data-shine
 								data-carousel-card
 								data-index={index}
-								role="group"
+								data-title={item.title}
+								data-summary={item.summary}
+								data-image={item.image ?? ''}
+								data-href={item.href}
 								aria-roledescription="slide"
 								aria-label={`${index + 1} of ${items.length}: ${item.title}`}
-								draggable="false"
 							>
 								<span class="showcase-card-icon" aria-hidden="true" set:html={item.iconSvg} />
 								<h3>{item.title}</h3>
 								<p>{item.tagline}</p>
-							</a>
+							</button>
 						))
 					}
 				</div>
@@ -104,7 +122,7 @@ const { items } = Astro.props;
 		if (!root) return; // Not on the homepage this navigation — no-op.
 
 		const stage = root.querySelector<HTMLElement>('[data-carousel-stage]');
-		const cards = Array.from(root.querySelectorAll<HTMLAnchorElement>('[data-carousel-card]'));
+		const cards = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-carousel-card]'));
 		// The dot strip is a SIBLING of [data-carousel] (see the markup above
 		// — .showcase-dots sits outside .showcase-carousel so it can center
 		// under the whole section, not just the stage), not a descendant of
@@ -123,6 +141,13 @@ const { items } = Astro.props;
 		let dragPreview = 0; // fractional card-steps offset while dragging
 		let autoTimer: number | null = null;
 		let idleResumeTimer: number | null = null;
+		// Once true, auto-rotate is done for the rest of this page visit — set
+		// by stopAutoRotatePermanently() the moment the visitor interacts with
+		// the carousel in any way (click, dot, arrow, keyboard nav, drag/swipe).
+		// startAuto()/scheduleIdleResume() both check this and refuse to start
+		// or schedule anything once it's true, so merely hovering/tabbing away
+		// afterward can never bring auto-rotate back.
+		let autoRotatePermanentlyStopped = false;
 
 		// Shortest signed wrap-distance from `active` to `index`, e.g. for 9
 		// cards, card 8 is -1 away from card 0 (not +8) — this is what keeps
@@ -166,10 +191,41 @@ const { items } = Astro.props;
 			});
 		}
 
+		// Tells HoloPreviewPanel (homepage only — the listener no-ops
+		// elsewhere) which card is now selected. Fired only for *explicit*
+		// selection (click-to-center, dot, arrow, keyboard, drag-snap — i.e.
+		// userInitiated goTo calls), not for ambient auto-rotate: the panel
+		// should track what a visitor actually chose, not flicker on its own
+		// every 3.5s while nobody's interacting with the carousel.
+		function dispatchSelect(index: number) {
+			const card = cards[index];
+			if (!card) return;
+			const href = card.dataset.href ?? '';
+			document.dispatchEvent(
+				new CustomEvent('holopreview:select', {
+					detail: {
+						id: href,
+						href,
+						title: card.dataset.title ?? '',
+						summary: card.dataset.summary ?? '',
+						image: card.dataset.image || null,
+					},
+				})
+			);
+		}
+
 		function goTo(index: number, { userInitiated = true } = {}) {
 			activeIndex = ((index % count) + count) % count;
 			render();
-			if (userInitiated) scheduleIdleResume();
+			if (userInitiated) {
+				// Every explicit selection — card click, dot, arrow, keyboard
+				// step, or a drag that snapped to a new card — permanently
+				// retires auto-rotate rather than the old "pause, then resume
+				// after a few seconds idle" behavior scheduleIdleResume() gave
+				// ambient hover/focus. See stopAutoRotatePermanently().
+				stopAutoRotatePermanently();
+				dispatchSelect(activeIndex);
+			}
 		}
 
 		function step(direction: 1 | -1, opts?: { userInitiated?: boolean }) {
@@ -178,7 +234,7 @@ const { items } = Astro.props;
 
 		// --- Auto-rotate -------------------------------------------------
 		function startAuto() {
-			if (prefersReducedMotion || autoTimer !== null || count < 2) return;
+			if (autoRotatePermanentlyStopped || prefersReducedMotion || autoTimer !== null || count < 2) return;
 			autoTimer = window.setInterval(() => step(1, { userInitiated: false }), 3500);
 		}
 
@@ -188,14 +244,36 @@ const { items } = Astro.props;
 			autoTimer = null;
 		}
 
+		// Ambient, temporary pause-and-resume for merely hovering the pointer
+		// over the carousel or tabbing focus into it — NOT a real interaction
+		// (no card was selected), so auto-rotate is still allowed to come back
+		// a few seconds after the pointer/focus leaves. Once
+		// autoRotatePermanentlyStopped is set this becomes a no-op past
+		// clearing whatever's currently running: it still stops the timer if
+		// asked, it just never schedules a new one.
 		function scheduleIdleResume() {
 			stopAuto();
 			if (idleResumeTimer !== null) window.clearTimeout(idleResumeTimer);
-			if (prefersReducedMotion) return;
+			if (autoRotatePermanentlyStopped || prefersReducedMotion) return;
 			idleResumeTimer = window.setTimeout(() => {
 				idleResumeTimer = null;
 				startAuto();
 			}, 4500);
+		}
+
+		// Permanent stop: called on every genuine interaction (click, dot,
+		// arrow, keyboard step, drag/swipe). Actually clears the interval and
+		// the pending resume timeout — doesn't just flip a flag while leaving
+		// either one ticking in the background — and the flag itself then
+		// blocks startAuto()/scheduleIdleResume() from ever starting a new one
+		// for the rest of this page visit.
+		function stopAutoRotatePermanently() {
+			autoRotatePermanentlyStopped = true;
+			stopAuto();
+			if (idleResumeTimer !== null) {
+				window.clearTimeout(idleResumeTimer);
+				idleResumeTimer = null;
+			}
 		}
 
 		// --- Arrows + dots -------------------------------------------------
@@ -224,24 +302,19 @@ const { items } = Astro.props;
 			{ signal }
 		);
 
-		// --- Click-to-center vs click-through ------------------------------
-		// The active card is a real link and navigates normally. Any other
-		// card intercepts its own click, brings itself to center instead of
-		// navigating away immediately, and does NOT count as a drag (see
-		// drag handling below, which sets wasDragging for genuine drags).
+		// --- Click-to-select --------------------------------------------
+		// Cards are buttons, not links (see the markup above) — a click never
+		// navigates anywhere. Every click centers that card (a no-op re-center
+		// if it's already active) and dispatches holopreview:select; the only
+		// way from here to the actual product page is HoloPreviewPanel's own
+		// "View details" CTA. wasDragging guards against a genuine drag's
+		// trailing synthesized click double-counting as a separate selection.
 		cards.forEach((card, index) => {
 			card.addEventListener(
 				'click',
-				(event) => {
-					if (wasDragging) {
-						event.preventDefault();
-						return;
-					}
-					if (index !== activeIndex) {
-						event.preventDefault();
-						goTo(index);
-					}
-					// index === activeIndex: let the <a> navigate normally.
+				() => {
+					if (wasDragging) return;
+					goTo(index);
 				},
 				{ signal }
 			);
@@ -285,11 +358,13 @@ const { items } = Astro.props;
 				dragging = true;
 				wasDragging = true;
 				stage!.classList.add('is-dragging');
-				stopAuto();
-				if (idleResumeTimer !== null) {
-					window.clearTimeout(idleResumeTimer);
-					idleResumeTimer = null;
-				}
+				// Crossing the drag threshold is itself the interaction — stop
+				// auto-rotate for good right here rather than waiting for
+				// pointerup (a drag that snaps to a new card goes through goTo()
+				// below and would hit this anyway, but a drag that snaps back to
+				// the same card never calls goTo(), so this is the only place
+				// that path is guaranteed to be covered).
+				stopAutoRotatePermanently();
 			}
 			// Dragging left (negative dx) reveals the NEXT card, dragging
 			// right reveals the PREVIOUS one — matches natural swipe intent.
@@ -311,12 +386,14 @@ const { items } = Astro.props;
 			if (stepsMoved !== 0) {
 				goTo(activeIndex + stepsMoved);
 			} else {
+				// Dragged back to the card that was already active — no goTo()
+				// call to go through, but stopAutoRotatePermanently() already
+				// ran when the drag started, so there's nothing left to resume.
 				render();
-				scheduleIdleResume();
 			}
 			// Clear the drag flag after this tick — a genuine drag's click
 			// (if the browser fires one at all after a real drag) still
-			// shouldn't count as navigation/centering.
+			// shouldn't count as a separate, redundant selection.
 			window.setTimeout(() => {
 				wasDragging = false;
 			}, 0);
@@ -439,6 +516,14 @@ const { items } = Astro.props;
 	}
 
 	.showcase-card {
+		/* Reset <button>'s native chrome/appearance — every other visual
+		   property below (background, border, font) already overrides the
+		   UA stylesheet, but Safari/iOS in particular can still keep native
+		   button-shaped appearance (rounded corners, shadow) underneath
+		   without this. */
+		appearance: none;
+		-webkit-appearance: none;
+		font: inherit;
 		/* background-color, not the shorthand — [data-shine]'s own
 		   background-image (see Layout.astro) needs that slot left alone. */
 		background-color: var(--color-bg-elevated);
@@ -464,16 +549,12 @@ const { items } = Astro.props;
 		z-index: calc(100 - (var(--abs-delta) * 10));
 		transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 		cursor: pointer;
-		/* These are <a> elements, which browsers make draggable by default —
-		   without this, a pointer-drag gesture starting on a card gets
-		   hijacked partway through by the browser's native link-drag (drag
-		   the link to a bookmark/new tab), which stops delivering pointermove
-		   events to this component's own drag handling entirely (confirmed
-		   via a raw event trace: movement just stops a few pixels in, no
-		   further pointermove ever arrives). draggable="false" on the
-		   element (see the markup above) is the primary fix; user-select and
-		   -webkit-user-drag reinforce it against text/image drag-selection
-		   starting the same native gesture from a slightly different path. */
+		/* Cards are <button> elements now (not links), so they're not
+		   natively draggable the way an <a>/<img> would be — but a
+		   pointer-drag gesture still needs to not turn into a text
+		   selection as it crosses the card's own heading/paragraph text,
+		   which user-select: none prevents. -webkit-user-drag is kept as a
+		   harmless belt-and-suspenders no-op. */
 		-webkit-user-drag: none;
 		user-select: none;
 		-webkit-user-select: none;

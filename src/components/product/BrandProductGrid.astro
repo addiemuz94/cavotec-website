@@ -1,0 +1,111 @@
+---
+// Shared "Products" grid for the brand landing pages under
+// /product/test-equipment-measurement/ (LINDOS, FREEDOM/ASTRONICS, REDWOOD,
+// DOEWE). Each brand page currently passes exactly one placeholder entry —
+// see the PLACEHOLDER CONTENT comment on each `brandProducts` array for why
+// — but the grid itself doesn't assume a count: as real products get added
+// per brand, more entries just get pushed into that page's array and this
+// component renders another card, no template changes needed here.
+export interface BrandProduct {
+	name: string;
+	description: string;
+}
+
+interface Props {
+	products: BrandProduct[];
+}
+
+const { products } = Astro.props;
+---
+
+<div class="brand-product-grid">
+	{
+		products.map((product, index) => (
+			<article class="brand-product-card tech-card" data-shine data-reveal style={`--reveal-i: ${index};`}>
+				<div class="brand-product-image">
+					<svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<rect x="3" y="4" width="18" height="16" rx="2" />
+						<circle cx="8.5" cy="9.5" r="1.5" />
+						<path d="M21 16l-5.5-5.5a1.5 1.5 0 0 0-2.1 0L4 19" />
+					</svg>
+				</div>
+				<div class="brand-product-body">
+					<span class="placeholder-tag">Coming soon</span>
+					<h3>{product.name}</h3>
+					<p>{product.description}</p>
+				</div>
+			</article>
+		))
+	}
+</div>
+
+<style>
+	.brand-product-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: 1.75rem;
+	}
+
+	.brand-product-card {
+		/* background-color, not the background shorthand — [data-shine]'s own
+		   background-image (see Layout.astro) needs that slot left alone. */
+		background-color: var(--color-bg-alt);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.brand-product-image {
+		aspect-ratio: 4 / 3;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--color-text-muted);
+		background: repeating-linear-gradient(
+			135deg,
+			var(--color-indigo),
+			var(--color-indigo) 10px,
+			var(--color-surface) 10px,
+			var(--color-surface) 20px
+		);
+		border-bottom: 1px dashed var(--color-border);
+	}
+
+	.brand-product-body {
+		padding: 1.75rem;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.6rem;
+	}
+
+	.placeholder-tag {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-amber-dark, var(--color-amber));
+		background: rgba(var(--color-amber-rgb), 0.14);
+		padding: 0.3rem 0.7rem;
+		border-radius: 999px;
+	}
+
+	.brand-product-body h3 {
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: var(--color-text);
+		margin: 0;
+	}
+
+	.brand-product-body p {
+		font-size: 0.9rem;
+		line-height: 1.6;
+		color: var(--color-text-muted);
+		margin: 0;
+	}
+</style>
